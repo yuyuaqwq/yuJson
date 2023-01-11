@@ -3,12 +3,11 @@
 #include <yuJson/json.hpp>
 
 
-
 int main()
 {
 	using yuJson::Json;
-	using yuJson::ast::String;
-	using yuJson::ast::Number;
+	using yuJson::value::String;
+	using yuJson::value::Number;
 
 	Json json;
 
