@@ -1,5 +1,5 @@
-#ifndef YUJSON_VALUE_JSON_H_
-#define YUJSON_VALUE_JSON_H_
+#ifndef YUJSON_JSON_H_
+#define YUJSON_JSON_H_
 
 #include <string>
 #include <memory>
@@ -132,4 +132,4 @@ private:
 
 } // namespace yuJson
 
-#endif // YUJSON_VALUE_JSON_H_
+#endif // YUJSON_JSON_H_
