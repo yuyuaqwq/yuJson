@@ -1,15 +1,8 @@
-#ifndef AST_VALUE_H_
-#define AST_VALUE_H_
-
-#include <exception>
+#ifndef YUJSON_AST_VALUE_H_
+#define YUJSON_AST_VALUE_H_
 
 namespace yuJson {
 namespace ast {
-
-class type_error : public std::exception {
-public:
-	type_error(const char* msg) : std::exception(msg) { }
-};
 
 enum class ValueType {
 	kNull = 0,
@@ -39,56 +32,56 @@ public:
 	bool IsBoolean() const noexcept {
 		return Type() == ValueType::kBoolean;
 	}
-	Boolean& ToBoolean() {
+	Boolean* ToBoolean() noexcept {
 		if (!IsBoolean())
 		{
-			throw type_error("not boolean");
+			return nullptr;
 		}
-		return *(Boolean*)this;// static_cast<ast::Boolean*>(this);
+		return (Boolean*)this;// static_cast<ast::Boolean*>(this);
 	}
 
 	bool IsNumber() const noexcept {
 		return Type() == ValueType::kNumber;
 	}
-	Number& ToNumber() {
+	Number* ToNumber() noexcept {
 		if (!IsNumber())
 		{
-			throw type_error("not number");
+			return nullptr;
 		}
-		return *(Number*)this; // static_cast<ast::Number*>(this);
+		return (Number*)this; // static_cast<ast::Number*>(this);
 	}
 
 	bool IsString() const noexcept {
 		return Type() == ValueType::kString;
 	}
-	String& ToString() {
+	String* ToString() noexcept {
 		if (!IsString())
 		{
-			throw type_error("not string");
+			return nullptr;
 		}
-		return *(String*)this; // static_cast<ast::String*>(this);
+		return (String*)this; // static_cast<ast::String*>(this);
 	}
 
 	bool IsArray() const noexcept {
 		return Type() == ValueType::kArray;
 	}
-	Array& ToArray() {
+	Array* ToArray() noexcept {
 		if (!IsArray())
 		{
-			throw type_error("not array");
+			return nullptr;
 		}
-		return *(Array*)this; //static_cast<ast::Array*>(this);
+		return (Array*)this; //static_cast<ast::Array*>(this);
 	}
 
 	bool IsObject() const noexcept {
 		return Type() == ValueType::kObject;
 	}
-	Object& ToObject() {
+	Object* ToObject() noexcept {
 		if (!IsObject())
 		{
-			throw type_error("not object");
+			return nullptr;
 		}
-		return *(Object*)this; // static_cast<ast::Object*>(this);
+		return (Object*)this; // static_cast<ast::Object*>(this);
 	}
 
 };
@@ -103,4 +96,4 @@ public:
 #include "ast\array.hpp"
 #include "ast\object.hpp"
 
-#endif // AST_VALUE_H_
+#endif // YUJSON_AST_VALUE_H_

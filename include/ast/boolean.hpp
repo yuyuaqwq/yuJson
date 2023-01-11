@@ -1,5 +1,5 @@
-#ifndef AST_BOOLEAN_H_
-#define AST_BOOLEAN_H_
+#ifndef YUJSON_AST_BOOLEAN_H_
+#define YUJSON_AST_BOOLEAN_H_
 
 #include "ast\value.hpp"
 
@@ -26,4 +26,4 @@ private:
 } // namespace ast
 } // namespace yuJson
 
-#endif // AST_BOOLEAN_H_
+#endif // YUJSON_AST_BOOLEAN_H_

@@ -1,5 +1,5 @@
-#ifndef AST_ARRAY_H_
-#define AST_ARRAY_H_
+#ifndef YUJSON_AST_ARRAY_H_
+#define YUJSON_AST_ARRAY_H_
 
 #include <vector>
 #include <memory>
@@ -44,4 +44,4 @@ private:
 } // namespace ast
 } // namespace yuJson
 
-#endif // AST_ARRAY_H_
+#endif // YUJSON_AST_ARRAY_H_

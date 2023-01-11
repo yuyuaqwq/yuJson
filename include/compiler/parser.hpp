@@ -1,5 +1,5 @@
-#ifndef PARSER_H_
-#define PARSER_H_
+#ifndef YUJSON_PARSER_H_
+#define YUJSON_PARSER_H_
 
 #include <exception>
 #include <memory>
@@ -40,7 +40,10 @@ public:
 
 private:
     std::unique_ptr<ast::Value> ParseValue() {
-        Token token = m_lexer->NextToken();
+		Token token;
+		if (!m_lexer->NextToken(&token)) {
+			return nullptr;
+		}
         switch (token.type) {
         case TokenType::kNull: {
             return std::make_unique<ast::Null>();
@@ -67,34 +70,40 @@ private:
             return ParseObject();
         }
 
-
-        throw ParserError("invalid token");
+		return nullptr;
 
     }
 
     std::unique_ptr<ast::Array> ParseArray() {
-
         std::unique_ptr<ast::Array> array = std::make_unique<ast::Array>();
 
-        Token token = m_lexer->LookAhead();
+		Token token;
+		if (!m_lexer->LookAhead(&token)) {
+			return nullptr;
+		}
         if (token.type == TokenType::kRbrack) {
-            m_lexer->NextToken();
+            m_lexer->NextToken(nullptr);
             return array;
         }
 
         array->PushBack(ParseValue());
 
         do {
-            Token token = m_lexer->LookAhead();
+			Token token;
+			if (!m_lexer->LookAhead(&token)) {
+				return nullptr;
+			}
             if (token.type != TokenType::kComma) {
                 break;
             }
-            m_lexer->NextToken();
+            m_lexer->NextToken(nullptr);
             array->PushBack(ParseValue());
 
         } while (true);
 
-        m_lexer->MatchToken(TokenType::kRbrack);
+		if (!m_lexer->MatchToken(TokenType::kRbrack)) {
+			return nullptr;
+		}
 
         return array;
     }
@@ -102,37 +111,45 @@ private:
     std::unique_ptr<ast::Object> ParseObject() {
         std::unique_ptr<ast::Object> object = std::make_unique<ast::Object>();
 
-        Token token = m_lexer->NextToken();
+		Token token;
+		if (!m_lexer->NextToken(&token)) {
+			return nullptr;
+		}
         if (token.type == TokenType::kRcurly) {
             return object;
         }
 
         if (token.type != TokenType::kString) {
-            throw ParserError("object key not string");
+			return nullptr;
         }
 
         std::string key = token.str;
 
-        token = m_lexer->NextToken();
-        if (token.type != TokenType::kColon) {
-            throw ParserError("object pair not colon separation");
+        
+
+        if (!m_lexer->NextToken(&token) || token.type != TokenType::kColon) {
+			return nullptr;
         }
 
         object->Insert(key, ParseValue());
 
         do {
-            Token token = m_lexer->LookAhead();
+			Token token;
+			
+			if (!m_lexer->LookAhead(&token)) {
+				return nullptr;
+			}
             if (token.type != TokenType::kComma) {
                 break;
             }
-            m_lexer->NextToken();
+            m_lexer->NextToken(nullptr);
 
-            token = m_lexer->NextToken();
+            m_lexer->NextToken(&token);
             std::string key = token.str;
 
-            token = m_lexer->NextToken();
+            m_lexer->NextToken(&token);
             if (token.type != TokenType::kColon) {
-                throw ParserError("object pair not colon separation");
+				return nullptr;
             }
 
             object->Insert(key, ParseValue());
@@ -152,4 +169,4 @@ private:
 } // namespace compiler
 } // namespace yuJson
 
-#endif // PARSER_H_
+#endif // YUJSON_PARSER_H_

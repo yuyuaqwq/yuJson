@@ -1,5 +1,5 @@
-#ifndef AST_OBJECT_H_
-#define AST_OBJECT_H_
+#ifndef YUJSON_AST_OBJECT_H_
+#define YUJSON_AST_OBJECT_H_
 
 #include <map>
 #include <string>
@@ -56,4 +56,4 @@ private:
 } // namespace ast
 } // namespace yuJson
 
-#endif // AST_OBJECT_H_
+#endif // YUJSON_AST_OBJECT_H_

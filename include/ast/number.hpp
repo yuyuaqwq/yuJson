@@ -1,5 +1,5 @@
-#ifndef AST_NUMBER_H_
-#define AST_NUMBER_H_
+#ifndef YUJSON_AST_NUMBER_H_
+#define YUJSON_AST_NUMBER_H_
 
 #include "ast\value.hpp"
 
@@ -32,4 +32,4 @@ private:
 } // namespace ast
 } // namespace yuJson
 
-#endif // AST_NUMBER_H_
+#endif // YUJSON_AST_NUMBER_H_

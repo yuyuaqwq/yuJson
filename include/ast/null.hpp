@@ -1,5 +1,5 @@
-#ifndef AST_NULL_H_
-#define AST_NULL_H_
+#ifndef YUJSON_AST_NULL_H_
+#define YUJSON_AST_NULL_H_
 
 #include "ast\value.hpp"
 
@@ -16,4 +16,4 @@ public:
 } // namespace ast
 } // namespace yuJson
 
-#endif // AST_NULL_H_
+#endif // YUJSON_AST_NULL_H_

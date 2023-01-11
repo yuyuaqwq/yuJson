@@ -1,5 +1,5 @@
-#ifndef LEXER_H_
-#define LEXER_H_
+#ifndef YUJSON_LEXER_H_
+#define YUJSON_LEXER_H_
 
 #include <string>
 
@@ -25,11 +25,6 @@ enum class TokenType {
 struct Token {
     TokenType type;
     std::string str;
-};
-
-class LexerError : public std::exception {
-public:
-    LexerError(const char* msg) : std::exception(msg) { }
 };
 
 class Lexer {
@@ -62,21 +57,24 @@ public:
         m_idx += c;
     }
 
-    Token LookAhead() {
+    bool LookAhead(Token* token) noexcept {
         if (m_nextToken.type == TokenType::kNone) {
-            m_nextToken = NextToken();
+			if (!NextToken(&m_nextToken)) {
+				return false;
+			}
         }
-        return m_nextToken;
+		*token = m_nextToken;
+		return true;
 
     }
 
-    Token NextToken() {
-
-        Token token;
+    bool NextToken(Token* token) noexcept {
         if (m_nextToken.type != TokenType::kNone) {
-            token = m_nextToken;
+			if (token) {
+				*token = m_nextToken;
+			}
             m_nextToken.type = TokenType::kNone;
-            return token;
+            return true;
         }
 
 
@@ -85,87 +83,88 @@ public:
         while ((c = NextChar()) && c == ' ');
 
         if (c == 0) {
-            token.type = TokenType::kEof;
-            return token;
+            token->type = TokenType::kEof;
+            return true;
         }
 
         switch (c) {
         case '{':
-            token.type = TokenType::kLcurly;
-            return token;
+            token->type = TokenType::kLcurly;
+            return true;
         case '}':
-            token.type = TokenType::kRcurly;
-            return token;
+            token->type = TokenType::kRcurly;
+            return true;
         case '[':
-            token.type = TokenType::kLbrack;
-            return token;
+            token->type = TokenType::kLbrack;
+            return true;
         case ']':
-            token.type = TokenType::kRbrack;
-            return token;
+            token->type = TokenType::kRbrack;
+            return true;
         case ',':
-            token.type = TokenType::kComma;
-            return token;
+            token->type = TokenType::kComma;
+            return true;
         case ':':
-            token.type = TokenType::kColon;
-            return token;
+            token->type = TokenType::kColon;
+            return true;
         }
 
         if (c == 'n') {
             if (MatchStr("ull")) {
-                token.type = TokenType::kNull;
-                return token;
+                token->type = TokenType::kNull;
+                return true;
             }
         }
         if (c == 't') {
             if (MatchStr("rue")) {
-                token.type = TokenType::kTrue;
-                return token;
+                token->type = TokenType::kTrue;
+                return true;
             }
         }
         if (c == 'f') {
             if (MatchStr("alse")) {
-                token.type = TokenType::kFalse;
-                return token;
+                token->type = TokenType::kFalse;
+                return true;
             }
         }
 
         if (c >= '0' && c <= '9') {
-            token.type = TokenType::kNumber;
+            token->type = TokenType::kNumber;
             do {
                 if (c >= '0' && c <= '9') {
-                    token.str += std::string(1, c);
+                    token->str += std::string(1, c);
                 }
                 else {
                     SkipChar(-1);
                     break;
                 }
             } while (c = NextChar());
-            return token;
+            return true;
         }
 
         if (c == '\"') {
-            token.type = TokenType::kString;
+            token->type = TokenType::kString;
             while ((c = NextChar()) && c != '\"') {
-                token.str += c;
+                token->str += c;
             };
             if (c != '\"') {
-                throw LexerError("cannot parse string");
+				return false;
             }
-            return token;
+            return true;
         }
 
-        throw LexerError("cannot parse token");
-
-        return token;
+		return false;
     }
 
-    void MatchToken(TokenType type) {
-        Token token = LookAhead();
+    bool MatchToken(TokenType type) noexcept {
+		Token token;
+		if (!LookAhead(&token)) {
+			return false;
+		}
         if (token.type != type) {
-            throw LexerError("cannot match token");
+			return false;
         }
-        NextToken();
-        return;
+        NextToken(nullptr);
+        return true;
     }
 
 private:
@@ -177,4 +176,4 @@ private:
 } // namespace compiler
 } // namespace yuJson
 
-#endif // LEXER_H_
+#endif // YUJSON_LEXER_H_

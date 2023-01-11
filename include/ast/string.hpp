@@ -1,5 +1,5 @@
-#ifndef AST_STRING_H_
-#define AST_STRING_H_
+#ifndef YUJSON_AST_STRING_H_
+#define YUJSON_AST_STRING_H_
 
 #include <string>
 
@@ -29,4 +29,4 @@ private:
 } // namespace ast
 } // namespace yuJson
 
-#endif // AST_STRING_H_
+#endif // YUJSON_AST_STRING_H_

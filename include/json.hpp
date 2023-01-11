@@ -1,5 +1,5 @@
-#ifndef JSON_H_
-#define JSON_H_
+#ifndef YUJSON_JSON_H_
+#define YUJSON_JSON_H_
 
 #include <exception>
 #include <string>
@@ -9,13 +9,6 @@
 #include "ast\value.hpp"
 
 namespace yuJson {
-
-class value_invalid : public std::exception {
-public:
-	value_invalid(const char* msg) : std::exception(msg) {
-
-	}
-};
 
 class Json {
 public:
@@ -41,11 +34,8 @@ public:
 		return jsonStr;
 	}
 
-	ast::Value& Get() {
-		if (!m_value) {
-			throw value_invalid("invalid value");
-		}
-		return *m_value;
+	ast::Value* Get() noexcept {
+		return m_value.get();
 	}
 
 	void Set(std::unique_ptr<ast::Value> value) {
@@ -143,4 +133,4 @@ private:
 
 } // namespace yuJson
 
-#endif // AST_JSON_H_
+#endif // YUJSON_JSON_H_
