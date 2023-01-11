@@ -80,7 +80,7 @@ public:
 
         char c;
 
-        while ((c = NextChar()) && (c == ' ' || c == '\r' || c == '\n'));
+        while ((c = NextChar()) && (c == ' ' || c == '\t' || c == '\r' || c == '\n'));
 
         if (c == 0) {
             token->type = TokenType::kEof;
