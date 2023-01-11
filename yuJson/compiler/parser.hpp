@@ -1,7 +1,6 @@
 #ifndef YUJSON_PARSER_H_
 #define YUJSON_PARSER_H_
 
-#include <exception>
 #include <memory>
 
 #include <yuJson/compiler/lexer.hpp>
@@ -22,12 +21,6 @@ string -> '"' ... '"'
 object -> "{" [string ":" value {"," string ":" value} ] "}"
 array -> "[" [value {"," value} ] "]"
 */
-
-class ParserError : public std::exception {
-public:
-    ParserError(const char* msg) : std::exception(msg) { }
-};
-
 
 class Parser {
 public:

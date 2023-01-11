@@ -20,14 +20,25 @@ public:
 	Json(const Json&) = delete;
 	void operator=(const Json&) = delete;
 
-	void Parse(const char* jsonText) {
+	bool IsValid() {
+		return m_value.get() != nullptr;
+	}
+
+	bool Parse(const char* jsonText) {
 		compiler::Lexer lexer(jsonText);
 		compiler::Parser parser(&lexer);
 		auto tempJson = parser.ParseJson();
+		if (!tempJson->Get()) {
+			return false;
+		}
 		m_value = std::move(tempJson->m_value);
+		return true;
 	}
 
 	std::string Print(bool format = true) const {
+		if (!m_value.get()) {
+			return "";
+		}
 		std::string jsonStr;
 		Print(m_value.get(), format, 0, &jsonStr);
 		return jsonStr;
