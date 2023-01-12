@@ -129,6 +129,7 @@ public:
 
         if (c >= '0' && c <= '9') {
             token->type = TokenType::kNumber;
+            token->str = "";
             do {
                 if (c >= '0' && c <= '9') {
                     token->str += std::string(1, c);
@@ -143,6 +144,7 @@ public:
 
         if (c == '\"') {
             token->type = TokenType::kString;
+            token->str = "";
             while ((c = NextChar()) && c != '\"') {
                 token->str += c;
             };
