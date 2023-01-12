@@ -33,10 +33,10 @@ public:
 
 private:
     std::unique_ptr<value::Value> ParseValue() {
-		Token token;
-		if (!m_lexer->NextToken(&token)) {
-			return nullptr;
-		}
+        Token token;
+        if (!m_lexer->NextToken(&token)) {
+            return nullptr;
+        }
         switch (token.type) {
         case TokenType::kNull: {
             return std::make_unique<value::Null>();
@@ -63,17 +63,17 @@ private:
             return ParseObject();
         }
 
-		return nullptr;
+        return nullptr;
 
     }
 
     std::unique_ptr<value::Array> ParseArray() {
         std::unique_ptr<value::Array> array = std::make_unique<value::Array>();
 
-		Token token;
-		if (!m_lexer->LookAhead(&token)) {
-			return nullptr;
-		}
+        Token token;
+        if (!m_lexer->LookAhead(&token)) {
+            return nullptr;
+        }
         if (token.type == TokenType::kRbrack) {
             m_lexer->NextToken(nullptr);
             return array;
@@ -82,10 +82,10 @@ private:
         array->Pushback(ParseValue());
 
         do {
-			Token token;
-			if (!m_lexer->LookAhead(&token)) {
-				return nullptr;
-			}
+            Token token;
+            if (!m_lexer->LookAhead(&token)) {
+                return nullptr;
+            }
             if (token.type != TokenType::kComma) {
                 break;
             }
@@ -94,9 +94,9 @@ private:
 
         } while (true);
 
-		if (!m_lexer->MatchToken(TokenType::kRbrack)) {
-			return nullptr;
-		}
+        if (!m_lexer->MatchToken(TokenType::kRbrack)) {
+            return nullptr;
+        }
 
         return array;
     }
@@ -104,16 +104,16 @@ private:
     std::unique_ptr<value::Object> ParseObject() {
         std::unique_ptr<value::Object> object = std::make_unique<value::Object>();
 
-		Token token;
-		if (!m_lexer->NextToken(&token)) {
-			return nullptr;
-		}
+        Token token;
+        if (!m_lexer->NextToken(&token)) {
+            return nullptr;
+        }
         if (token.type == TokenType::kRcurly) {
             return object;
         }
 
         if (token.type != TokenType::kString) {
-			return nullptr;
+            return nullptr;
         }
 
         std::string key = token.str;
@@ -121,17 +121,17 @@ private:
         
 
         if (!m_lexer->NextToken(&token) || token.type != TokenType::kColon) {
-			return nullptr;
+            return nullptr;
         }
 
         object->Set(key, ParseValue());
 
         do {
-			Token token;
-			
-			if (!m_lexer->LookAhead(&token)) {
-				return nullptr;
-			}
+            Token token;
+            
+            if (!m_lexer->LookAhead(&token)) {
+                return nullptr;
+            }
             if (token.type != TokenType::kComma) {
                 break;
             }
@@ -142,7 +142,7 @@ private:
 
             m_lexer->NextToken(&token);
             if (token.type != TokenType::kColon) {
-				return nullptr;
+                return nullptr;
             }
 
             object->Set(key, ParseValue());

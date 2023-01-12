@@ -8,9 +8,9 @@ namespace value {
 
 class Null : public Value {
 public:
-	virtual ValueType Type() const noexcept {
-		return ValueType::kNull;
-	}
+    virtual ValueType Type() const noexcept {
+        return ValueType::kNull;
+    }
 };
 
 } // namespace value

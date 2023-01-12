@@ -8,19 +8,19 @@ namespace value {
 
 class Boolean : public Value {
 public:
-	explicit Boolean(bool b) noexcept : m_bool(b) { }
-	~Boolean() noexcept { }
+    explicit Boolean(bool b) noexcept : m_bool(b) { }
+    ~Boolean() noexcept { }
 
-	virtual ValueType Type() const noexcept {
-		return ValueType::kBoolean;
-	}
+    virtual ValueType Type() const noexcept {
+        return ValueType::kBoolean;
+    }
 
-	bool Get() noexcept {
-		return m_bool;
-	}
+    bool Get() noexcept {
+        return m_bool;
+    }
 
 private:
-	bool m_bool;
+    bool m_bool;
 };
 
 } // namespace value
