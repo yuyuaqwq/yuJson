@@ -30,7 +30,10 @@ public:
     }
 
     Value& Get(const std::string& key) {
-        return *m_obj.at(key);
+        if (Find(key)) {
+            return *m_obj[key];
+        }
+        return *(Value*)nullptr;
     }
 
     bool Find(const std::string& key) const noexcept {

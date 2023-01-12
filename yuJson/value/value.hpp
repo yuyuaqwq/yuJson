@@ -32,6 +32,10 @@ public:
 
     virtual ValueType Type() const = 0;
 
+    bool IsValid() const {
+        return this != nullptr;
+    }
+
     bool IsNull() const noexcept {
         return Type() == ValueType::kNull;
     }
@@ -53,7 +57,7 @@ public:
     }
 
     bool IsNumber() const noexcept {
-        return Type() == ValueType::kNumber;
+        return IsValid() && Type() == ValueType::kNumber;
     }
 
     Number& ToNumber() noexcept {
@@ -64,7 +68,7 @@ public:
     }
 
     bool IsString() const noexcept {
-        return Type() == ValueType::kString;
+        return IsValid() && Type() == ValueType::kString;
     }
 
     String& ToString() noexcept {
@@ -75,7 +79,7 @@ public:
     }
 
     bool IsArray() const noexcept {
-        return Type() == ValueType::kArray;
+        return IsValid() && Type() == ValueType::kArray;
     }
 
     Array& ToArray() noexcept {
@@ -86,7 +90,7 @@ public:
     }
 
     bool IsObject() const noexcept {
-        return Type() == ValueType::kObject;
+        return IsValid() && Type() == ValueType::kObject;
     }
 
     Object& ToObject() noexcept {

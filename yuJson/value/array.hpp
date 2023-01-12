@@ -29,7 +29,10 @@ public:
     }
 
     Value& Get(int i) {
-        return *m_arr.at(i);
+        if (i < 0 || i >= m_arr.size()) {
+            return *(Value*)nullptr;
+        }
+        return *m_arr[i];
     }
 
     void Pushback(std::unique_ptr<Value> value) {

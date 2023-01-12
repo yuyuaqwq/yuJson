@@ -14,8 +14,12 @@ int main()
 
     json.Parse(R"({ "qvq":   ["233", 123, "emm", {"qaq":"sb", "emmm":true}] })");
     std::cout << json.Print() << std::endl;
-
+    
     json.GetObject().Set("sb", 233);
+
+    auto& val = json.GetObject().Get("2b");
+    std::cout << (val.IsString() ? val.ToString().Get() : "对象中不存在该键值对") << std::endl;
+
     std::cout << json.GetObject().Get("sb").ToNumber().GetInt() << std::endl;
     std::cout << json.Print() << std::endl;
 
