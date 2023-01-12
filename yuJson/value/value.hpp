@@ -21,6 +21,13 @@ class Object;
 
 class Value {
 public:
+
+	Value() noexcept { }
+
+	Value(String&& str);
+
+	void Value::operator=(String&& str);
+
 	virtual ~Value() noexcept { }
 
 	virtual ValueType Type() const = 0;
@@ -32,56 +39,61 @@ public:
 	bool IsBoolean() const noexcept {
 		return Type() == ValueType::kBoolean;
 	}
-	Boolean* ToBoolean() noexcept {
-		if (!IsBoolean())
-		{
-			return nullptr;
+
+	template <typename T>
+	T& To() {
+		return *(T*)this;// static_cast<ast::Boolean*>(this);
+	}
+
+	Boolean& ToBoolean() noexcept {
+		if (!IsBoolean()) {
+			return *(Boolean*)nullptr;
 		}
-		return (Boolean*)this;// static_cast<ast::Boolean*>(this);
+		return *(Boolean*)this;// static_cast<ast::Boolean*>(this);
 	}
 
 	bool IsNumber() const noexcept {
 		return Type() == ValueType::kNumber;
 	}
-	Number* ToNumber() noexcept {
-		if (!IsNumber())
-		{
-			return nullptr;
+
+	Number& ToNumber() noexcept {
+		if (!IsNumber()) {
+			return *(Number*)nullptr;
 		}
-		return (Number*)this; // static_cast<ast::Number*>(this);
+		return *(Number*)this; // static_cast<ast::Number*>(this);
 	}
 
 	bool IsString() const noexcept {
 		return Type() == ValueType::kString;
 	}
-	String* ToString() noexcept {
-		if (!IsString())
-		{
-			return nullptr;
+
+	String& ToString() noexcept {
+		if (!IsString()) {
+			return *(String*)nullptr;
 		}
-		return (String*)this; // static_cast<ast::String*>(this);
+		return *(String*)this; // static_cast<ast::String*>(this);
 	}
 
 	bool IsArray() const noexcept {
 		return Type() == ValueType::kArray;
 	}
-	Array* ToArray() noexcept {
-		if (!IsArray())
-		{
-			return nullptr;
+
+	Array& ToArray() noexcept {
+		if (!IsArray()) {
+			return *(Array*)nullptr;
 		}
-		return (Array*)this; //static_cast<ast::Array*>(this);
+		return *(Array*)this; //static_cast<ast::Array*>(this);
 	}
 
 	bool IsObject() const noexcept {
 		return Type() == ValueType::kObject;
 	}
-	Object* ToObject() noexcept {
-		if (!IsObject())
-		{
-			return nullptr;
+
+	Object& ToObject() noexcept {
+		if (!IsObject()) {
+			return *(Object*)nullptr;
 		}
-		return (Object*)this; // static_cast<ast::Object*>(this);
+		return *(Object*)this; // static_cast<ast::Object*>(this);
 	}
 
 };

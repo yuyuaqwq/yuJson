@@ -8,8 +8,8 @@ namespace value {
 
 class Number : public Value {
 public:
-	explicit Number(double num) noexcept : m_float(num) { }
-	// explicit Number(long long num);
+	// explicit Number(double num) noexcept : m_float(num) { }
+	/*explicit*/ Number(long long num) noexcept : m_int(num) { }
 	~Number() noexcept { }
 
 	virtual ValueType Type() const noexcept {
@@ -18,6 +18,18 @@ public:
 
 	double GetFloat() noexcept {
 		return m_float;
+	}
+
+	void SetFloat(double num) noexcept {
+		m_float = num;
+	}
+
+	long long GetInt() noexcept {
+		return m_int;
+	}
+
+	void SetInt(long long num) noexcept {
+		m_int = num;
 	}
 
 private:

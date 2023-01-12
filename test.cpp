@@ -6,23 +6,22 @@
 int main()
 {
 	using yuJson::Json;
-	using yuJson::value::String;
-	using yuJson::value::Number;
+	using namespace yuJson::value;
 
 	Json json;
+
+	json.Parse("s");
 
 	json.Parse(R"({ "qvq":   ["233", 123, "emm", {"qaq":"sb", "emmm":true}] })");
 	std::cout << json.Print() << std::endl;
 
-	json.Get()->ToObject()->Insert("sb", std::make_unique<String>("qtmd"));
+	json.GetObject().Set("sb", 233);
+	std::cout << json.GetObject().Get("sb").ToNumber().GetInt() << std::endl;
 	std::cout << json.Print() << std::endl;
 
-	json.Get()->ToObject()->Set("sb", std::make_unique<Number>(233));
-
-	std::cout << json.Get()->ToObject()->At("sb").ToNumber()->GetFloat() << std::endl;
-
+	json.Set("233");
 	std::cout << json.Print() << std::endl;
 
-	json.Set(std::make_unique<String>("233"));
+	json.Set(nullptr);
 	std::cout << json.Print() << std::endl;
 }

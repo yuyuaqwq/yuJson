@@ -28,7 +28,7 @@ public:
 		compiler::Lexer lexer(jsonText);
 		compiler::Parser parser(&lexer);
 		auto tempJson = parser.ParseJson();
-		if (!tempJson->Get()) {
+		if (!tempJson->IsValid()) {
 			return false;
 		}
 		m_value = std::move(tempJson->m_value);
@@ -44,14 +44,71 @@ public:
 		return jsonStr;
 	}
 
-	value::Value* Get() noexcept {
-		return m_value.get();
+	value::Value& Get() noexcept {
+		return *m_value;
+	}
+
+	template <typename T>
+	T& Get() {
+		return *(T*)m_value.get();
+	}
+
+	value::Null& GetNull() noexcept {
+		return *(value::Null*)m_value.get();
+	}
+
+	value::Boolean& GetBoolean() noexcept {
+		return *(value::Boolean*)m_value.get();
+	}
+
+	value::Number& GetNumber() noexcept {
+		return *(value::Number*)m_value.get();
+	}
+
+	value::String& GetString() noexcept {
+		return *(value::String*)m_value.get();
+	}
+
+	value::Array& GetArray() noexcept {
+		return *(value::Array*)m_value.get();
+	}
+
+	value::Object& GetObject() noexcept {
+		return *(value::Object*)m_value.get();
 	}
 
 	void Set(std::unique_ptr<value::Value> value) {
 		m_value = std::move(value);
 	}
 
+	//template <typename T>
+	//void Set(T&& val) {
+	//	m_value = std::make_unique<T>(std::move(val));
+	//}
+
+	void Set(nullptr_t) {
+		m_value = std::make_unique<value::Null>();
+	}
+
+	void Set(value::Boolean&& boolean) {
+		m_value = std::make_unique<value::Boolean>(std::move(boolean));
+	}
+
+	void Set(value::Number&& num) {
+		m_value = std::make_unique<value::Number>(std::move(num));
+	}
+
+	void Set(value::String&& str) {
+		m_value = std::make_unique<value::String>(std::move(str));
+	}
+
+	void Set(value::Array&& arr) {
+		m_value = std::make_unique<value::Array>(std::move(arr));
+	}
+
+	void Set(value::Object&& obj) {
+		m_value = std::make_unique<value::Object>(std::move(obj));
+	}
 
 private:
 	void Print(value::Value* value, bool format, size_t level, std::string* jsonStr) const {
@@ -70,7 +127,7 @@ private:
 			break;
 		}
 		case value::ValueType::kNumber: {
-			*jsonStr += std::to_string(static_cast<value::Number*>(value)->GetFloat());
+			*jsonStr += std::to_string(static_cast<value::Number*>(value)->GetInt());
 			break;
 		}
 		case value::ValueType::kString: {
@@ -82,7 +139,7 @@ private:
 			if (format) {
 				indent += std::string(kIndent, '  ');
 			}
-			const auto& arr = static_cast<value::Array*>(value)->Get();
+			const auto& arr = static_cast<value::Array*>(value)->GetVector();
 			for (int i = 0; i < arr.size(); ) {
 				if (format) {
 					*jsonStr += '\n' + indent;
@@ -107,7 +164,7 @@ private:
 				indent += std::string(kIndent, '  ');
 			}
 
-			const auto& obj = static_cast<value::Object*>(value)->Get();
+			const auto& obj = static_cast<value::Object*>(value)->GetMap();
 			int i = 0;
 			for (const auto& it : obj) {
 				if (format) {
@@ -132,7 +189,6 @@ private:
 		}
 		}
 	}
-
 
 private:
 	std::unique_ptr<value::Value> m_value;

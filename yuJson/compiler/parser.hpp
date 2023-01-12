@@ -79,7 +79,7 @@ private:
             return array;
         }
 
-        array->PushBack(ParseValue());
+        array->Pushback(ParseValue());
 
         do {
 			Token token;
@@ -90,7 +90,7 @@ private:
                 break;
             }
             m_lexer->NextToken(nullptr);
-            array->PushBack(ParseValue());
+            array->Pushback(ParseValue());
 
         } while (true);
 
@@ -124,7 +124,7 @@ private:
 			return nullptr;
         }
 
-        object->Insert(key, ParseValue());
+        object->Set(key, ParseValue());
 
         do {
 			Token token;
@@ -145,7 +145,7 @@ private:
 				return nullptr;
             }
 
-            object->Insert(key, ParseValue());
+            object->Set(key, ParseValue());
 
         } while (true);
 
