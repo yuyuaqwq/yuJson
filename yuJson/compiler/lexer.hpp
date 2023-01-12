@@ -59,20 +59,20 @@ public:
 
     bool LookAhead(Token* token) noexcept {
         if (m_nextToken.type == TokenType::kNone) {
-			if (!NextToken(&m_nextToken)) {
-				return false;
-			}
+            if (!NextToken(&m_nextToken)) {
+                return false;
+            }
         }
-		*token = m_nextToken;
-		return true;
+        *token = m_nextToken;
+        return true;
 
     }
 
     bool NextToken(Token* token) noexcept {
         if (m_nextToken.type != TokenType::kNone) {
-			if (token) {
-				*token = m_nextToken;
-			}
+            if (token) {
+                *token = m_nextToken;
+            }
             m_nextToken.type = TokenType::kNone;
             return true;
         }
@@ -147,21 +147,21 @@ public:
                 token->str += c;
             };
             if (c != '\"') {
-				return false;
+                return false;
             }
             return true;
         }
 
-		return false;
+        return false;
     }
 
     bool MatchToken(TokenType type) noexcept {
-		Token token;
-		if (!LookAhead(&token)) {
-			return false;
-		}
+        Token token;
+        if (!LookAhead(&token)) {
+            return false;
+        }
         if (token.type != type) {
-			return false;
+            return false;
         }
         NextToken(nullptr);
         return true;

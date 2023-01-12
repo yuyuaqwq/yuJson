@@ -42,7 +42,7 @@ public:
 
 	template <typename T>
 	T& To() {
-		return *(T*)this;// static_cast<ast::Boolean*>(this);
+		return *(T*)this;// static_cast<ast::T*>(this);
 	}
 
 	Boolean& ToBoolean() noexcept {
@@ -97,6 +97,26 @@ public:
 	}
 
 };
+
+inline std::unique_ptr<Boolean> CreateBoolean(Boolean&& boolean) {
+	return std::make_unique<Boolean>(std::move(boolean));
+}
+
+inline std::unique_ptr<Number> CreateNumber(Number&& num) {
+	return std::make_unique<Number>(std::move(num));
+}
+
+inline std::unique_ptr<String> CreateString(String&& str) {
+	return std::make_unique<String>(std::move(str));
+}
+
+inline std::unique_ptr<Array> CreateArray() {
+	return std::make_unique<Array>();
+}
+
+inline std::unique_ptr<Object> CreateObject() {
+	return std::make_unique<Object>();
+}
 
 } // namespace value
 } // namespace yuJson
