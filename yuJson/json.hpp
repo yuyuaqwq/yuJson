@@ -49,7 +49,7 @@ public:
     }
 
     template <typename T>
-    T& Get() {
+    T& Get() noexcept {
         return *(T*)m_value.get();
     }
 
