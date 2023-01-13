@@ -147,13 +147,14 @@ public:
             token->str = "";
             bool skip = false;
             while ((c = NextChar())) {
+                if (c == '\\') {
+                    skip = true;
+                    continue;
+                }
                 if (skip == false && c == '\"') {
                     break;
                 }
-                if (skip) skip = false;
-                if (c == '\\') {
-                    skip = true;
-                }
+                if (skip) { skip = false; }
                 token->str += c;
             };
             if (c != '\"') {
