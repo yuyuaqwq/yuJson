@@ -146,7 +146,7 @@ public:
             token->type = TokenType::kString;
             token->str = "";
             bool skip = false;
-            while ((c = NextChar())) {
+            while (c = NextChar()) {
                 if (c == '\\') {
                     skip = true;
                     continue;
