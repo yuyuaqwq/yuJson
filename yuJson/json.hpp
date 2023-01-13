@@ -54,27 +54,27 @@ public:
     }
 
     value::Null& GetNull() noexcept {
-        return *(value::Null*)m_value.get();
+        return m_value->ToNull();
     }
 
     value::Boolean& GetBoolean() noexcept {
-        return *(value::Boolean*)m_value.get();
+        return m_value->ToBoolean();
     }
 
     value::Number& GetNumber() noexcept {
-        return *(value::Number*)m_value.get();
+        return m_value->ToNumber();
     }
 
     value::String& GetString() noexcept {
-        return *(value::String*)m_value.get();
+        return m_value->ToString();
     }
 
     value::Array& GetArray() noexcept {
-        return *(value::Array*)m_value.get();
+        return m_value->ToArray();
     }
 
     value::Object& GetObject() noexcept {
-        return *(value::Object*)m_value.get();
+        return m_value->ToObject();
     }
 
     void Set(std::unique_ptr<value::Value> value) {

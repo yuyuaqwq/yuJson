@@ -36,17 +36,24 @@ public:
         return this != nullptr;
     }
 
+    template <typename T>
+    T& To() {
+        return *(T*)this;// static_cast<ast::T*>(this);
+    }
+
     bool IsNull() const noexcept {
         return Type() == ValueType::kNull;
     }
 
-    bool IsBoolean() const noexcept {
-        return Type() == ValueType::kBoolean;
+    Null& ToNull() noexcept {
+        if (!IsNull()) {
+            return *(Null*)nullptr;
+        }
+        return *(Null*)this;// static_cast<ast::Boolean*>(this);
     }
 
-    template <typename T>
-    T& To() {
-        return *(T*)this;// static_cast<ast::T*>(this);
+    bool IsBoolean() const noexcept {
+        return Type() == ValueType::kBoolean;
     }
 
     Boolean& ToBoolean() noexcept {
