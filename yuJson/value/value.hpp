@@ -13,6 +13,7 @@ enum class ValueType {
     kObject
 };
 
+class Null;
 class Boolean;
 class Number;
 class String;

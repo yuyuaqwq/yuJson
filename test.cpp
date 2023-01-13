@@ -12,7 +12,7 @@ int main()
 
     json.Parse("s");
 
-    json.Parse(R"({ "qvq":   ["233", 123, "emm", {"qaq":"sb", "emmm":true}] })");
+    json.Parse(R"({ "qv\"q":   ["233", 123, "emm", {"qaq":"s\"b", "emmm":true}] })");
     std::cout << json.Print() << std::endl;
     
     json.GetObject().Set("sb", 233);

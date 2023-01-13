@@ -145,7 +145,15 @@ public:
         if (c == '\"') {
             token->type = TokenType::kString;
             token->str = "";
-            while ((c = NextChar()) && c != '\"') {
+            bool skip = false;
+            while ((c = NextChar())) {
+                if (skip == false && c == '\"') {
+                    break;
+                }
+                if (skip) skip = false;
+                if (c == '\\') {
+                    skip = true;
+                }
                 token->str += c;
             };
             if (c != '\"') {
