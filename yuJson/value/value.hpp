@@ -24,10 +24,6 @@ public:
 
     Value() noexcept { }
 
-    Value(String&& str);
-
-    void Value::operator=(String&& str);
-
     virtual ~Value() noexcept { }
 
     virtual ValueType Type() const noexcept = 0;
