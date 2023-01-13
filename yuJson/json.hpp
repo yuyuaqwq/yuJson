@@ -20,7 +20,7 @@ public:
     Json(const Json&) = delete;
     void operator=(const Json&) = delete;
 
-    bool IsValid() {
+    bool IsValid() noexcept {
         return m_value.get() != nullptr;
     }
 

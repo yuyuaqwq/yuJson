@@ -30,9 +30,9 @@ public:
 
     virtual ~Value() noexcept { }
 
-    virtual ValueType Type() const = 0;
+    virtual ValueType Type() const noexcept = 0;
 
-    bool IsValid() const {
+    bool IsValid() const noexcept {
         return this != nullptr;
     }
 
