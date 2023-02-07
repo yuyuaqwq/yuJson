@@ -1,5 +1,5 @@
-#ifndef YUJSON_LEXER_H_
-#define YUJSON_LEXER_H_
+#ifndef YUJSON_COMPILER_LEXER_H_
+#define YUJSON_COMPILER_LEXER_H_
 
 #include <string>
 
@@ -187,4 +187,4 @@ private:
 } // namespace compiler
 } // namespace yuJson
 
-#endif // YUJSON_LEXER_H_
+#endif // YUJSON_COMPILER_LEXER_H_

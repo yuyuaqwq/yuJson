@@ -1,5 +1,5 @@
-#ifndef YUJSON_PARSER_H_
-#define YUJSON_PARSER_H_
+#ifndef YUJSON_COMPILER_PARSER_H_
+#define YUJSON_COMPILER_PARSER_H_
 
 #include <memory>
 
@@ -162,4 +162,4 @@ private:
 } // namespace compiler
 } // namespace yuJson
 
-#endif // YUJSON_PARSER_H_
+#endif // YUJSON_COMPILER_PARSER_H_
