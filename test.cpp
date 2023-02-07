@@ -23,7 +23,10 @@ int main()
     std::cout << json.GetObject().Get("sb").ToNumber().GetInt() << std::endl;
     std::cout << json.Print() << std::endl;
 
-    json.Set("233");
+    auto obj = CreateObject();
+    obj->Set("adw", std::move(json.GetObject()));
+
+    json.Set(std::move(obj));
     std::cout << json.Print() << std::endl;
 
     json.Set(nullptr);
