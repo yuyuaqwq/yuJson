@@ -12,9 +12,9 @@ namespace yuJson {
 class Json {
 public:
     Json() noexcept { }
-    explicit Json(std::unique_ptr<value::Value> value) : m_value(nullptr) {
-        m_value = std::move(value);
-    }
+    explicit Json(std::unique_ptr<value::Value> value) noexcept : m_value{ std::move(value) } { }
+    Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
+
     ~Json() noexcept { }
 
     Json(const Json&) = delete;
