@@ -18,6 +18,10 @@ public:
     bool Get() noexcept {
         return m_bool;
     }
+    
+    void Set(bool b) noexcept {
+        m_bool = b;
+    }
 
 private:
     bool m_bool;
