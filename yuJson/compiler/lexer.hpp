@@ -154,7 +154,13 @@ public:
                 if (skip == false && c == '\"') {
                     break;
                 }
-                if (skip) { skip = false; }
+                if (skip) { 
+                    skip = false; 
+                    // 只处理引号的转义
+                    if (c != '\"') {
+                        token->str += "\\";
+                    }
+                }
                 token->str += c;
             };
             if (c != '\"') {

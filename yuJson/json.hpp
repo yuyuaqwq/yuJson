@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <regex>
 
 #include <yuJson/compiler/parser.hpp>
 #include <yuJson/value/value.hpp>
@@ -111,6 +112,12 @@ public:
     }
 
 private:
+    void StrEscapr(std::string* str) const {
+        // 只处理引号的转义
+        // *str = std::regex_replace(*str, std::regex(R"(\\)"), R"(\\")");
+        *str = std::regex_replace(*str, std::regex(R"(")"), R"(\")");
+    }
+
     void Print(value::Value* value, bool format, size_t level, std::string* jsonStr) const {
         std::string indent;
         if (format) {
@@ -131,7 +138,9 @@ private:
             break;
         }
         case value::ValueType::kString: {
-            *jsonStr += "\"" + static_cast<value::String*>(value)->Get() + "\"";
+            auto str = static_cast<value::String*>(value)->Get();
+            StrEscapr(&str);
+            *jsonStr += "\"" + str + "\"";
             break;
         }
         case value::ValueType::kArray: {
@@ -170,7 +179,9 @@ private:
                 if (format) {
                     *jsonStr += '\n' + indent;
                 }
-                *jsonStr += '\"' + it.first + "\":";
+                auto key = it.first;
+                StrEscapr(&key);
+                *jsonStr += '\"' + key + "\":";
 
                 Print(it.second.get(), format, level + 1, jsonStr);
                 if (++i < obj.size()) {
