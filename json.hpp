@@ -113,8 +113,8 @@ public:
 
 private:
     void StrEscapr(std::string* str) const {
-        // 只处理引号的转义
-        // *str = std::regex_replace(*str, std::regex(R"(\\)"), R"(\\")");
+        // 引号添加\转义，一个\修改为两个\\ 
+        *str = std::regex_replace(*str, std::regex(R"(\\)"), R"(\\)");
         *str = std::regex_replace(*str, std::regex(R"(")"), R"(\")");
     }
 

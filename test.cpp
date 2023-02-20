@@ -24,7 +24,7 @@ int main()
     std::cout << json.Print() << std::endl;
 
     auto obj = CreateObject();
-    obj->Set("adw", std::move(json.GetObject()));
+    obj->Set("ad\\w", std::move(json.GetObject()));
 
     json.Set(std::move(obj));
     std::cout << json.Print() << std::endl;
