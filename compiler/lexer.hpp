@@ -65,7 +65,6 @@ public:
         }
         *token = m_nextToken;
         return true;
-
     }
 
     bool NextToken(Token* token) noexcept {
@@ -77,16 +76,13 @@ public:
             return true;
         }
 
-
         char c;
-
         while ((c = NextChar()) && (c == ' ' || c == '\t' || c == '\r' || c == '\n'));
 
         if (c == 0) {
             token->type = TokenType::kEof;
             return true;
         }
-
         switch (c) {
         case '{':
             token->type = TokenType::kLcurly;
@@ -156,7 +152,7 @@ public:
                 }
                 if (skip) { 
                     skip = false; 
-                    // Ö»´¦ÀíÒıºÅµÄ×ªÒå
+                    // Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åµï¿½×ªï¿½ï¿½
                     if (c != '\"') {
                         token->str += "\\";
                     }
@@ -168,7 +164,6 @@ public:
             }
             return true;
         }
-
         return false;
     }
 
