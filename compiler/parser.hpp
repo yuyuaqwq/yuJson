@@ -54,22 +54,18 @@ private:
             return std::make_unique<value::String>(token.str);
         }
         }
-
         if (token.type == TokenType::kLbrack) {
             return ParseArray();
         }
-
         if (token.type == TokenType::kLcurly) {
             return ParseObject();
         }
-
         return nullptr;
 
     }
 
     std::unique_ptr<value::Array> ParseArray() {
         std::unique_ptr<value::Array> array = std::make_unique<value::Array>();
-
         Token token;
         if (!m_lexer->LookAhead(&token)) {
             return nullptr;
@@ -78,9 +74,7 @@ private:
             m_lexer->NextToken(nullptr);
             return array;
         }
-
         array->Pushback(ParseValue());
-
         do {
             Token token;
             if (!m_lexer->LookAhead(&token)) {
@@ -93,17 +87,14 @@ private:
             array->Pushback(ParseValue());
 
         } while (true);
-
         if (!m_lexer->MatchToken(TokenType::kRbrack)) {
             return nullptr;
         }
-
         return array;
     }
 
     std::unique_ptr<value::Object> ParseObject() {
         std::unique_ptr<value::Object> object = std::make_unique<value::Object>();
-
         Token token;
         if (!m_lexer->NextToken(&token)) {
             return nullptr;
@@ -111,24 +102,16 @@ private:
         if (token.type == TokenType::kRcurly) {
             return object;
         }
-
         if (token.type != TokenType::kString) {
             return nullptr;
         }
-
         std::string key = token.str;
-
-        
-
         if (!m_lexer->NextToken(&token) || token.type != TokenType::kColon) {
             return nullptr;
         }
-
         object->Set(key, ParseValue());
-
         do {
             Token token;
-            
             if (!m_lexer->LookAhead(&token)) {
                 return nullptr;
             }
@@ -144,13 +127,9 @@ private:
             if (token.type != TokenType::kColon) {
                 return nullptr;
             }
-
             object->Set(key, ParseValue());
-
         } while (true);
-
         m_lexer->MatchToken(TokenType::kRcurly);
-
         return object;
     }
 
