@@ -7,9 +7,7 @@
 #include <yuJson/value/value.hpp>
 
 namespace yuJson {
-
 class Json;
-
 namespace compiler {
 
 /* EBNF
