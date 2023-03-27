@@ -13,10 +13,8 @@ namespace value {
 class Object : public Value {
 public:
     Object() noexcept { }
-
-    ~Object() noexcept { }
-
     Object(Object&& obj) noexcept : m_obj(std::move(obj.m_obj)) { }
+    ~Object() noexcept { }
 
     Object(const Object&) = delete;
     void operator=(const Object&) = delete;
@@ -34,6 +32,13 @@ public:
             return *m_obj[key];
         }
         return *(Value*)nullptr;
+    }
+
+    std::unique_ptr<Value>* GetPtr(const std::string& key) {
+        if (Find(key)) {
+            return &m_obj[key];
+        }
+        return nullptr;
     }
 
     bool Find(const std::string& key) const noexcept {

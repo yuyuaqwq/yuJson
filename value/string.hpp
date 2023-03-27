@@ -10,9 +10,8 @@ namespace value {
 
 class String : public Value {
 public:
-
-    /*explicit*/ String(const char* str) : m_str(str) { }
-    /*explicit*/ String(const std::string& str) : m_str(str) { }
+    explicit String(const char* str) : m_str(str) { }
+    explicit String(const std::string& str) : m_str(str) { }
     String(String&& str) noexcept : m_str(str.Get()) { }
 
     void operator=(String& str) = delete;

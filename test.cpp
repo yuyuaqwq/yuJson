@@ -8,27 +8,22 @@ int main()
     using yuJson::Json;
     using namespace yuJson::value;
 
-    Json json;
+    Json json{ "awdwd" , { "aa", 123 }, "emmm", 3333};
+    json["cccccc"] = "qaq";
+    json["awdwd"]["aa"] = { 1,2,3,4 };
+    std::cout << json.Print() << std::endl << std::endl;
 
-    json.Parse("s");
+    json = {1, 2};
+    std::cout << json.Print() << std::endl << std::endl;
 
-    json.Parse(R"({ "qv\"q":   ["233", 123, "emm", {"qa\q":"s\"b", "emmm":true}] })");
-    std::cout << json.Print() << std::endl;
+    json.Parse(R"({ "qvq":   ["233", 123, "emm", {"qa\q":"sb", "emmm":true}] })");
+    std::cout << json.Print() << std::endl << std::endl;
     
-    json.GetObject().Set("sb", 233);
+    std::cout << (json.Find("qvq") ? "exist" : "non-existent") << std::endl << std::endl;
+    std::cout << (json.Find("qaq") ? "exist" : "non-existent") << std::endl << std::endl;
 
-    auto& val = json.GetObject().Get("2b");
-    std::cout << (val.IsString() ? val.ToString().Get() : "对象中不存在该键值对") << std::endl;
+    std::cout << json["qvq"][3].Print() << std::endl << std::endl;
 
-    std::cout << json.GetObject().Get("sb").ToNumber().GetInt() << std::endl;
-    std::cout << json.Print() << std::endl;
-
-    auto obj = CreateObject();
-    obj->Set("ad\\w", std::move(json.GetObject()));
-
-    json.Set(std::move(obj));
-    std::cout << json.Print() << std::endl;
-
-    json.Set(nullptr);
-    std::cout << json.Print() << std::endl;
+    std::cout << json["qvq"][3]["emmm"].GetBoolean().Get() << std::endl << std::endl;
+    std::cout << json.Print() << std::endl << std::endl;
 }

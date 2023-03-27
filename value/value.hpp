@@ -22,9 +22,7 @@ class Object;
 
 class Value {
 public:
-
     Value() noexcept { }
-
     virtual ~Value() noexcept { }
 
     virtual ValueType Type() const noexcept = 0;

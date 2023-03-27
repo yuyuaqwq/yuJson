@@ -12,9 +12,7 @@ namespace value {
 class Array : public Value {
 public:
     Array() noexcept { }
-
     Array(Array&& arr) noexcept : m_arr(std::move(arr.m_arr)) { }
-
     ~Array() noexcept { }
 
     Array(const Array&) = delete;
@@ -32,7 +30,14 @@ public:
         if (i < 0 || i >= m_arr.size()) {
             return *(Value*)nullptr;
         }
-        return *m_arr[i];
+        return (Value&)*m_arr[i];
+    }
+
+    std::unique_ptr<Value>* GetPtr(int i) {
+        if (i < 0 || i >= m_arr.size()) {
+            return nullptr;
+        }
+        return &m_arr[i];
     }
 
     void Pushback(std::unique_ptr<Value> value) {

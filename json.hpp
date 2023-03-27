@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <regex>
+#include <initializer_list>
 
 #include <yuJson/compiler/parser.hpp>
 #include <yuJson/value/value.hpp>
@@ -15,11 +16,57 @@ public:
     Json() noexcept { }
     explicit Json(std::unique_ptr<value::Value> value) noexcept : m_value{ std::move(value) } { }
     Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
-
+    Json(nullptr_t) : m_value{ std::make_unique<value::Null>() } { }
+    Json(bool b) : m_value{ std::make_unique<value::Boolean>(b) } { }
+    Json(int i) : m_value{ std::make_unique<value::Number>(long long(i)) } { }
+    Json(double d) : m_value{ std::make_unique<value::Number>(d) } { }
+    Json(const char* str) : m_value{ std::make_unique<value::String>(str) } { }
+    Json(std::initializer_list<Json> json) {
+        if (json.size() % 2 == 0) {
+            bool is_obj = true;
+            for (auto iter = json.begin(); iter != json.end(); iter+=2) {
+                if (!iter->m_value->IsString()) {
+                    is_obj = false;
+                    break;
+                }
+            }
+            if (is_obj) {
+                m_value = std::make_unique<value::Object>();
+                for (auto iter = json.begin(); iter != json.end(); iter += 2) {
+                    m_value->ToObject().Set(iter->m_value->ToString().Get(), std::move(((Json*)iter + 1)->m_value));
+                }
+            }
+        }
+        if (!IsValid()) {
+            m_value = std::make_unique<value::Array>();
+            for (auto iter = json.begin(); iter != json.end(); iter++) {
+                m_value->ToArray().Pushback(std::move(((Json*)iter)->m_value));
+            }
+        }
+    }
     ~Json() noexcept { }
 
     Json(const Json&) = delete;
     void operator=(const Json&) = delete;
+
+    void operator=(Json&& json) noexcept {
+        m_value = std::move(json.m_value);
+    }
+
+    Json& operator[](const char* str) {
+        if (!GetObject().Find(str)) {
+            GetObject().Set(str, nullptr);
+        }
+        return (Json&)*GetObject().GetPtr(str);
+    }
+
+    Json& operator[](int index) {
+        return (Json&)*GetArray().GetPtr(index);
+    }
+
+    bool Find(const char* str) {
+        return GetObject().Find(str);
+    }
 
     bool IsValid() noexcept {
         return m_value.get() != nullptr;
@@ -43,10 +90,6 @@ public:
         std::string jsonStr;
         Print(m_value.get(), format, 0, &jsonStr);
         return jsonStr;
-    }
-
-    value::Value& Get() noexcept {
-        return *m_value;
     }
 
     template <typename T>
