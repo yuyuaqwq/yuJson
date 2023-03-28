@@ -16,6 +16,6 @@ std::cout << obj.Print() << std::endl;
 yuJson::Json json = { 1, 2, 3, 4, "hello world" };
 
 // 如何分辨创建的是对象还是列表？
-// 初始化列表中元素数量%2==0，且key对应槽为string则以创建对象
+// 初始化列表中 element_count % 2 == 0，且key对应槽为string则以创建对象
 
 ```
