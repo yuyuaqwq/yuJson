@@ -19,6 +19,7 @@ public:
     Json(nullptr_t) : m_value{ std::make_unique<value::Null>() } { }
     Json(bool b) : m_value{ std::make_unique<value::Boolean>(b) } { }
     Json(int i) : m_value{ std::make_unique<value::Number>(long long(i)) } { }
+    Json(unsigned int i) : m_value{ std::make_unique<value::Number>(unsigned long long(i)) } { }
     Json(double d) : m_value{ std::make_unique<value::Number>(d) } { }
     Json(const char* str) : m_value{ std::make_unique<value::String>(str) } { }
     Json(std::initializer_list<Json> json) {
