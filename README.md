@@ -1,10 +1,11 @@
 # yuJson
 基于递归下降的Json解析库
 
-# 使用
+# 引用
 仅需包含json.hpp文件
 
-#入门
+# 快速入门
+
 ```C++
 // 创建json中的对象
 yuJson::Json obj = { "key","value", "rmb",99999 };
