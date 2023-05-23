@@ -16,7 +16,7 @@ public:
         return ValueType::kNumber;
     }
 
-    double GetFloat() noexcept {
+    double& GetFloat() noexcept {
         return m_float;
     }
 
@@ -24,7 +24,7 @@ public:
         m_float = num;
     }
 
-    long long GetInt() noexcept {
+    long long& GetInt() noexcept {
         return m_int;
     }
 

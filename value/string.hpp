@@ -26,7 +26,7 @@ public:
         return ValueType::kString;
     }
 
-    const std::string& Get() const noexcept {
+    std::string& Get() noexcept {
         return m_str;
     }
 

@@ -15,7 +15,7 @@ public:
         return ValueType::kBoolean;
     }
 
-    bool Get() noexcept {
+    bool& Get() noexcept {
         return m_bool;
     }
     

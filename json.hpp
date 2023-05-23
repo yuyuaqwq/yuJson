@@ -65,6 +65,24 @@ public:
         return (Json&)*GetArray().GetPtr(index);
     }
 
+    bool operator==(const Json&& other) const {
+        if (GetType() != other.GetType()) {
+            return false;
+        }
+        switch (GetType()) {
+        case value::ValueType::kNull:
+            return true;
+        case value::ValueType::kBoolean:
+            return  m_value->ToBoolean().Get() == other.m_value->ToBoolean().Get();
+        case value::ValueType::kNumber:
+            return m_value->ToNumber().GetInt() == other.m_value->ToNumber().GetInt();
+        case value::ValueType::kString:
+            return m_value->ToString().Get() == other.m_value->ToString().Get();
+        default:
+            return false;
+        }
+    }
+
     bool Find(const char* str) {
         return GetObject().Find(str);
     }
@@ -98,6 +116,10 @@ public:
         return *(T*)m_value.get();
     }
 
+    value::ValueType GetType() const noexcept {
+        return m_value->Type();
+    }
+
     value::Null& GetNull() noexcept {
         return m_value->ToNull();
     }
@@ -106,12 +128,28 @@ public:
         return m_value->ToBoolean();
     }
 
+    bool& Boolean() noexcept {
+        return m_value->ToBoolean().Get();
+    }
+
     value::Number& GetNumber() noexcept {
         return m_value->ToNumber();
     }
 
+    long long& Int() noexcept {
+        return m_value->ToNumber().GetInt();
+    }
+
+    double& Float() noexcept {
+        return m_value->ToNumber().GetFloat();
+    }
+
     value::String& GetString() noexcept {
         return m_value->ToString();
+    }
+
+    std::string& String() noexcept {
+        return m_value->ToString().Get();
     }
 
     value::Array& GetArray() noexcept {
@@ -153,6 +191,67 @@ public:
 
     void Set(value::Object&& obj) {
         m_value = std::make_unique<value::Object>(std::move(obj));
+    }
+
+public:
+    class Iterator {
+    public:
+        Iterator(Json* base) {
+            m_base = base;
+            if (base) {
+                if (m_base->GetType() == value::ValueType::kArray) {
+                    m_obj_iter = m_base->GetObject().GetMap().begin();
+                }
+                else if (m_base->GetType() == value::ValueType::kObject) {
+                    m_arr_iter = m_base->GetArray().GetVector().begin();
+                }
+            }
+        }
+
+        bool operator!=(const Iterator& other) const {
+            if (m_base->GetType() == value::ValueType::kArray) {
+                return m_base->GetObject().GetMap() == other.m_base->GetObject().GetMap();
+            }
+            else if (m_base->GetType() == value::ValueType::kObject) {
+                return m_base->GetArray().GetVector() == other.m_base->GetArray().GetVector();
+            }
+            return false;
+        }
+
+        Json& operator*() const {
+            if (m_base->GetType() == value::ValueType::kArray) {
+                return (Json&)m_obj_iter->second;
+            }
+            else if (m_base->GetType() == value::ValueType::kObject) {
+                return (Json&)*m_arr_iter;
+            }
+            return *(Json*)nullptr;
+        }
+
+        const Iterator& operator++() {
+            if (m_base->GetType() == value::ValueType::kArray) {
+                m_arr_iter++;
+            }
+            else if (m_base->GetType() == value::ValueType::kObject) {
+                m_obj_iter++;
+            }
+            return *this;
+        }
+    private:
+        union {
+            std::map<std::string, std::unique_ptr<value::Value>>::const_iterator m_obj_iter;
+            std::vector<std::unique_ptr<value::Value>>::const_iterator m_arr_iter;
+        };
+        Json* m_base;
+    };
+
+public:
+    Iterator begin() {
+        return Iterator(this);
+    }
+
+    Iterator end() {
+        return Iterator(nullptr);
     }
 
 private:
