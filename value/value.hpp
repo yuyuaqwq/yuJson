@@ -1,6 +1,8 @@
 #ifndef YUJSON_VALUE_VALUE_H_
 #define YUJSON_VALUE_VALUE_H_
 
+#include <exception>
+
 namespace yuJson {
 namespace value {
 
@@ -22,6 +24,14 @@ class Object;
 
 class Value {
 public:
+    class TypeError : public std::exception {
+    public:
+        TypeError(const char* message) : std::exception(message){
+
+        }
+    };
+
+public:
     Value() noexcept { }
     virtual ~Value() noexcept { }
 
@@ -40,9 +50,9 @@ public:
         return Type() == ValueType::kNull;
     }
 
-    Null& ToNull() noexcept {
+    Null& ToNull() {
         if (!IsNull()) {
-            return *(Null*)nullptr;
+            throw TypeError("Not Null data");
         }
         return *(Null*)this;// static_cast<ast::Boolean*>(this);
     }
@@ -51,9 +61,9 @@ public:
         return Type() == ValueType::kBoolean;
     }
 
-    Boolean& ToBoolean() noexcept {
+    Boolean& ToBoolean() {
         if (!IsBoolean()) {
-            return *(Boolean*)nullptr;
+            throw TypeError("Not Boolean data");
         }
         return *(Boolean*)this;// static_cast<ast::Boolean*>(this);
     }
@@ -62,9 +72,9 @@ public:
         return IsValid() && Type() == ValueType::kNumber;
     }
 
-    Number& ToNumber() noexcept {
+    Number& ToNumber() {
         if (!IsNumber()) {
-            return *(Number*)nullptr;
+            throw TypeError("Not Number data");
         }
         return *(Number*)this; // static_cast<ast::Number*>(this);
     }
@@ -73,9 +83,9 @@ public:
         return IsValid() && Type() == ValueType::kString;
     }
 
-    String& ToString() noexcept {
+    String& ToString() {
         if (!IsString()) {
-            return *(String*)nullptr;
+            throw TypeError("Not String data");
         }
         return *(String*)this; // static_cast<ast::String*>(this);
     }
@@ -84,9 +94,9 @@ public:
         return IsValid() && Type() == ValueType::kArray;
     }
 
-    Array& ToArray() noexcept {
+    Array& ToArray() {
         if (!IsArray()) {
-            return *(Array*)nullptr;
+            throw TypeError("Not Array data");
         }
         return *(Array*)this; //static_cast<ast::Array*>(this);
     }
@@ -95,9 +105,9 @@ public:
         return IsValid() && Type() == ValueType::kObject;
     }
 
-    Object& ToObject() noexcept {
+    Object& ToObject() {
         if (!IsObject()) {
-            return *(Object*)nullptr;
+            throw TypeError("Not Object data");
         }
         return *(Object*)this; // static_cast<ast::Object*>(this);
     }

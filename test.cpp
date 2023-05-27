@@ -23,6 +23,6 @@ int main()
 
     std::cout << json["qvq"][3].Print() << std::endl << std::endl;
 
-    std::cout << json["qvq"][3]["emmm"].GetBoolean().Get() << std::endl << std::endl;
+    std::cout << json["qvq"][3]["emmm"].Boolean() << std::endl << std::endl;
     std::cout << json.Print() << std::endl << std::endl;
 }

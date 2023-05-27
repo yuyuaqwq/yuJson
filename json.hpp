@@ -120,43 +120,43 @@ public:
         return m_value->Type();
     }
 
-    value::Null& GetNull() noexcept {
+    value::Null& GetNull() {
         return m_value->ToNull();
     }
 
-    value::Boolean& GetBoolean() noexcept {
+    value::Boolean& GetBoolean() {
         return m_value->ToBoolean();
     }
 
-    bool& Boolean() noexcept {
+    bool& Boolean() {
         return m_value->ToBoolean().Get();
     }
 
-    value::Number& GetNumber() noexcept {
+    value::Number& GetNumber() {
         return m_value->ToNumber();
     }
 
-    long long& Int() noexcept {
+    long long& Int() {
         return m_value->ToNumber().GetInt();
     }
 
-    double& Float() noexcept {
+    double& Float() {
         return m_value->ToNumber().GetFloat();
     }
 
-    value::String& GetString() noexcept {
+    value::String& GetString() {
         return m_value->ToString();
     }
 
-    std::string& String() noexcept {
+    std::string& String() {
         return m_value->ToString().Get();
     }
 
-    value::Array& GetArray() noexcept {
+    value::Array& GetArray() {
         return m_value->ToArray();
     }
 
-    value::Object& GetObject() noexcept {
+    value::Object& GetObject() {
         return m_value->ToObject();
     }
 
@@ -196,7 +196,7 @@ public:
 public:
     class Iterator {
     public:
-        Iterator(Json* base) {
+        Iterator(Json* base){
             m_base = base;
             if (base) {
                 if (m_base->GetType() == value::ValueType::kArray) {
@@ -207,6 +207,11 @@ public:
                 }
             }
         }
+        Iterator(const Iterator& other) {
+            m_base = other.m_base;
+        }
+
+        ~Iterator() { }
 
         bool operator!=(const Iterator& other) const {
             if (m_base->GetType() == value::ValueType::kArray) {
