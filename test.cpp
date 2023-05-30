@@ -1,13 +1,10 @@
 ﻿#include <iostream>
-
 #include <yuJson/json.hpp>
 
 
 int main()
 {
-    using yuJson::Json;
-
-    Json json{ "awdwd" , { "aa", 123 }, "emmm", 3333};
+    yuJson::Json json{ "awdwd", { "aa", 123 }, "emmm", 3333};
     json["cccccc"] = "qaq";
     json["awdwd"]["aa"] = { 1,2,3,4 };
     std::cout << json.Print() << std::endl << std::endl;

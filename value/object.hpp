@@ -1,95 +1,91 @@
 #ifndef YUJSON_VALUE_OBJECT_H_
 #define YUJSON_VALUE_OBJECT_H_
 
-#include <map>
-#include <string>
-#include <memory>
-
 #include <yuJson/value/value.hpp>
 
 namespace yuJson {
 namespace value {
-
-class Object : public Value {
+class ObjectValue : public ValueBase {
 public:
-    Object() noexcept { }
-    Object(Object&& obj) noexcept : m_obj(std::move(obj.m_obj)) { }
-    ~Object() noexcept { }
+    ObjectValue() noexcept { }
+    ObjectValue(ObjectValue&& obj) noexcept : m_obj(std::move(obj.m_obj)) { }
+    ~ObjectValue() noexcept { }
 
-    Object(const Object&) = delete;
-    void operator=(const Object&) = delete;
+    ObjectValue(const ObjectValue&) = delete;
+    void operator=(const ObjectValue&) = delete;
 
     virtual ValueType Type() const noexcept {
         return ValueType::kObject;
     }
 
-    const std::map<std::string, std::unique_ptr<Value>>& GetMap() const noexcept {
+    const ValueMap& GetMap() const noexcept {
         return m_obj;
     }
 
-    Value& Get(const std::string& key) {
+    ValueBase& Get(const _SCN string& key) {
         if (Find(key)) {
             return *m_obj[key];
         }
-        return *(Value*)nullptr;
+        return *(ValueBase*)nullptr;
     }
 
-    std::unique_ptr<Value>* GetPtr(const std::string& key) {
+    _SCN unique_ptr<ValueBase>* GetPtr(const _SCN string& key) {
         if (Find(key)) {
             return &m_obj[key];
         }
         return nullptr;
     }
 
-    bool Find(const std::string& key) const noexcept {
+    bool Find(const _SCN string& key) const noexcept {
         return m_obj.find(key) != m_obj.end();
     }
 
-    void Set(const std::string& key, std::unique_ptr<Value> value) {
+    void Set(const _SCN string& key, _SCN unique_ptr<ValueBase> value) {
         auto& it = m_obj.operator[](key);
         it = std::move(value);
     }
 
-    void Set(const std::string& key, nullptr_t) {
-        Set(key, std::make_unique<value::Null>());
+    void Set(const _SCN string& key, nullptr_t) {
+        Set(key, MakeUnique<value::NullValue>());
     }
 
-    void Set(const std::string& key, Boolean&& boolean) {
-        Set(key, std::make_unique<value::Boolean>(std::move(boolean)));
+    void Set(const _SCN string& key, BooleanValue&& boolean) {
+        Set(key, MakeUnique<value::BooleanValue>(std::move(boolean)));
     }
 
-    void Set(const std::string& key, Number&& num) {
-        Set(key, std::make_unique<value::Number>(std::move(num)));
+    void Set(const _SCN string& key, NumberValue&& num) {
+        Set(key, MakeUnique<value::NumberValue>(std::move(num)));
     }
 
-    void Set(const std::string& key, String&& str) {
-        Set(key, std::make_unique<value::String>(std::move(str)));
+    void Set(const _SCN string& key, StringValue&& str) {
+        Set(key, MakeUnique<value::StringValue>(std::move(str)));
     }
 
-    void Set(const std::string& key, Array&& arr) {
-        Set(key, std::make_unique<value::Array>(std::move(arr)));
+    void Set(const _SCN string& key, ArrayValue&& arr) {
+        Set(key, MakeUnique<value::ArrayValue>(std::move(arr)));
     }
 
-    void Set(const std::string& key, Object&& obj) {
-        Set(key, std::make_unique<value::Object>(std::move(obj)));
+    void Set(const _SCN string& key, ObjectValue&& obj) {
+        Set(key, MakeUnique<value::ObjectValue>(std::move(obj)));
     }
 
-    void Delete(const std::string& key) noexcept {
+    void Delete(const _SCN string& key) noexcept {
         m_obj.erase(key);
     }
 
 private:
-    std::map<std::string, std::unique_ptr<Value>> m_obj;
+    ValueMap m_obj;
 };
 
-inline void Array::Pushback(Object&& obj) {
-    Pushback(std::make_unique<Object>(std::move(obj)));
+inline void ArrayValue::Pushback(ObjectValue&& obj) {
+    Pushback(MakeUnique<ObjectValue>(std::move(obj)));
 }
 
-inline void Array::Set(int i, Object&& obj) noexcept {
-    Set(i, std::make_unique<Object>(std::move(obj)));
+inline void ArrayValue::Set(int i, ObjectValue&& obj) noexcept {
+    Set(i, MakeUnique<ObjectValue>(std::move(obj)));
 }
 
+using Object = UniquePtr<ObjectValue>;
 } // namespace value
 } // namespace yuJson
 

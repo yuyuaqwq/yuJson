@@ -6,10 +6,10 @@
 namespace yuJson {
 namespace value {
 
-class Boolean : public Value {
+class BooleanValue : public ValueBase {
 public:
-    explicit Boolean(bool b) noexcept : m_bool(b) { }
-    ~Boolean() noexcept { }
+    explicit BooleanValue(bool b) noexcept : m_bool(b) { }
+    ~BooleanValue() noexcept { }
 
     virtual ValueType Type() const noexcept {
         return ValueType::kBoolean;
@@ -27,6 +27,7 @@ private:
     bool m_bool;
 };
 
+using Boolean = UniquePtr<BooleanValue>;
 } // namespace value
 } // namespace yuJson
 

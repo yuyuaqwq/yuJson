@@ -24,12 +24,12 @@ enum class TokenType {
 
 struct Token {
     TokenType type;
-    std::string str;
+    CString str;
 };
 
 class Lexer {
 public:
-    Lexer(const std::string& src) : m_src(src), m_idx(0) {
+    Lexer(const CString& src) : m_src(src), m_idx(0) {
         m_nextToken.type = TokenType::kNone;
     }
 
@@ -128,7 +128,7 @@ public:
             token->str = "";
             do {
                 if (c >= '0' && c <= '9') {
-                    token->str += std::string(1, c);
+                    token->str += CString(1, c);
                 }
                 else {
                     SkipChar(-1);
@@ -152,7 +152,6 @@ public:
                 }
                 if (skip) { 
                     skip = false; 
-                    // ֻ�������ŵ�ת��
                     if (c != '\"') {
                         token->str += "\\";
                     }
@@ -180,7 +179,7 @@ public:
     }
 
 private:
-    std::string m_src;
+    CString m_src;
     size_t m_idx;
     Token m_nextToken;
 };

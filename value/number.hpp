@@ -5,12 +5,11 @@
 
 namespace yuJson {
 namespace value {
-
-class Number : public Value {
+class NumberValue : public ValueBase {
 public:
     //explicit Number(double num) noexcept : m_float(num) { }
-    explicit Number(long long num) noexcept : m_int(num) { }
-    ~Number() noexcept { }
+    explicit NumberValue(long long num) noexcept : m_int(num) { }
+    ~NumberValue() noexcept { }
 
     virtual ValueType Type() const noexcept {
         return ValueType::kNumber;
@@ -41,6 +40,7 @@ private:
 
 };
 
+using Number = UniquePtr<NumberValue>;
 } // namespace value
 } // namespace yuJson
 

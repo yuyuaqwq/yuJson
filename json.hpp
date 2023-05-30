@@ -1,27 +1,27 @@
 #ifndef YUJSON_JSON_H_
 #define YUJSON_JSON_H_
 
+#ifndef _SCN
+#define _SCN std::
+#endif // _SCN
+
 #include <string>
 #include <memory>
 #include <regex>
 #include <initializer_list>
 
 #include <yuJson/compiler/parser.hpp>
-#include <yuJson/value/value.hpp>
+#include <yuJson/value/make.hpp>
 
 namespace yuJson {
 
 class Json {
 public:
     Json() noexcept { }
-    explicit Json(std::unique_ptr<value::Value> value) noexcept : m_value{ std::move(value) } { }
+    explicit Json(value::Value value) noexcept : m_value{ std::move(value) } { }
     Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
-    Json(nullptr_t) : m_value{ std::make_unique<value::Null>() } { }
-    Json(bool b) : m_value{ std::make_unique<value::Boolean>(b) } { }
-    Json(int i) : m_value{ std::make_unique<value::Number>(long long(i)) } { }
-    Json(unsigned int i) : m_value{ std::make_unique<value::Number>(unsigned long long(i)) } { }
-    Json(double d) : m_value{ std::make_unique<value::Number>(d) } { }
-    Json(const char* str) : m_value{ std::make_unique<value::String>(str) } { }
+    template<class T>
+    Json(T value) : m_value{ value::MakeValue<T>(value) } {}
     Json(std::initializer_list<Json> json) {
         if (json.size() % 2 == 0) {
             bool is_obj = true;
@@ -32,14 +32,15 @@ public:
                 }
             }
             if (is_obj) {
-                m_value = std::make_unique<value::Object>();
+                m_value = MakeUnique<value::ObjectValue>();
                 for (auto iter = json.begin(); iter != json.end(); iter += 2) {
-                    m_value->ToObject().Set(iter->m_value->ToString().Get(), std::move(((Json*)iter + 1)->m_value));
+                    _SCN string key = iter->m_value->ToString().Get();
+                    m_value->ToObject().Set(key, std::move(((Json*)iter + 1)->m_value));
                 }
             }
         }
         if (!IsValid()) {
-            m_value = std::make_unique<value::Array>();
+            m_value = MakeUnique<value::ArrayValue>();
             for (auto iter = json.begin(); iter != json.end(); iter++) {
                 m_value->ToArray().Pushback(std::move(((Json*)iter)->m_value));
             }
@@ -94,19 +95,19 @@ public:
     bool Parse(const char* jsonText) {
         compiler::Lexer lexer(jsonText);
         compiler::Parser parser(&lexer);
-        auto tempJson = parser.ParseJson();
-        if (!tempJson->IsValid()) {
+        auto tempbasic_Json = MakeUnique<Json>(parser.ParseValue());
+        if (!tempbasic_Json->IsValid()) {
             return false;
         }
-        m_value = std::move(tempJson->m_value);
+        m_value = std::move(tempbasic_Json->m_value);
         return true;
     }
 
-    std::string Print(bool format = true) const {
+    _SCN string Print(bool format = true) const {
         if (!m_value.get()) {
             return "";
         }
-        std::string jsonStr;
+        _SCN string jsonStr;
         Print(m_value.get(), format, 0, &jsonStr);
         return jsonStr;
     }
@@ -120,11 +121,11 @@ public:
         return m_value->Type();
     }
 
-    value::Null& GetNull() {
+    value::NullValue& GetNull() {
         return m_value->ToNull();
     }
 
-    value::Boolean& GetBoolean() {
+    value::BooleanValue& GetBoolean() {
         return m_value->ToBoolean();
     }
 
@@ -132,7 +133,7 @@ public:
         return m_value->ToBoolean().Get();
     }
 
-    value::Number& GetNumber() {
+    value::NumberValue& GetNumber() {
         return m_value->ToNumber();
     }
 
@@ -144,53 +145,53 @@ public:
         return m_value->ToNumber().GetFloat();
     }
 
-    value::String& GetString() {
+    value::StringValue& GetString() {
         return m_value->ToString();
     }
 
-    std::string& String() {
+    _SCN string& String() {
         return m_value->ToString().Get();
     }
 
-    value::Array& GetArray() {
+    value::ArrayValue& GetArray() {
         return m_value->ToArray();
     }
 
-    value::Object& GetObject() {
+    value::ObjectValue& GetObject() {
         return m_value->ToObject();
     }
 
-    void Set(std::unique_ptr<value::Value> value) {
+    void Set(_SCN unique_ptr<value::ValueBase> value) {
         m_value = std::move(value);
     }
 
     //template <typename T>
     //void Set(T&& val) {
-    //    m_value = std::make_unique<T>(std::move(val));
+    //    m_value = MakeUnique<T>(std::move(val));
     //}
 
     void Set(nullptr_t) {
-        m_value = std::make_unique<value::Null>();
+        m_value = MakeUnique<value::NullValue>();
     }
 
-    void Set(value::Boolean&& boolean) {
-        m_value = std::make_unique<value::Boolean>(std::move(boolean));
+    void Set(value::BooleanValue&& boolean) {
+        m_value = MakeUnique<value::BooleanValue>(std::move(boolean));
     }
 
-    void Set(value::Number&& num) {
-        m_value = std::make_unique<value::Number>(std::move(num));
+    void Set(value::NumberValue&& num) {
+        m_value = MakeUnique<value::NumberValue>(std::move(num));
     }
 
-    void Set(value::String&& str) {
-        m_value = std::make_unique<value::String>(std::move(str));
+    void Set(value::StringValue&& str) {
+        m_value = MakeUnique<value::StringValue>(std::move(str));
     }
 
-    void Set(value::Array&& arr) {
-        m_value = std::make_unique<value::Array>(std::move(arr));
+    void Set(value::ArrayValue&& arr) {
+        m_value = MakeUnique<value::ArrayValue>(std::move(arr));
     }
 
-    void Set(value::Object&& obj) {
-        m_value = std::make_unique<value::Object>(std::move(obj));
+    void Set(value::ObjectValue&& obj) {
+        m_value = MakeUnique<value::ObjectValue>(std::move(obj));
     }
 
 public:
@@ -244,8 +245,8 @@ public:
         }
     private:
         union {
-            std::map<std::string, std::unique_ptr<value::Value>>::const_iterator m_obj_iter;
-            std::vector<std::unique_ptr<value::Value>>::const_iterator m_arr_iter;
+            value::ValueMap::const_iterator m_obj_iter;
+            value::ValueVector::const_iterator m_arr_iter;
         };
         Json* m_base;
     };
@@ -260,16 +261,16 @@ public:
     }
 
 private:
-    void StrEscapr(std::string* str) const {
+    void StrEscapr(_SCN string* str) const {
         // 引号添加\转义，一个\修改为两个\\ 
         *str = std::regex_replace(*str, std::regex(R"(\\)"), R"(\\)");
         *str = std::regex_replace(*str, std::regex(R"(")"), R"(\")");
     }
 
-    void Print(value::Value* value, bool format, size_t level, std::string* jsonStr) const {
-        std::string indent;
+    void Print(value::ValueBase* value, bool format, size_t level, _SCN string* jsonStr) const {
+        _SCN string indent;
         if (format) {
-            indent = std::string(level * kIndent, '  ');
+            indent = _SCN string(level * kIndent, '  ');
         }
 
         switch (value->Type()) {
@@ -278,15 +279,15 @@ private:
             break;
         }
         case value::ValueType::kBoolean: {
-            *jsonStr += static_cast<value::Boolean*>(value)->Get() ? "true" : "false";
+            *jsonStr += static_cast<value::BooleanValue*>(value)->Get() ? "true" : "false";
             break;
         }
         case value::ValueType::kNumber: {
-            *jsonStr += std::to_string(static_cast<value::Number*>(value)->GetInt());
+            *jsonStr += std::to_string(static_cast<value::NumberValue*>(value)->GetInt());
             break;
         }
         case value::ValueType::kString: {
-            auto str = static_cast<value::String*>(value)->Get();
+            auto str = static_cast<value::StringValue*>(value)->Get();
             StrEscapr(&str);
             *jsonStr += "\"" + str + "\"";
             break;
@@ -294,9 +295,9 @@ private:
         case value::ValueType::kArray: {
             *jsonStr += '[';
             if (format) {
-                indent += std::string(kIndent, '  ');
+                indent += _SCN string(kIndent, '  ');
             }
-            const auto& arr = static_cast<value::Array*>(value)->GetVector();
+            const auto& arr = static_cast<value::ArrayValue*>(value)->GetVector();
             for (int i = 0; i < arr.size(); ) {
                 if (format) {
                     *jsonStr += '\n' + indent;
@@ -318,10 +319,11 @@ private:
         case value::ValueType::kObject: {
             *jsonStr += '{';
             if (format) {
-                indent += std::string(kIndent, '  ');
+                
+                indent += _SCN string(kIndent, '  ');
             }
 
-            const auto& obj = static_cast<value::Object*>(value)->GetMap();
+            const auto& obj = static_cast<value::ObjectValue*>(value)->GetMap();
             int i = 0;
             for (const auto& it : obj) {
                 if (format) {
@@ -350,12 +352,12 @@ private:
     }
 
 private:
-    std::unique_ptr<value::Value> m_value;
+    value::Value m_value;
 
 private:
     static const int kIndent = 4;
 };
 
-} // namespace yuJson
+} // namespace yubasic_Json
 
 #endif // YUJSON_JSON_H_

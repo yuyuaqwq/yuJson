@@ -15,14 +15,14 @@ enum class ValueType {
     kObject
 };
 
-class Null;
-class Boolean;
-class Number;
-class String;
-class Array;
-class Object;
+class NullValue;
+class BooleanValue;
+class NumberValue;
+class StringValue;
+class ArrayValue;
+class ObjectValue;
 
-class Value {
+class ValueBase {
 public:
     class TypeError : public std::exception {
     public:
@@ -32,14 +32,10 @@ public:
     };
 
 public:
-    Value() noexcept { }
-    virtual ~Value() noexcept { }
+    ValueBase() noexcept { }
+    virtual ~ValueBase() noexcept { }
 
-    virtual ValueType Type() const noexcept = 0;
-
-    bool IsValid() const noexcept {
-        return this != nullptr;
-    }
+    virtual inline ValueType Type() const noexcept = 0;
 
     template <typename T>
     T& To() {
@@ -50,92 +46,110 @@ public:
         return Type() == ValueType::kNull;
     }
 
-    Null& ToNull() {
+    NullValue& ToNull() {
         if (!IsNull()) {
             throw TypeError("Not Null data");
         }
-        return *(Null*)this;// static_cast<ast::Boolean*>(this);
+        return *(NullValue*)this;// static_cast<ast::Boolean*>(this);
     }
 
     bool IsBoolean() const noexcept {
         return Type() == ValueType::kBoolean;
     }
 
-    Boolean& ToBoolean() {
+    BooleanValue& ToBoolean() {
         if (!IsBoolean()) {
             throw TypeError("Not Boolean data");
         }
-        return *(Boolean*)this;// static_cast<ast::Boolean*>(this);
+        return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
     }
 
     bool IsNumber() const noexcept {
-        return IsValid() && Type() == ValueType::kNumber;
+        return Type() == ValueType::kNumber;
     }
 
-    Number& ToNumber() {
+    NumberValue& ToNumber() {
         if (!IsNumber()) {
             throw TypeError("Not Number data");
         }
-        return *(Number*)this; // static_cast<ast::Number*>(this);
+        return *(NumberValue*)this; // static_cast<ast::Number*>(this);
     }
 
     bool IsString() const noexcept {
-        return IsValid() && Type() == ValueType::kString;
+        return Type() == ValueType::kString;
     }
 
-    String& ToString() {
+    StringValue& ToString() {
         if (!IsString()) {
             throw TypeError("Not String data");
         }
-        return *(String*)this; // static_cast<ast::String*>(this);
+        return *(StringValue*)this; // static_cast<ast::String*>(this);
     }
 
     bool IsArray() const noexcept {
-        return IsValid() && Type() == ValueType::kArray;
+        return Type() == ValueType::kArray;
     }
 
-    Array& ToArray() {
+    ArrayValue& ToArray() {
         if (!IsArray()) {
             throw TypeError("Not Array data");
         }
-        return *(Array*)this; //static_cast<ast::Array*>(this);
+        return *(ArrayValue*)this; //static_cast<ast::Array*>(this);
     }
 
     bool IsObject() const noexcept {
-        return IsValid() && Type() == ValueType::kObject;
+        return Type() == ValueType::kObject;
     }
 
-    Object& ToObject() {
+    ObjectValue& ToObject() {
         if (!IsObject()) {
             throw TypeError("Not Object data");
         }
-        return *(Object*)this; // static_cast<ast::Object*>(this);
+        return *(ObjectValue*)this; // static_cast<ast::Object*>(this);
     }
 
 };
 
-inline std::unique_ptr<Boolean> CreateBoolean(Boolean&& boolean) {
-    return std::make_unique<Boolean>(std::move(boolean));
-}
-
-inline std::unique_ptr<Number> CreateNumber(Number&& num) {
-    return std::make_unique<Number>(std::move(num));
-}
-
-inline std::unique_ptr<String> CreateString(String&& str) {
-    return std::make_unique<String>(std::move(str));
-}
-
-inline std::unique_ptr<Array> CreateArray() {
-    return std::make_unique<Array>();
-}
-
-inline std::unique_ptr<Object> CreateObject() {
-    return std::make_unique<Object>();
-}
-
 } // namespace value
 } // namespace yuJson
+
+
+// 定义内部使用的using
+#include <vector>
+#include <map>
+#include <string>
+#include <memory>
+namespace yuJson{
+    template<class T>
+    using UniquePtr = _SCN unique_ptr<T>;
+    // 重写make_unique取消命名空间声明
+    template <class T, class... Types, std::enable_if_t<!std::is_array_v<T>, int> = 0>
+    inline UniquePtr<T> MakeUnique(Types&&... args) {
+        return UniquePtr<T>(new T(std::forward<Types>(args)...));
+    }
+    template <class T, std::enable_if_t<std::is_array_v<T>&& std::extent_v<T> == 0, int> = 0>
+    inline UniquePtr<T> MakeUnique(const size_t _Size) {
+        using Elem = std::remove_extent_t<T>;
+        return UniquePtr<T>(new Elem[_Size]());
+    }
+    template <class T, class... Types, std::enable_if_t<std::extent_v<T> != 0, int> = 0>
+    inline void MakeUnique(Types&&...) = delete;
+
+    // 声明cpp容器
+    template<class T>
+    using CVector = _SCN vector<T>;
+    template<class KeyT, class ValueT>
+    using CMap = _SCN map<KeyT, ValueT>;
+    using CString = _SCN string;
+
+    namespace value{
+        using Value = UniquePtr<ValueBase>;
+        using ValueVector = CVector<Value>;
+        using ValueMap = CMap<CString, Value>;
+    }
+}
+
+
 
 #include <yuJson/value/null.hpp>
 #include <yuJson/value/boolean.hpp>
@@ -143,5 +157,4 @@ inline std::unique_ptr<Object> CreateObject() {
 #include <yuJson/value/string.hpp>
 #include <yuJson/value/array.hpp>
 #include <yuJson/value/object.hpp>
-
 #endif // YUJSON_VALUE_VALUE_H_
