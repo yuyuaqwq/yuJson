@@ -40,7 +40,7 @@ public:
             return MakeUnique<value::BooleanValue>(false);
         }
         case TokenType::kNumber: {
-            return MakeUnique<value::NumberValue>(atoi(token.str.c_str()));
+            return MakeUnique<value::NumberValue>(atoll(token.str.c_str()));
         }
         case TokenType::kString: {
             return MakeUnique<value::StringValue>(token.str);

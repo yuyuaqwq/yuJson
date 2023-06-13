@@ -20,6 +20,7 @@ enum class TokenType {
     kRcurly,
     kComma,
     kColon,
+    kMinus,
 };
 
 struct Token {
@@ -123,11 +124,11 @@ public:
             }
         }
 
-        if (c >= '0' && c <= '9') {
+        if (c >= '0' && c <= '9' || c == '-') {
             token->type = TokenType::kNumber;
             token->str = "";
             do {
-                if (c >= '0' && c <= '9') {
+                if (c >= '0' && c <= '9' || c == '-') {
                     token->str += CString(1, c);
                 }
                 else {
