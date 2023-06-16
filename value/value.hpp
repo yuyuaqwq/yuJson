@@ -114,41 +114,17 @@ public:
 } // namespace yuJson
 
 
-// 定义内部使用的using
 #include <vector>
 #include <map>
 #include <string>
 #include <memory>
 namespace yuJson{
-    template<class T>
-    using UniquePtr = _SCN unique_ptr<T>;
-    // 重写make_unique取消命名空间声明
-    template <class T, class... Types, std::enable_if_t<!std::is_array_v<T>, int> = 0>
-    inline UniquePtr<T> MakeUnique(Types&&... args) {
-        return UniquePtr<T>(new T(std::forward<Types>(args)...));
-    }
-    template <class T, std::enable_if_t<std::is_array_v<T>&& std::extent_v<T> == 0, int> = 0>
-    inline UniquePtr<T> MakeUnique(const size_t _Size) {
-        using Elem = std::remove_extent_t<T>;
-        return UniquePtr<T>(new Elem[_Size]());
-    }
-    template <class T, class... Types, std::enable_if_t<std::extent_v<T> != 0, int> = 0>
-    inline void MakeUnique(Types&&...) = delete;
-
-    // 声明cpp容器
-    template<class T>
-    using CVector = _SCN vector<T>;
-    template<class KeyT, class ValueT>
-    using CMap = _SCN map<KeyT, ValueT>;
-    using CString = _SCN string;
-
     namespace value{
-        using Value = UniquePtr<ValueBase>;
-        using ValueVector = CVector<Value>;
-        using ValueMap = CMap<CString, Value>;
+        using Value = _SCN unique_ptr<ValueBase>;
+        using ValueVector = _SCN vector<Value>;
+        using ValueMap = _SCN map<_SCN string, Value>;
     }
 }
-
 
 
 #include <yuJson/value/null.hpp>

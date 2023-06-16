@@ -25,12 +25,12 @@ enum class TokenType {
 
 struct Token {
     TokenType type;
-    CString str;
+    _SCN string str;
 };
 
 class Lexer {
 public:
-    Lexer(const CString& src) : m_src(src), m_idx(0) {
+    Lexer(const _SCN string& src) : m_src(src), m_idx(0) {
         m_nextToken.type = TokenType::kNone;
     }
 
@@ -129,7 +129,7 @@ public:
             token->str = "";
             do {
                 if (c >= '0' && c <= '9' || c == '-') {
-                    token->str += CString(1, c);
+                    token->str += _SCN string(1, c);
                 }
                 else {
                     SkipChar(-1);
@@ -180,7 +180,7 @@ public:
     }
 
 private:
-    CString m_src;
+    _SCN string m_src;
     size_t m_idx;
     Token m_nextToken;
 };

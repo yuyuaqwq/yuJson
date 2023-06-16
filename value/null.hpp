@@ -12,7 +12,7 @@ public:
     }
 };
 
-using Null = UniquePtr<NullValue>;
+using Null = _SCN unique_ptr<NullValue>;
 } // namespace value
 } // namespace yuJson
 

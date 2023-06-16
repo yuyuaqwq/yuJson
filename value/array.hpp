@@ -40,23 +40,23 @@ public:
     }
 
     void Pushback(nullptr_t) {
-        Pushback(MakeUnique<NullValue>());
+        Pushback(_SCN make_unique<NullValue>());
     }
 
     void Pushback(BooleanValue&& boolean) {
-        Pushback(MakeUnique<BooleanValue>(std::move(boolean)));
+        Pushback(_SCN make_unique<BooleanValue>(std::move(boolean)));
     }
 
     void Pushback(NumberValue&& num) {
-        Pushback(MakeUnique<NumberValue>(std::move(num)));
+        Pushback(_SCN make_unique<NumberValue>(std::move(num)));
     }
 
     void Pushback(StringValue&& str) {
-        Pushback(MakeUnique<StringValue>(std::move(str)));
+        Pushback(_SCN make_unique<StringValue>(std::move(str)));
     }
 
     void Pushback(ArrayValue&& arr) {
-        Pushback(MakeUnique<ArrayValue>(std::move(arr)));
+        Pushback(_SCN make_unique<ArrayValue>(std::move(arr)));
     }
 
     void Pushback(ObjectValue&& obj);
@@ -66,23 +66,23 @@ public:
     }
 
     void Set(int i, nullptr_t) noexcept {
-        Set(i, MakeUnique<NullValue>());
+        Set(i, _SCN make_unique<NullValue>());
     }
 
     void Set(int i, BooleanValue&& boolean) noexcept {
-        Set(i, MakeUnique<BooleanValue>(std::move(boolean)));
+        Set(i, _SCN make_unique<BooleanValue>(std::move(boolean)));
     }
 
     void Set(int i, NumberValue&& num) noexcept {
-        Set(i, MakeUnique<NumberValue>(std::move(num)));
+        Set(i, _SCN make_unique<NumberValue>(std::move(num)));
     }
 
     void Set(int i, StringValue&& str) noexcept {
-        Set(i, MakeUnique<StringValue>(std::move(str)));
+        Set(i, _SCN make_unique<StringValue>(std::move(str)));
     }
 
     void Set(int i, ArrayValue&& arr) noexcept {
-        Set(i, MakeUnique<ArrayValue>(std::move(arr)));
+        Set(i, _SCN make_unique<ArrayValue>(std::move(arr)));
     }
 
     void Set(int i, ObjectValue&& obj) noexcept;
@@ -91,7 +91,7 @@ private:
     ValueVector m_arr;
 };
 
-using Array = UniquePtr<ArrayValue>;
+using Array = _SCN unique_ptr<ArrayValue>;
 } // namespace value
 } // namespace yuJson
 

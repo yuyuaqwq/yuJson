@@ -31,19 +31,19 @@ public:
         }
         switch (token.type) {
         case TokenType::kNull: {
-            return MakeUnique<value::NullValue>();
+            return _SCN make_unique<value::NullValue>();
         }
         case TokenType::kTrue: {
-            return MakeUnique<value::BooleanValue>(true);
+            return _SCN make_unique<value::BooleanValue>(true);
         }
         case TokenType::kFalse: {
-            return MakeUnique<value::BooleanValue>(false);
+            return _SCN make_unique<value::BooleanValue>(false);
         }
         case TokenType::kNumber: {
-            return MakeUnique<value::NumberValue>(atoll(token.str.c_str()));
+            return _SCN make_unique<value::NumberValue>(atoll(token.str.c_str()));
         }
         case TokenType::kString: {
-            return MakeUnique<value::StringValue>(token.str);
+            return _SCN make_unique<value::StringValue>(token.str);
         }
         }
         if (token.type == TokenType::kLbrack) {
@@ -58,7 +58,7 @@ public:
 
 private:
     value::Array ParseArray() {
-        value::Array array = MakeUnique<value::ArrayValue>();
+        value::Array array = _SCN make_unique<value::ArrayValue>();
         Token token;
         if (!m_lexer->LookAhead(&token)) {
             return nullptr;
@@ -87,7 +87,7 @@ private:
     }
 
     value::Object ParseObject() {
-        value::Object object = MakeUnique<value::ObjectValue>();
+        value::Object object = _SCN make_unique<value::ObjectValue>();
         Token token;
         if (!m_lexer->NextToken(&token)) {
             return nullptr;

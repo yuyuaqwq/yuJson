@@ -8,7 +8,7 @@ namespace value {
 class StringValue : public ValueBase {
 public:
     explicit StringValue(const char* str) : m_str(str) { }
-    explicit StringValue(const CString& str) : m_str(str) { }
+    explicit StringValue(const _SCN string& str) : m_str(str) { }
     StringValue(StringValue&& str) noexcept : m_str(str.Get()) { }
 
     void operator=(StringValue& str) = delete;
@@ -23,15 +23,15 @@ public:
         return ValueType::kString;
     }
 
-    CString& Get() noexcept {
+    _SCN string& Get() noexcept {
         return m_str;
     }
 
 private:
-    CString m_str;
+    _SCN string m_str;
 };
 
-using String = UniquePtr<StringValue>;
+using String = _SCN unique_ptr<StringValue>;
 } // namespace value
 } // namespace yuJson
 

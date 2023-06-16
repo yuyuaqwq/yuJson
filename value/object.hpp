@@ -46,27 +46,27 @@ public:
     }
 
     void Set(const _SCN string& key, nullptr_t) {
-        Set(key, MakeUnique<value::NullValue>());
+        Set(key, _SCN make_unique<value::NullValue>());
     }
 
     void Set(const _SCN string& key, BooleanValue&& boolean) {
-        Set(key, MakeUnique<value::BooleanValue>(std::move(boolean)));
+        Set(key, _SCN make_unique<value::BooleanValue>(std::move(boolean)));
     }
 
     void Set(const _SCN string& key, NumberValue&& num) {
-        Set(key, MakeUnique<value::NumberValue>(std::move(num)));
+        Set(key, _SCN make_unique<value::NumberValue>(std::move(num)));
     }
 
     void Set(const _SCN string& key, StringValue&& str) {
-        Set(key, MakeUnique<value::StringValue>(std::move(str)));
+        Set(key, _SCN make_unique<value::StringValue>(std::move(str)));
     }
 
     void Set(const _SCN string& key, ArrayValue&& arr) {
-        Set(key, MakeUnique<value::ArrayValue>(std::move(arr)));
+        Set(key, _SCN make_unique<value::ArrayValue>(std::move(arr)));
     }
 
     void Set(const _SCN string& key, ObjectValue&& obj) {
-        Set(key, MakeUnique<value::ObjectValue>(std::move(obj)));
+        Set(key, _SCN make_unique<value::ObjectValue>(std::move(obj)));
     }
 
     void Delete(const _SCN string& key) noexcept {
@@ -78,14 +78,14 @@ private:
 };
 
 inline void ArrayValue::Pushback(ObjectValue&& obj) {
-    Pushback(MakeUnique<ObjectValue>(std::move(obj)));
+    Pushback(_SCN make_unique<ObjectValue>(std::move(obj)));
 }
 
 inline void ArrayValue::Set(int i, ObjectValue&& obj) noexcept {
-    Set(i, MakeUnique<ObjectValue>(std::move(obj)));
+    Set(i, _SCN make_unique<ObjectValue>(std::move(obj)));
 }
 
-using Object = UniquePtr<ObjectValue>;
+using Object = _SCN unique_ptr<ObjectValue>;
 } // namespace value
 } // namespace yuJson
 

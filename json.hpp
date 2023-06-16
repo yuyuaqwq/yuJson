@@ -21,7 +21,7 @@ public:
     explicit Json(value::Value value) noexcept : m_value{ std::move(value) } { }
     Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
     template<class T>
-    Json(T value) : m_value{ value::MakeValue<T>(value) } {}
+    Json(T value) : m_value{ value::make_value(value) } {}
     Json(std::initializer_list<Json> json) {
         if (json.size() % 2 == 0) {
             bool is_obj = true;
@@ -32,7 +32,7 @@ public:
                 }
             }
             if (is_obj) {
-                m_value = MakeUnique<value::ObjectValue>();
+                m_value = _SCN make_unique<value::ObjectValue>();
                 for (auto iter = json.begin(); iter != json.end(); iter += 2) {
                     _SCN string key = iter->m_value->ToString().Get();
                     m_value->ToObject().Set(key, std::move(((Json*)iter + 1)->m_value));
@@ -40,7 +40,7 @@ public:
             }
         }
         if (!IsValid()) {
-            m_value = MakeUnique<value::ArrayValue>();
+            m_value = _SCN make_unique<value::ArrayValue>();
             for (auto iter = json.begin(); iter != json.end(); iter++) {
                 m_value->ToArray().Pushback(std::move(((Json*)iter)->m_value));
             }
@@ -95,7 +95,7 @@ public:
     bool Parse(const char* jsonText) {
         compiler::Lexer lexer(jsonText);
         compiler::Parser parser(&lexer);
-        auto tempbasic_Json = MakeUnique<Json>(parser.ParseValue());
+        auto tempbasic_Json = _SCN make_unique<Json>(parser.ParseValue());
         if (!tempbasic_Json->IsValid()) {
             return false;
         }
@@ -167,31 +167,31 @@ public:
 
     //template <typename T>
     //void Set(T&& val) {
-    //    m_value = MakeUnique<T>(std::move(val));
+    //    m_value = _SCN make_unique<T>(std::move(val));
     //}
 
     void Set(nullptr_t) {
-        m_value = MakeUnique<value::NullValue>();
+        m_value = _SCN make_unique<value::NullValue>();
     }
 
     void Set(value::BooleanValue&& boolean) {
-        m_value = MakeUnique<value::BooleanValue>(std::move(boolean));
+        m_value = _SCN make_unique<value::BooleanValue>(std::move(boolean));
     }
 
     void Set(value::NumberValue&& num) {
-        m_value = MakeUnique<value::NumberValue>(std::move(num));
+        m_value = _SCN make_unique<value::NumberValue>(std::move(num));
     }
 
     void Set(value::StringValue&& str) {
-        m_value = MakeUnique<value::StringValue>(std::move(str));
+        m_value = _SCN make_unique<value::StringValue>(std::move(str));
     }
 
     void Set(value::ArrayValue&& arr) {
-        m_value = MakeUnique<value::ArrayValue>(std::move(arr));
+        m_value = _SCN make_unique<value::ArrayValue>(std::move(arr));
     }
 
     void Set(value::ObjectValue&& obj) {
-        m_value = MakeUnique<value::ObjectValue>(std::move(obj));
+        m_value = _SCN make_unique<value::ObjectValue>(std::move(obj));
     }
 
 public:

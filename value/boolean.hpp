@@ -27,7 +27,7 @@ private:
     bool m_bool;
 };
 
-using Boolean = UniquePtr<BooleanValue>;
+using Boolean = _SCN unique_ptr<BooleanValue>;
 } // namespace value
 } // namespace yuJson
 
