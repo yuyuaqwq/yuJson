@@ -18,7 +18,7 @@ public:
         return ValueType::kObject;
     }
 
-    const ValueMap& GetMap() const noexcept {
+    const ValuePtrtMap& GetMap() const noexcept {
         return m_obj;
     }
 
@@ -29,7 +29,7 @@ public:
         return *(ValueBase*)nullptr;
     }
 
-    _SCN unique_ptr<ValueBase>* GetPtr(const _SCN string& key) {
+    ValuePtr* GetPtr(const _SCN string& key) {
         if (Find(key)) {
             return &m_obj[key];
         }
@@ -40,7 +40,7 @@ public:
         return m_obj.find(key) != m_obj.end();
     }
 
-    void Set(const _SCN string& key, _SCN unique_ptr<ValueBase> value) {
+    void Set(const _SCN string& key, ValuePtr value) {
         auto& it = m_obj.operator[](key);
         it = std::move(value);
     }
@@ -74,7 +74,7 @@ public:
     }
 
 private:
-    ValueMap m_obj;
+    ValuePtrtMap m_obj;
 };
 
 inline void ArrayValue::Pushback(ObjectValue&& obj) {
@@ -85,7 +85,7 @@ inline void ArrayValue::Set(int i, ObjectValue&& obj) noexcept {
     Set(i, _SCN make_unique<ObjectValue>(std::move(obj)));
 }
 
-using Object = _SCN unique_ptr<ObjectValue>;
+using ObjectPtr = _SCN unique_ptr<ObjectValue>;
 } // namespace value
 } // namespace yuJson
 

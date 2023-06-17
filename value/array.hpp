@@ -17,7 +17,7 @@ public:
     virtual ValueType Type() const noexcept {
         return ValueType::kArray;
     }
-    const ValueVector& GetVector() const noexcept {
+    const ValuePtrVector& GetVector() const noexcept {
         return m_arr;
     }
 
@@ -28,14 +28,14 @@ public:
         return (ValueBase&)*m_arr[i];
     }
 
-    Value* GetPtr(int i) {
+    ValuePtr* GetPtr(int i) {
         if (i < 0 || i >= m_arr.size()) {
             return nullptr;
         }
         return &m_arr[i];
     }
 
-    void Pushback(Value value) {
+    void Pushback(ValuePtr value) {
         m_arr.push_back(std::move(value));
     }
 
@@ -61,7 +61,7 @@ public:
 
     void Pushback(ObjectValue&& obj);
 
-    void Set(int i, _SCN unique_ptr<ValueBase> value) noexcept {
+    void Set(int i, ValuePtr value) noexcept {
         m_arr[i] = std::move(value);
     }
 
@@ -88,10 +88,10 @@ public:
     void Set(int i, ObjectValue&& obj) noexcept;
 
 private:
-    ValueVector m_arr;
+    ValuePtrVector m_arr;
 };
 
-using Array = _SCN unique_ptr<ArrayValue>;
+using ArrayPtr = _SCN unique_ptr<ArrayValue>;
 } // namespace value
 } // namespace yuJson
 

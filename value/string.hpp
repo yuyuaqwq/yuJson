@@ -31,7 +31,7 @@ private:
     _SCN string m_str;
 };
 
-using String = _SCN unique_ptr<StringValue>;
+using StringPtr = _SCN unique_ptr<StringValue>;
 } // namespace value
 } // namespace yuJson
 

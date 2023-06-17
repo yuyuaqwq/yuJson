@@ -18,14 +18,16 @@ namespace yuJson {
 class Json {
 public:
     Json() noexcept { }
-    explicit Json(value::Value value) noexcept : m_value{ std::move(value) } { }
+    explicit Json(value::ValuePtr value) noexcept : m_value{ std::move(value) } { }
     Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
     template<class T>
     Json(T value) : m_value{ value::make_value(value) } {}
-    Json(std::initializer_list<Json> json) {
-        if (json.size() % 2 == 0) {
+    template<class... ArgsT>
+    Json(ArgsT&&... args) {
+        _SCN initializer_list<Json> jsons{std::forward<ArgsT>(args)...};
+        if (jsons.size() % 2 == 0) {
             bool is_obj = true;
-            for (auto iter = json.begin(); iter != json.end(); iter+=2) {
+            for (auto iter = jsons.begin(); iter != jsons.end(); iter+=2) {
                 if (!iter->m_value->IsString()) {
                     is_obj = false;
                     break;
@@ -33,7 +35,7 @@ public:
             }
             if (is_obj) {
                 m_value = _SCN make_unique<value::ObjectValue>();
-                for (auto iter = json.begin(); iter != json.end(); iter += 2) {
+                for (auto iter = jsons.begin(); iter != jsons.end(); iter += 2) {
                     _SCN string key = iter->m_value->ToString().Get();
                     m_value->ToObject().Set(key, std::move(((Json*)iter + 1)->m_value));
                 }
@@ -41,7 +43,7 @@ public:
         }
         if (!IsValid()) {
             m_value = _SCN make_unique<value::ArrayValue>();
-            for (auto iter = json.begin(); iter != json.end(); iter++) {
+            for (auto iter = jsons.begin(); iter != jsons.end(); iter++) {
                 m_value->ToArray().Pushback(std::move(((Json*)iter)->m_value));
             }
         }
@@ -165,10 +167,10 @@ public:
         m_value = std::move(value);
     }
 
-    //template <typename T>
-    //void Set(T&& val) {
-    //    m_value = _SCN make_unique<T>(std::move(val));
-    //}
+    template <typename T>
+    void Set(T&& val) {
+        m_value = _SCN make_unique<T>(std::move(val));
+    }
 
     void Set(nullptr_t) {
         m_value = _SCN make_unique<value::NullValue>();
@@ -245,8 +247,8 @@ public:
         }
     private:
         union {
-            value::ValueMap::const_iterator m_obj_iter;
-            value::ValueVector::const_iterator m_arr_iter;
+            value::ValuePtrtMap::const_iterator m_obj_iter;
+            value::ValuePtrVector::const_iterator m_arr_iter;
         };
         Json* m_base;
     };
@@ -283,7 +285,9 @@ private:
             break;
         }
         case value::ValueType::kNumber: {
-            *jsonStr += std::to_string(static_cast<value::NumberValue*>(value)->GetInt());
+            char buf[21]{ 0 };
+            _itoa_s(static_cast<value::NumberValue*>(value)->GetInt(), buf, 10);
+            *jsonStr += buf;
             break;
         }
         case value::ValueType::kString: {
@@ -319,7 +323,6 @@ private:
         case value::ValueType::kObject: {
             *jsonStr += '{';
             if (format) {
-                
                 indent += _SCN string(kIndent, '  ');
             }
 
@@ -352,7 +355,7 @@ private:
     }
 
 private:
-    value::Value m_value;
+    value::ValuePtr m_value;
 
 private:
     static const int kIndent = 4;

@@ -40,7 +40,7 @@ private:
 
 };
 
-using Number = _SCN unique_ptr<NumberValue>;
+using NumberPtr = _SCN unique_ptr<NumberValue>;
 } // namespace value
 } // namespace yuJson
 

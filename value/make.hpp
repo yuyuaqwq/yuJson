@@ -14,16 +14,16 @@ namespace yuJson {
 
         // 如果T为bool, 返回BooleanValue
         template<class T>
-        using enable_if_bool_t = enable_if_any_of_t<T, Boolean, bool>;
+        using enable_if_bool_t = enable_if_any_of_t<T, BooleanPtr, bool>;
         // 如果T∈ALL_NUMBER_TYPES, 返回NumberValue
         template<class T>
-        using enable_if_number_t = enable_if_any_of_t<T, Number, ALL_NUMBER_TYPES>;
+        using enable_if_number_t = enable_if_any_of_t<T, NumberPtr, ALL_NUMBER_TYPES>;
         template<class T>
         // 如果T为nullptr, 返回NullValue
-        using enable_if_null_t = typename std::enable_if_t<std::is_null_pointer_v<T>, Null>;
+        using enable_if_null_t = typename std::enable_if_t<std::is_null_pointer_v<T>, NullPtr>;
         // 如果T∈{const char*, const char[N]}, 返回StringValue
         template<class T>
-        using enable_if_str_t = enable_if_any_of_t<T, String, const char*, const char[]>;
+        using enable_if_str_t = enable_if_any_of_t<T, StringPtr, const char*, const char[]>;
 
         /*
         * 利用enable_if的特性, 根据不同类型的T调用不同的"重载"函数

@@ -24,7 +24,7 @@ public:
     Parser(Lexer* lexer) : m_lexer(lexer) { }
 
 public:
-    value::Value ParseValue() {
+    value::ValuePtr ParseValue() {
         Token token;
         if (!m_lexer->NextToken(&token)) {
             return nullptr;
@@ -57,8 +57,8 @@ public:
     }
 
 private:
-    value::Array ParseArray() {
-        value::Array array = _SCN make_unique<value::ArrayValue>();
+    value::ArrayPtr ParseArray() {
+        value::ArrayPtr array = _SCN make_unique<value::ArrayValue>();
         Token token;
         if (!m_lexer->LookAhead(&token)) {
             return nullptr;
@@ -86,8 +86,8 @@ private:
         return array;
     }
 
-    value::Object ParseObject() {
-        value::Object object = _SCN make_unique<value::ObjectValue>();
+    value::ObjectPtr ParseObject() {
+        value::ObjectPtr object = _SCN make_unique<value::ObjectValue>();
         Token token;
         if (!m_lexer->NextToken(&token)) {
             return nullptr;
