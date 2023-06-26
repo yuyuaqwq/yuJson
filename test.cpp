@@ -4,6 +4,9 @@
 
 int main()
 {
+    auto obj = yuJson::Json::MakeObject();
+    std::cout << obj.Print() << std::endl << std::endl;
+
     yuJson::Json json{ "awdwd", yuJson::Json({ "aa", 123 }), "emmm", 3333};
     json["cccccc"] = "qaq";
     json["awdwd"]["aa"] = { 1,2,3,4 };

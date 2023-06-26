@@ -17,14 +17,17 @@ namespace yuJson {
 
 class Json {
 public:
+    template<class T>
+    using enable_if_cant_convert_to_valueptr_t = std::enable_if_t<!std::is_convertible_v<T, value::ValuePtr>, int>;
+
     Json() noexcept { }
     explicit Json(value::ValuePtr value) noexcept : m_value{ std::move(value) } { }
     Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
-    template<class T>
+    template<class T, enable_if_cant_convert_to_valueptr_t<T> = 0>
     Json(T value) : m_value{ value::make_value(value) } {}
-    template<class... ArgsT>
-    Json(ArgsT&&... args) {
-        _SCN initializer_list<Json> jsons{std::forward<ArgsT>(args)...};
+    template<class ThisT, class... RestT, enable_if_cant_convert_to_valueptr_t<ThisT> = 0>
+    Json(ThisT&& this_arg, RestT&&... rest_args) {
+        _SCN initializer_list<Json> jsons{std::forward<ThisT>(this_arg), std::forward<RestT>(rest_args)...};
         if (jsons.size() % 2 == 0) {
             bool is_obj = true;
             for (auto iter = jsons.begin(); iter != jsons.end(); iter+=2) {
@@ -194,6 +197,16 @@ public:
 
     void Set(value::ObjectValue&& obj) {
         m_value = _SCN make_unique<value::ObjectValue>(std::move(obj));
+    }
+
+    static Json MakeObject()
+    {
+        return Json(std::make_unique<yuJson::value::ObjectValue>());
+    }
+
+    static Json MakeArray()
+    {
+        return Json(std::make_unique<yuJson::value::ArrayValue>());
     }
 
 public:
