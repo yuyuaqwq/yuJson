@@ -8,7 +8,7 @@ namespace value {
 class NumberValue : public ValueBase {
 public:
     //explicit Number(double num) noexcept : m_float(num) { }
-    explicit NumberValue(long long num) noexcept : m_int(num) { }
+    NumberValue(long long num) noexcept : m_int(num) { }
     ~NumberValue() noexcept { }
 
     virtual ValueType Type() const noexcept {

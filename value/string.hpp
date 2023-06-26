@@ -7,7 +7,7 @@ namespace yuJson {
 namespace value {
 class StringValue : public ValueBase {
 public:
-    explicit StringValue(const char* str) : m_str(str) { }
+    StringValue(const char* str) : m_str(str) { }
     explicit StringValue(const _SCN string& str) : m_str(str) { }
     StringValue(StringValue&& str) noexcept : m_str(str.Get()) { }
 

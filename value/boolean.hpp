@@ -8,7 +8,7 @@ namespace value {
 
 class BooleanValue : public ValueBase {
 public:
-    explicit BooleanValue(bool b) noexcept : m_bool(b) { }
+    BooleanValue(bool b) noexcept : m_bool(b) { }
     ~BooleanValue() noexcept { }
 
     virtual ValueType Type() const noexcept {

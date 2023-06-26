@@ -7,6 +7,10 @@ namespace yuJson {
 namespace value {
 class NullValue : public ValueBase {
 public:
+    NullValue() { }
+
+    NullValue(std::nullptr_t) { }
+
     virtual ValueType Type() const noexcept {
         return ValueType::kNull;
     }
