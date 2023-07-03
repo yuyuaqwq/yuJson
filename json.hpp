@@ -7,7 +7,6 @@
 
 #include <string>
 #include <memory>
-#include <regex>
 #include <initializer_list>
 
 #include <yuJson/compiler/parser.hpp>
@@ -64,11 +63,11 @@ public:
         if (!GetObject().Find(str)) {
             GetObject().Set(str, nullptr);
         }
-        return (Json&)*GetObject().GetPtr(str);
+        return *(Json*)GetObject().GetPtr(str);
     }
 
     Json& operator[](int index) {
-        return (Json&)*GetArray().GetPtr(index);
+        return *(Json*)GetArray().GetPtr(index);
     }
 
     bool operator==(const Json&& other) const {
@@ -97,15 +96,10 @@ public:
         return m_value.get() != nullptr;
     }
 
-    bool Parse(const char* jsonText) {
+    static Json Parse(const char* jsonText) {
         compiler::Lexer lexer(jsonText);
         compiler::Parser parser(&lexer);
-        auto tempbasic_Json = _SCN make_unique<Json>(parser.ParseValue());
-        if (!tempbasic_Json->IsValid()) {
-            return false;
-        }
-        m_value = std::move(tempbasic_Json->m_value);
-        return true;
+        return Json(parser.ParseValue());
     }
 
     _SCN string Print(bool format = true) const {
@@ -276,10 +270,20 @@ public:
     }
 
 private:
+    static std::string Replace(const std::string& str, const std::string& replace, const std::string& target) {
+        auto new_str = str;
+        size_t pos = 0;
+        pos = new_str.find(replace);
+        while (pos != -1) {
+            new_str = new_str.replace(pos, replace.size(), target.c_str());
+            pos = new_str.find(replace, pos + target.size() + 1);
+        }
+        return new_str;
+    }
     void StrEscapr(_SCN string* str) const {
         // 引号添加\转义，一个\修改为两个\\ 
-        *str = std::regex_replace(*str, std::regex(R"(\\)"), R"(\\)");
-        *str = std::regex_replace(*str, std::regex(R"(")"), R"(\")");
+        *str = Replace(*str, R"(\)", R"(\\)");
+        *str = Replace(*str, R"(")", R"(\")");
     }
 
     void Print(value::ValueBase* value, bool format, size_t level, _SCN string* jsonStr) const {

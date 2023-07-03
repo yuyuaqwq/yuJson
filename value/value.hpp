@@ -119,11 +119,13 @@ public:
 #include <string>
 #include <memory>
 namespace yuJson{
-    namespace value{
-        using ValuePtr = _SCN unique_ptr<ValueBase>;
-        using ValuePtrVector = _SCN vector<ValuePtr>;
-        using ValuePtrtMap = _SCN map<_SCN string, ValuePtr>;
-    }
+namespace value{
+
+using ValuePtr = _SCN unique_ptr<ValueBase>;
+using ValuePtrVector = _SCN vector<ValuePtr>;
+using ValuePtrtMap = _SCN map<_SCN string, ValuePtr>;
+
+}
 }
 
 

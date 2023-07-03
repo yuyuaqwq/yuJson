@@ -7,10 +7,21 @@ int main()
     auto obj = yuJson::Json::MakeObject();
     std::cout << obj.Print() << std::endl << std::endl;
 
+    auto qqq = obj.GetObject().At("abc");
+
+    obj["aa"]["bb"];
+
     yuJson::Json json{ "awdwd", yuJson::Json({ "aa", 123 }), "emmm", 3333};
     json["cccccc"] = "qaq";
     json["awdwd"]["aa"] = { 1,2,3,4 };
     std::cout << json.Print() << std::endl << std::endl;
+
+    auto cac = yuJson::Json::Parse("{a}");
+    if (cac.IsValid()) {
+        printf("valid");
+    }
+
+
 
     json = {1, 2};
     std::cout << json.Print() << std::endl << std::endl;

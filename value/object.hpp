@@ -1,9 +1,12 @@
 #ifndef YUJSON_VALUE_OBJECT_H_
 #define YUJSON_VALUE_OBJECT_H_
 
+#include <stdexcept>
+
 #include <yuJson/value/value.hpp>
 
 namespace yuJson {
+class Json;
 namespace value {
 class ObjectValue : public ValueBase {
 public:
@@ -22,16 +25,16 @@ public:
         return m_obj;
     }
 
-    ValueBase& Get(const _SCN string& key) {
+    Json& At(const _SCN string& key) {
         if (Find(key)) {
-            return *m_obj[key];
+            return *(Json*)m_obj[key].get();
         }
-        return *(ValueBase*)nullptr;
+        throw std::out_of_range("object at");
     }
 
-    ValuePtr* GetPtr(const _SCN string& key) {
+    ValueBase* GetPtr(const _SCN string& key) {
         if (Find(key)) {
-            return &m_obj[key];
+            return m_obj[key].get();
         }
         return nullptr;
     }

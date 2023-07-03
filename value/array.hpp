@@ -1,9 +1,12 @@
 #ifndef YUJSON_VALUE_ARRAY_H_
 #define YUJSON_VALUE_ARRAY_H_
 
+#include <stdexcept>
+
 #include <yuJson/value/value.hpp>
 
 namespace yuJson {
+class Json;
 namespace value {
 class ArrayValue : public ValueBase {
 public:
@@ -21,21 +24,21 @@ public:
         return m_arr;
     }
 
-    ValueBase& Get(int i) {
+    Json& At(int i) {
         if (i < 0 || i >= m_arr.size()) {
-            return *(ValueBase*)nullptr;
+            return *(Json*)nullptr;
         }
-        return (ValueBase&)*m_arr[i];
+        throw std::out_of_range("array at");
     }
 
-    ValuePtr* GetPtr(int i) {
+    ValueBase* GetPtr(int i) {
         if (i < 0 || i >= m_arr.size()) {
             return nullptr;
         }
-        return &m_arr[i];
+        return m_arr[i].get();
     }
 
-    void Pushback(ValuePtr value) {
+    void Pushback(ValuePtr&& value) {
         m_arr.push_back(std::move(value));
     }
 
