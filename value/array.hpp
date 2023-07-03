@@ -26,9 +26,13 @@ public:
 
     Json& At(int i) {
         if (i < 0 || i >= m_arr.size()) {
-            return *(Json*)nullptr;
+            throw std::out_of_range("array at");
         }
-        throw std::out_of_range("array at");
+        return *(Json*)m_arr[i].get();
+    }
+
+    Json& operator[](int i) {
+        return *(Json*)m_arr[i].get();
     }
 
     ValueBase* GetPtr(int i) {
