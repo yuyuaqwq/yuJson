@@ -25,10 +25,7 @@ public:
     }
 
     Json& At(int i) {
-        if (i < 0 || i >= m_arr.size()) {
-            throw std::out_of_range("array at");
-        }
-        return *(Json*)&m_arr[i];
+        return *(Json*)&m_arr.at(i);
     }
 
     Json& operator[](int i) {

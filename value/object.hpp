@@ -26,10 +26,7 @@ public:
     }
 
     Json& At(const _SCN string& key) {
-        if (Find(key)) {
-            return *(Json*)&m_obj[key];
-        }
-        throw std::out_of_range("object at");
+        return *(Json*)&m_obj.at(key);
     }
 
     Json& operator[](const _SCN string& key) {
