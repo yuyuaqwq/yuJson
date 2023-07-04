@@ -17,14 +17,18 @@ namespace yuJson {
 class Json {
 public:
     template<class T>
-    using enable_if_cant_convert_to_valueptr_t = std::enable_if_t<!std::is_convertible_v<T, value::ValuePtr>, int>;
+    using type_limit_t =
+        std::enable_if_t<
+        !std::is_convertible_v<T, value::ValuePtr> &&
+        !std::_Is_any_of_v<T, Json, Json&, Json&&>,
+        int>;
 
     Json() noexcept { }
     explicit Json(value::ValuePtr value) noexcept : m_value{ std::move(value) } { }
     Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
-    template<class T, enable_if_cant_convert_to_valueptr_t<T> = 0>
+    template<class T, type_limit_t<T> = 0>
     Json(T value) : m_value{ value::make_value(value) } {}
-    template<class ThisT, class... RestT, enable_if_cant_convert_to_valueptr_t<ThisT> = 0>
+    template<class ThisT, class... RestT, type_limit_t<ThisT> = 0>
     Json(ThisT&& this_arg, RestT&&... rest_args) {
         _SCN initializer_list<Json> jsons{std::forward<ThisT>(this_arg), std::forward<RestT>(rest_args)...};
         if (jsons.size() % 2 == 0) {
@@ -195,12 +199,12 @@ public:
 
     static Json MakeObject()
     {
-        return Json(std::make_unique<yuJson::value::ObjectValue>());
+        return Json(_SCN make_unique<yuJson::value::ObjectValue>());
     }
 
     static Json MakeArray()
     {
-        return Json(std::make_unique<yuJson::value::ArrayValue>());
+        return Json(_SCN make_unique<yuJson::value::ArrayValue>());
     }
 
 public:
@@ -270,7 +274,7 @@ public:
     }
 
 private:
-    static std::string Replace(const std::string& str, const std::string& replace, const std::string& target) {
+    static _SCN string Replace(const _SCN string& str, const _SCN string& replace, const _SCN string& target) {
         auto new_str = str;
         size_t pos = 0;
         pos = new_str.find(replace);
