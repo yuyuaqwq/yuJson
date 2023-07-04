@@ -27,20 +27,13 @@ public:
 
     Json& At(const _SCN string& key) {
         if (Find(key)) {
-            return *(Json*)m_obj[key].get();
+            return *(Json*)&m_obj[key];
         }
         throw std::out_of_range("object at");
     }
 
     Json& operator[](const _SCN string& key) {
-        return *(Json*)m_obj[key].get();
-    }
-
-    ValueBase* GetPtr(const _SCN string& key) {
-        if (Find(key)) {
-            return m_obj[key].get();
-        }
-        return nullptr;
+        return *(Json*)&m_obj[key];
     }
 
     bool Find(const _SCN string& key) const noexcept {

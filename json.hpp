@@ -64,14 +64,19 @@ public:
     }
 
     Json& operator[](const char* str) {
-        if (!GetObject().Find(str)) {
-            GetObject().Set(str, nullptr);
-        }
-        return *(Json*)GetObject().GetPtr(str);
+        return GetObject()[str];
     }
 
     Json& operator[](int index) {
-        return *(Json*)GetArray().GetPtr(index);
+        return GetArray()[index];
+    }
+
+    Json& At(const char* str) {
+        return GetObject().At(str);
+    }
+
+    Json& At(int index) {
+        return GetArray().At(index);
     }
 
     bool operator==(const Json&& other) const {
