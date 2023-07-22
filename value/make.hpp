@@ -5,29 +5,29 @@
 
 namespace yuJson {
   namespace value {
-    // ����Number��C����
+    // 所有Number的C类型
 #define ALL_NUMBER_TYPES char, signed char, unsigned char, wchar_t, char16_t, char32_t, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long, float, double, long double
 
-    // ���JudgedObjT��JudgeTypesT, �򷵻�����ΪRetValT
+    // 如果JudgedObjT∈JudgeTypesT, 则返回类型为RetValT
     template<class JudgedObjT, class RetValT, class... JudgeTypesT>
     using enable_if_any_of_t = typename std::enable_if_t<std::_Is_any_of_v<std::remove_reference_t<JudgedObjT>, JudgeTypesT...>, RetValT>;
 
-    // ���TΪbool, ����BooleanValue
+    // 如果T为bool, 返回BooleanValue
     template<class T>
     using enable_if_bool_t = enable_if_any_of_t<T, BooleanPtr, bool>;
-    // ���T��ALL_NUMBER_TYPES, ����NumberValue
+    // 如果T∈ALL_NUMBER_TYPES, 返回NumberValue
     template<class T>
     using enable_if_number_t = enable_if_any_of_t<T, NumberPtr, ALL_NUMBER_TYPES>;
     template<class T>
-    // ���TΪnullptr, ����NullValue
+    // 如果T为nullptr, 返回NullValue
     using enable_if_null_t = typename std::enable_if_t<std::is_null_pointer_v<T>, NullPtr>;
-    // ���T��{const char*, const char[N]}, ����StringValue
+    // 如果T∈{const char*, const char[N]}, 返回StringValue
     template<class T>
     using enable_if_str_t = enable_if_any_of_t<T, StringPtr, const char*, const char[]>;
 
     /*
-    * ����enable_if������, ���ݲ�ͬ���͵�T���ò�ͬ��"����"����
-    * ���û��ƥ�����ᱨ��
+    * 利用enable_if的特性, 根据不同类型的T调用不同的"重载"函数
+    * 如果没有匹配的则会报错
     */
     template<class T>
     inline constexpr enable_if_bool_t<T> make_value(T value) {
