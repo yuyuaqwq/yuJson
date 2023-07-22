@@ -7,36 +7,36 @@ namespace yuJson {
 namespace value {
 class NumberValue : public ValueBase {
 public:
-    //explicit Number(double num) noexcept : m_float(num) { }
-    NumberValue(long long num) noexcept : m_int(num) { }
-    ~NumberValue() noexcept { }
+  //explicit Number(double num) noexcept : m_float(num) { }
+  NumberValue(long long num) noexcept : m_int(num) { }
+  ~NumberValue() noexcept { }
 
-    virtual ValueType Type() const noexcept {
-        return ValueType::kNumber;
-    }
+  virtual ValueType Type() const noexcept {
+    return ValueType::kNumber;
+  }
 
-    double& GetFloat() noexcept {
-        return m_float;
-    }
+  double& GetFloat() noexcept {
+    return m_float;
+  }
 
-    void SetFloat(double num) noexcept {
-        m_float = num;
-    }
+  void SetFloat(double num) noexcept {
+    m_float = num;
+  }
 
-    long long& GetInt() noexcept {
-        return m_int;
-    }
+  long long& GetInt() noexcept {
+    return m_int;
+  }
 
-    void SetInt(long long num) noexcept {
-        m_int = num;
-    }
+  void SetInt(long long num) noexcept {
+    m_int = num;
+  }
 
 private:
-    union
-    {
-        double m_float;
-        long long m_int;
-    };
+  union
+  {
+    double m_float;
+    long long m_int;
+  };
 
 };
 

@@ -10,82 +10,82 @@ class Json;
 namespace value {
 class ArrayValue : public ValueBase {
 public:
-    ArrayValue() noexcept { }
-    ArrayValue(ArrayValue&& arr) noexcept : m_arr(std::move(arr.m_arr)) { }
-    ~ArrayValue() noexcept { }
+  ArrayValue() noexcept { }
+  ArrayValue(ArrayValue&& arr) noexcept : m_arr(std::move(arr.m_arr)) { }
+  ~ArrayValue() noexcept { }
 
-    ArrayValue(const ArrayValue&) = delete;
-    void operator=(const ArrayValue&) = delete;
+  ArrayValue(const ArrayValue&) = delete;
+  void operator=(const ArrayValue&) = delete;
 
-    virtual ValueType Type() const noexcept {
-        return ValueType::kArray;
-    }
-    const ValuePtrVector& GetVector() const noexcept {
-        return m_arr;
-    }
+  virtual ValueType Type() const noexcept {
+    return ValueType::kArray;
+  }
+  const ValuePtrVector& GetVector() const noexcept {
+    return m_arr;
+  }
 
-    Json& At(int i) {
-        return *(Json*)&m_arr.at(i);
-    }
+  Json& At(int i) {
+    return *(Json*)&m_arr.at(i);
+  }
 
-    Json& operator[](int i) {
-        return *(Json*)&m_arr[i];
-    }
+  Json& operator[](int i) {
+    return *(Json*)&m_arr[i];
+  }
 
-    void Pushback(ValuePtr&& value) {
-        m_arr.push_back(std::move(value));
-    }
+  void Pushback(ValuePtr&& value) {
+    m_arr.push_back(std::move(value));
+  }
 
-    void Pushback(nullptr_t) {
-        Pushback(_SCN make_unique<NullValue>());
-    }
+  void Pushback(nullptr_t) {
+    Pushback(_SCN make_unique<NullValue>());
+  }
 
-    void Pushback(BooleanValue&& boolean) {
-        Pushback(_SCN make_unique<BooleanValue>(std::move(boolean)));
-    }
+  void Pushback(BooleanValue&& boolean) {
+    Pushback(_SCN make_unique<BooleanValue>(std::move(boolean)));
+  }
 
-    void Pushback(NumberValue&& num) {
-        Pushback(_SCN make_unique<NumberValue>(std::move(num)));
-    }
+  void Pushback(NumberValue&& num) {
+    Pushback(_SCN make_unique<NumberValue>(std::move(num)));
+  }
 
-    void Pushback(StringValue&& str) {
-        Pushback(_SCN make_unique<StringValue>(std::move(str)));
-    }
+  void Pushback(StringValue&& str) {
+    Pushback(_SCN make_unique<StringValue>(std::move(str)));
+  }
 
-    void Pushback(ArrayValue&& arr) {
-        Pushback(_SCN make_unique<ArrayValue>(std::move(arr)));
-    }
+  void Pushback(ArrayValue&& arr) {
+    Pushback(_SCN make_unique<ArrayValue>(std::move(arr)));
+  }
 
-    void Pushback(ObjectValue&& obj);
+  void Pushback(ObjectValue&& obj);
 
-    void Set(int i, ValuePtr value) noexcept {
-        m_arr[i] = std::move(value);
-    }
+  void Set(int i, ValuePtr value) noexcept {
+    m_arr[i] = std::move(value);
+  }
 
-    void Set(int i, nullptr_t) noexcept {
-        Set(i, _SCN make_unique<NullValue>());
-    }
+  void Set(int i, nullptr_t) noexcept {
+    Set(i, _SCN make_unique<NullValue>());
+  }
 
-    void Set(int i, BooleanValue&& boolean) noexcept {
-        Set(i, _SCN make_unique<BooleanValue>(std::move(boolean)));
-    }
+  void Set(int i, BooleanValue&& boolean) noexcept {
+    Set(i, _SCN make_unique<BooleanValue>(std::move(boolean)));
+  }
 
-    void Set(int i, NumberValue&& num) noexcept {
-        Set(i, _SCN make_unique<NumberValue>(std::move(num)));
-    }
+  void Set(int i, NumberValue&& num) noexcept {
+    Set(i, _SCN make_unique<NumberValue>(std::move(num)));
+  }
 
-    void Set(int i, StringValue&& str) noexcept {
-        Set(i, _SCN make_unique<StringValue>(std::move(str)));
-    }
+  void Set(int i, StringValue&& str) noexcept {
+    Set(i, _SCN make_unique<StringValue>(std::move(str)));
+  }
 
-    void Set(int i, ArrayValue&& arr) noexcept {
-        Set(i, _SCN make_unique<ArrayValue>(std::move(arr)));
-    }
+  void Set(int i, ArrayValue&& arr) noexcept {
+    Set(i, _SCN make_unique<ArrayValue>(std::move(arr)));
+  }
 
-    void Set(int i, ObjectValue&& obj) noexcept;
+  void Set(int i, ObjectValue&& obj) noexcept;
 
 private:
-    ValuePtrVector m_arr;
+  ValuePtrVector m_arr;
 };
 
 using ArrayPtr = _SCN unique_ptr<ArrayValue>;

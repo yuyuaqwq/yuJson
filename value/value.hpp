@@ -7,12 +7,12 @@ namespace yuJson {
 namespace value {
 
 enum class ValueType {
-    kNull = 0,
-    kBoolean,
-    kNumber,
-    kString,
-    kArray,
-    kObject
+  kNull = 0,
+  kBoolean,
+  kNumber,
+  kString,
+  kArray,
+  kObject
 };
 
 class NullValue;
@@ -24,89 +24,89 @@ class ObjectValue;
 
 class ValueBase {
 public:
-    class TypeError : public std::exception {
-    public:
-        TypeError(const char* message) : std::exception(message){
+  class TypeError : public std::exception {
+  public:
+    TypeError(const char* message) : std::exception(message){
 
-        }
-    };
+    }
+  };
 
 public:
-    ValueBase() noexcept { }
-    virtual ~ValueBase() noexcept { }
+  ValueBase() noexcept { }
+  virtual ~ValueBase() noexcept { }
 
-    virtual inline ValueType Type() const noexcept = 0;
+  virtual inline ValueType Type() const noexcept = 0;
 
-    template <typename T>
-    T& To() {
-        return *(T*)this;// static_cast<ast::T*>(this);
+  template <typename T>
+  T& To() {
+    return *(T*)this;// static_cast<ast::T*>(this);
+  }
+
+  bool IsNull() const noexcept {
+    return Type() == ValueType::kNull;
+  }
+
+  NullValue& ToNull() {
+    if (!IsNull()) {
+      throw TypeError("Not Null data");
     }
+    return *(NullValue*)this;// static_cast<ast::Boolean*>(this);
+  }
 
-    bool IsNull() const noexcept {
-        return Type() == ValueType::kNull;
-    }
+  bool IsBoolean() const noexcept {
+    return Type() == ValueType::kBoolean;
+  }
 
-    NullValue& ToNull() {
-        if (!IsNull()) {
-            throw TypeError("Not Null data");
-        }
-        return *(NullValue*)this;// static_cast<ast::Boolean*>(this);
+  BooleanValue& ToBoolean() {
+    if (!IsBoolean()) {
+      throw TypeError("Not Boolean data");
     }
+    return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
+  }
 
-    bool IsBoolean() const noexcept {
-        return Type() == ValueType::kBoolean;
-    }
+  bool IsNumber() const noexcept {
+    return Type() == ValueType::kNumber;
+  }
 
-    BooleanValue& ToBoolean() {
-        if (!IsBoolean()) {
-            throw TypeError("Not Boolean data");
-        }
-        return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
+  NumberValue& ToNumber() {
+    if (!IsNumber()) {
+      throw TypeError("Not Number data");
     }
+    return *(NumberValue*)this; // static_cast<ast::Number*>(this);
+  }
 
-    bool IsNumber() const noexcept {
-        return Type() == ValueType::kNumber;
-    }
+  bool IsString() const noexcept {
+    return Type() == ValueType::kString;
+  }
 
-    NumberValue& ToNumber() {
-        if (!IsNumber()) {
-            throw TypeError("Not Number data");
-        }
-        return *(NumberValue*)this; // static_cast<ast::Number*>(this);
+  StringValue& ToString() {
+    if (!IsString()) {
+      throw TypeError("Not String data");
     }
+    return *(StringValue*)this; // static_cast<ast::String*>(this);
+  }
 
-    bool IsString() const noexcept {
-        return Type() == ValueType::kString;
-    }
+  bool IsArray() const noexcept {
+    return Type() == ValueType::kArray;
+  }
 
-    StringValue& ToString() {
-        if (!IsString()) {
-            throw TypeError("Not String data");
-        }
-        return *(StringValue*)this; // static_cast<ast::String*>(this);
+  ArrayValue& ToArray() {
+    if (!IsArray()) {
+      throw TypeError("Not Array data");
     }
+    return *(ArrayValue*)this; //static_cast<ast::Array*>(this);
+  }
 
-    bool IsArray() const noexcept {
-        return Type() == ValueType::kArray;
-    }
+  bool IsObject() const noexcept {
+    return Type() == ValueType::kObject;
+  }
 
-    ArrayValue& ToArray() {
-        if (!IsArray()) {
-            throw TypeError("Not Array data");
-        }
-        return *(ArrayValue*)this; //static_cast<ast::Array*>(this);
+  ObjectValue& ToObject() {
+    if (!IsObject()) {
+      throw TypeError("Not Object data");
     }
-
-    bool IsObject() const noexcept {
-        return Type() == ValueType::kObject;
-    }
-
-    ObjectValue& ToObject() {
-        if (!IsObject()) {
-            throw TypeError("Not Object data");
-        }
-        return *(ObjectValue*)this; // static_cast<ast::Object*>(this);
-    }
+    return *(ObjectValue*)this; // static_cast<ast::Object*>(this);
+  }
 
 };
 

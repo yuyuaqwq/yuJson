@@ -4,48 +4,48 @@
 #include <yuJson/value/value.hpp>
 
 namespace yuJson {
-	namespace value {
-        // ËùÓÐNumberµÄCÀàÐÍ
+  namespace value {
+    // ï¿½ï¿½ï¿½ï¿½Numberï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½
 #define ALL_NUMBER_TYPES char, signed char, unsigned char, wchar_t, char16_t, char32_t, short, unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long, float, double, long double
 
-        // Èç¹ûJudgedObjT¡ÊJudgeTypesT, Ôò·µ»ØÀàÐÍÎªRetValT
-        template<class JudgedObjT, class RetValT, class... JudgeTypesT>
-        using enable_if_any_of_t = typename std::enable_if_t<std::_Is_any_of_v<std::remove_reference_t<JudgedObjT>, JudgeTypesT...>, RetValT>;
+    // ï¿½ï¿½ï¿½JudgedObjTï¿½ï¿½JudgeTypesT, ï¿½ò·µ»ï¿½ï¿½ï¿½ï¿½ï¿½ÎªRetValT
+    template<class JudgedObjT, class RetValT, class... JudgeTypesT>
+    using enable_if_any_of_t = typename std::enable_if_t<std::_Is_any_of_v<std::remove_reference_t<JudgedObjT>, JudgeTypesT...>, RetValT>;
 
-        // Èç¹ûTÎªbool, ·µ»ØBooleanValue
-        template<class T>
-        using enable_if_bool_t = enable_if_any_of_t<T, BooleanPtr, bool>;
-        // Èç¹ûT¡ÊALL_NUMBER_TYPES, ·µ»ØNumberValue
-        template<class T>
-        using enable_if_number_t = enable_if_any_of_t<T, NumberPtr, ALL_NUMBER_TYPES>;
-        template<class T>
-        // Èç¹ûTÎªnullptr, ·µ»ØNullValue
-        using enable_if_null_t = typename std::enable_if_t<std::is_null_pointer_v<T>, NullPtr>;
-        // Èç¹ûT¡Ê{const char*, const char[N]}, ·µ»ØStringValue
-        template<class T>
-        using enable_if_str_t = enable_if_any_of_t<T, StringPtr, const char*, const char[]>;
+    // ï¿½ï¿½ï¿½TÎªbool, ï¿½ï¿½ï¿½ï¿½BooleanValue
+    template<class T>
+    using enable_if_bool_t = enable_if_any_of_t<T, BooleanPtr, bool>;
+    // ï¿½ï¿½ï¿½Tï¿½ï¿½ALL_NUMBER_TYPES, ï¿½ï¿½ï¿½ï¿½NumberValue
+    template<class T>
+    using enable_if_number_t = enable_if_any_of_t<T, NumberPtr, ALL_NUMBER_TYPES>;
+    template<class T>
+    // ï¿½ï¿½ï¿½TÎªnullptr, ï¿½ï¿½ï¿½ï¿½NullValue
+    using enable_if_null_t = typename std::enable_if_t<std::is_null_pointer_v<T>, NullPtr>;
+    // ï¿½ï¿½ï¿½Tï¿½ï¿½{const char*, const char[N]}, ï¿½ï¿½ï¿½ï¿½StringValue
+    template<class T>
+    using enable_if_str_t = enable_if_any_of_t<T, StringPtr, const char*, const char[]>;
 
-        /*
-        * ÀûÓÃenable_ifµÄÌØÐÔ, ¸ù¾Ý²»Í¬ÀàÐÍµÄTµ÷ÓÃ²»Í¬µÄ"ÖØÔØ"º¯Êý
-        * Èç¹ûÃ»ÓÐÆ¥ÅäµÄÔò»á±¨´í
-        */
-        template<class T>
-        inline constexpr enable_if_bool_t<T> make_value(T value) {
-            return _SCN make_unique<BooleanValue>(value);
-        }
-        template<class T>
-        inline constexpr enable_if_number_t<T> make_value(T value) {
-            return _SCN make_unique<NumberValue>(value);
-        }
-        template<class T>
-        inline constexpr enable_if_null_t<T> make_value(T value) {
-            return _SCN make_unique<NullValue>(value);
-        }
-        template<class T>
-        inline constexpr enable_if_str_t<T> make_value(T&& value) {
-            return _SCN make_unique<StringValue>(value);
-        }
-	}
+    /*
+    * ï¿½ï¿½ï¿½ï¿½enable_ifï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½Ý²ï¿½Í¬ï¿½ï¿½ï¿½Íµï¿½Tï¿½ï¿½ï¿½Ã²ï¿½Í¬ï¿½ï¿½"ï¿½ï¿½ï¿½ï¿½"ï¿½ï¿½ï¿½ï¿½
+    * ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Æ¥ï¿½ï¿½ï¿½ï¿½ï¿½á±¨ï¿½ï¿½
+    */
+    template<class T>
+    inline constexpr enable_if_bool_t<T> make_value(T value) {
+      return _SCN make_unique<BooleanValue>(value);
+    }
+    template<class T>
+    inline constexpr enable_if_number_t<T> make_value(T value) {
+      return _SCN make_unique<NumberValue>(value);
+    }
+    template<class T>
+    inline constexpr enable_if_null_t<T> make_value(T value) {
+      return _SCN make_unique<NullValue>(value);
+    }
+    template<class T>
+    inline constexpr enable_if_str_t<T> make_value(T&& value) {
+      return _SCN make_unique<StringValue>(value);
+    }
+  }
 }
 
 #endif // YUJSON_VALUE_MAKE_H_

@@ -10,76 +10,76 @@ class Json;
 namespace value {
 class ObjectValue : public ValueBase {
 public:
-    ObjectValue() noexcept { }
-    ObjectValue(ObjectValue&& obj) noexcept : m_obj(std::move(obj.m_obj)) { }
-    ~ObjectValue() noexcept { }
+  ObjectValue() noexcept { }
+  ObjectValue(ObjectValue&& obj) noexcept : m_obj(std::move(obj.m_obj)) { }
+  ~ObjectValue() noexcept { }
 
-    ObjectValue(const ObjectValue&) = delete;
-    void operator=(const ObjectValue&) = delete;
+  ObjectValue(const ObjectValue&) = delete;
+  void operator=(const ObjectValue&) = delete;
 
-    virtual ValueType Type() const noexcept {
-        return ValueType::kObject;
-    }
+  virtual ValueType Type() const noexcept {
+    return ValueType::kObject;
+  }
 
-    const ValuePtrtMap& GetMap() const noexcept {
-        return m_obj;
-    }
+  const ValuePtrtMap& GetMap() const noexcept {
+    return m_obj;
+  }
 
-    Json& At(const _SCN string& key) {
-        return *(Json*)&m_obj.at(key);
-    }
+  Json& At(const _SCN string& key) {
+    return *(Json*)&m_obj.at(key);
+  }
 
-    Json& operator[](const _SCN string& key) {
-        return *(Json*)&m_obj[key];
-    }
+  Json& operator[](const _SCN string& key) {
+    return *(Json*)&m_obj[key];
+  }
 
-    bool Find(const _SCN string& key) const noexcept {
-        return m_obj.find(key) != m_obj.end();
-    }
+  bool Find(const _SCN string& key) const noexcept {
+    return m_obj.find(key) != m_obj.end();
+  }
 
-    void Set(const _SCN string& key, ValuePtr value) {
-        auto& it = m_obj.operator[](key);
-        it = std::move(value);
-    }
+  void Set(const _SCN string& key, ValuePtr value) {
+    auto& it = m_obj.operator[](key);
+    it = std::move(value);
+  }
 
-    void Set(const _SCN string& key, nullptr_t) {
-        Set(key, _SCN make_unique<value::NullValue>());
-    }
+  void Set(const _SCN string& key, nullptr_t) {
+    Set(key, _SCN make_unique<value::NullValue>());
+  }
 
-    void Set(const _SCN string& key, BooleanValue&& boolean) {
-        Set(key, _SCN make_unique<value::BooleanValue>(std::move(boolean)));
-    }
+  void Set(const _SCN string& key, BooleanValue&& boolean) {
+    Set(key, _SCN make_unique<value::BooleanValue>(std::move(boolean)));
+  }
 
-    void Set(const _SCN string& key, NumberValue&& num) {
-        Set(key, _SCN make_unique<value::NumberValue>(std::move(num)));
-    }
+  void Set(const _SCN string& key, NumberValue&& num) {
+    Set(key, _SCN make_unique<value::NumberValue>(std::move(num)));
+  }
 
-    void Set(const _SCN string& key, StringValue&& str) {
-        Set(key, _SCN make_unique<value::StringValue>(std::move(str)));
-    }
+  void Set(const _SCN string& key, StringValue&& str) {
+    Set(key, _SCN make_unique<value::StringValue>(std::move(str)));
+  }
 
-    void Set(const _SCN string& key, ArrayValue&& arr) {
-        Set(key, _SCN make_unique<value::ArrayValue>(std::move(arr)));
-    }
+  void Set(const _SCN string& key, ArrayValue&& arr) {
+    Set(key, _SCN make_unique<value::ArrayValue>(std::move(arr)));
+  }
 
-    void Set(const _SCN string& key, ObjectValue&& obj) {
-        Set(key, _SCN make_unique<value::ObjectValue>(std::move(obj)));
-    }
+  void Set(const _SCN string& key, ObjectValue&& obj) {
+    Set(key, _SCN make_unique<value::ObjectValue>(std::move(obj)));
+  }
 
-    void Delete(const _SCN string& key) noexcept {
-        m_obj.erase(key);
-    }
+  void Delete(const _SCN string& key) noexcept {
+    m_obj.erase(key);
+  }
 
 private:
-    ValuePtrtMap m_obj;
+  ValuePtrtMap m_obj;
 };
 
 inline void ArrayValue::Pushback(ObjectValue&& obj) {
-    Pushback(_SCN make_unique<ObjectValue>(std::move(obj)));
+  Pushback(_SCN make_unique<ObjectValue>(std::move(obj)));
 }
 
 inline void ArrayValue::Set(int i, ObjectValue&& obj) noexcept {
-    Set(i, _SCN make_unique<ObjectValue>(std::move(obj)));
+  Set(i, _SCN make_unique<ObjectValue>(std::move(obj)));
 }
 
 using ObjectPtr = _SCN unique_ptr<ObjectValue>;
