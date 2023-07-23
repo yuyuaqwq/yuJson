@@ -1,12 +1,16 @@
 #ifndef YUJSON_JSON_H_
 #define YUJSON_JSON_H_
 
+#ifndef _SCN
+#define _SCN std::
+#endif // _SCN
+
 #include <string>
 #include <memory>
-#include <regex>
 #include <initializer_list>
 
 #include <yuJson/compiler/parser.hpp>
+#include <yuJson/value/make.hpp>
 
 namespace yuJson {
 class Json {
@@ -14,352 +18,376 @@ private:
     //using json_string = std::basic_string<char, std::char_traits<char>, allocatorT<char>>;
 
 public:
-    Json() noexcept { }
-    explicit Json(std::unique_ptr<value::Value> value) noexcept : m_value{ std::move(value) } { }
-    Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
-    Json(nullptr_t) : m_value{ std::make_unique<value::Null>() } { }
-    Json(bool b) : m_value{ std::make_unique<value::Boolean>(b) } { }
-    Json(int i) : m_value{ std::make_unique<value::Number>(long long(i)) } { }
-    Json(unsigned int i) : m_value{ std::make_unique<value::Number>(unsigned long long(i)) } { }
-    Json(double d) : m_value{ std::make_unique<value::Number>(d) } { }
-    Json(const char* str) : m_value{ std::make_unique<value::String>(str) } { }
-    Json(std::initializer_list<Json> json) {
-        if (json.size() % 2 == 0) {
-            bool is_obj = true;
-            for (auto iter = json.begin(); iter != json.end(); iter+=2) {
-                if (!iter->m_value->IsString()) {
-                    is_obj = false;
-                    break;
-                }
-            }
-            if (is_obj) {
-                m_value = std::make_unique<value::Object>();
-                for (auto iter = json.begin(); iter != json.end(); iter += 2) {
-                    std::string key = iter->m_value->ToString().Get();
-                    m_value->ToObject().Set(key, std::move(((Json*)iter + 1)->m_value));
-                }
-            }
+  template<class T>
+  using type_limit_t =
+    std::enable_if_t<
+    !std::is_convertible_v<T, value::ValuePtr> &&
+    !std::_Is_any_of_v<T, Json, Json&, Json&&>,
+    int>;
+
+  Json() noexcept { }
+  explicit Json(value::ValuePtr value) noexcept : m_value{ std::move(value) } { }
+  Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
+  template<class T, type_limit_t<T> = 0>
+  Json(T value) : m_value{ value::make_value(value) } {}
+  template<class ThisT, class... RestT, type_limit_t<ThisT> = 0>
+  Json(ThisT&& this_arg, RestT&&... rest_args) {
+    _SCN initializer_list<Json> jsons{std::forward<ThisT>(this_arg), std::forward<RestT>(rest_args)...};
+    if (jsons.size() % 2 == 0) {
+      bool is_obj = true;
+      for (auto iter = jsons.begin(); iter != jsons.end(); iter+=2) {
+        if (!iter->m_value->IsString()) {
+          is_obj = false;
+          break;
         }
-        if (!IsValid()) {
-            m_value = std::make_unique<value::Array>();
-            for (auto iter = json.begin(); iter != json.end(); iter++) {
-                m_value->ToArray().Pushback(std::move(((Json*)iter)->m_value));
-            }
+      }
+      if (is_obj) {
+        m_value = _SCN make_unique<value::ObjectValue>();
+        for (auto iter = jsons.begin(); iter != jsons.end(); iter += 2) {
+          _SCN string key = iter->m_value->ToString().Get();
+          m_value->ToObject().Set(key, std::move(((Json*)iter + 1)->m_value));
         }
+      }
     }
-    ~Json() noexcept { }
-
-    Json(const Json&) = delete;
-    void operator=(const Json&) = delete;
-
-    void operator=(Json&& json) noexcept {
-        m_value = std::move(json.m_value);
+    if (!IsValid()) {
+      m_value = _SCN make_unique<value::ArrayValue>();
+      for (auto iter = jsons.begin(); iter != jsons.end(); iter++) {
+        m_value->ToArray().Pushback(std::move(((Json*)iter)->m_value));
+      }
     }
+  }
+  ~Json() noexcept { }
 
-    Json& operator[](const char* str) {
-        if (!GetObject().Find(str)) {
-            GetObject().Set(str, nullptr);
-        }
-        return (Json&)*GetObject().GetPtr(str);
+  Json(const Json&) = delete;
+  void operator=(const Json&) = delete;
+
+  void operator=(Json&& json) noexcept {
+    m_value = std::move(json.m_value);
+  }
+
+  Json& operator[](const char* str) {
+    return GetObject()[str];
+  }
+
+  Json& operator[](int index) {
+    return GetArray()[index];
+  }
+
+  Json& At(const char* str) {
+    return GetObject().At(str);
+  }
+
+  Json& At(int index) {
+    return GetArray().At(index);
+  }
+
+  bool operator==(const Json&& other) const {
+    if (GetType() != other.GetType()) {
+      return false;
     }
-
-    Json& operator[](int index) {
-        return (Json&)*GetArray().GetPtr(index);
+    switch (GetType()) {
+    case value::ValueType::kNull:
+      return true;
+    case value::ValueType::kBoolean:
+      return  m_value->ToBoolean().Get() == other.m_value->ToBoolean().Get();
+    case value::ValueType::kNumber:
+      return m_value->ToNumber().GetInt() == other.m_value->ToNumber().GetInt();
+    case value::ValueType::kString:
+      return m_value->ToString().Get() == other.m_value->ToString().Get();
+    default:
+      return false;
     }
+  }
 
-    bool operator==(const Json&& other) const {
-        if (GetType() != other.GetType()) {
-            return false;
-        }
-        switch (GetType()) {
-        case value::ValueType::kNull:
-            return true;
-        case value::ValueType::kBoolean:
-            return  m_value->ToBoolean().Get() == other.m_value->ToBoolean().Get();
-        case value::ValueType::kNumber:
-            return m_value->ToNumber().GetInt() == other.m_value->ToNumber().GetInt();
-        case value::ValueType::kString:
-            return m_value->ToString().Get() == other.m_value->ToString().Get();
-        default:
-            return false;
-        }
+  bool Find(const char* str) {
+    return GetObject().Find(str);
+  }
+
+  bool IsValid() noexcept {
+    return m_value.get() != nullptr;
+  }
+
+  static Json Parse(const char* jsonText) {
+    compiler::Lexer lexer(jsonText);
+    compiler::Parser parser(&lexer);
+    return Json(parser.ParseValue());
+  }
+
+  _SCN string Print(bool format = true) const {
+    if (!m_value.get()) {
+      return "";
     }
+    _SCN string jsonStr;
+    Print(m_value.get(), format, 0, &jsonStr);
+    return jsonStr;
+  }
 
-    bool Find(const char* str) {
-        return GetObject().Find(str);
-    }
+  template <typename T>
+  T& Get() noexcept {
+    return *(T*)m_value.get();
+  }
 
-    bool IsValid() noexcept {
-        return m_value.get() != nullptr;
-    }
+  value::ValueType GetType() const noexcept {
+    return m_value->Type();
+  }
 
-    bool Parse(const char* jsonText) {
-        compiler::Lexer lexer(jsonText);
-        compiler::Parser parser(&lexer);
-        auto tempJson = std::make_unique<Json>(parser.ParseValue());
-        if (!tempJson->IsValid()) {
-            return false;
-        }
-        m_value = std::move(tempJson->m_value);
-        return true;
-    }
+  value::NullValue& GetNull() {
+    return m_value->ToNull();
+  }
 
-    std::string Print(bool format = true) const {
-        if (!m_value.get()) {
-            return "";
-        }
-        std::string jsonStr;
-        Print(m_value.get(), format, 0, &jsonStr);
-        return jsonStr;
-    }
+  value::BooleanValue& GetBoolean() {
+    return m_value->ToBoolean();
+  }
 
-    template <typename T>
-    T& Get() noexcept {
-        return *(T*)m_value.get();
-    }
+  bool& Boolean() {
+    return m_value->ToBoolean().Get();
+  }
 
-    value::ValueType GetType() const noexcept {
-        return m_value->Type();
-    }
+  value::NumberValue& GetNumber() {
+    return m_value->ToNumber();
+  }
 
-    value::Null& GetNull() {
-        return m_value->ToNull();
-    }
+  long long& Int() {
+    return m_value->ToNumber().GetInt();
+  }
 
-    value::Boolean& GetBoolean() {
-        return m_value->ToBoolean();
-    }
+  double& Float() {
+    return m_value->ToNumber().GetFloat();
+  }
 
-    bool& Boolean() {
-        return m_value->ToBoolean().Get();
-    }
+  value::StringValue& GetString() {
+    return m_value->ToString();
+  }
 
-    value::Number& GetNumber() {
-        return m_value->ToNumber();
-    }
+  _SCN string& String() {
+    return m_value->ToString().Get();
+  }
 
-    long long& Int() {
-        return m_value->ToNumber().GetInt();
-    }
+  value::ArrayValue& GetArray() {
+    return m_value->ToArray();
+  }
 
-    double& Float() {
-        return m_value->ToNumber().GetFloat();
-    }
+  value::ObjectValue& GetObject() {
+    return m_value->ToObject();
+  }
 
-    value::String& GetString() {
-        return m_value->ToString();
-    }
+  void Set(_SCN unique_ptr<value::ValueBase> value) {
+    m_value = std::move(value);
+  }
 
-    std::string& String() {
-        return m_value->ToString().Get();
-    }
+  template <typename T>
+  void Set(T&& val) {
+    m_value = _SCN make_unique<T>(std::move(val));
+  }
 
-    value::Array& GetArray() {
-        return m_value->ToArray();
-    }
+  void Set(nullptr_t) {
+    m_value = _SCN make_unique<value::NullValue>();
+  }
 
-    value::Object& GetObject() {
-        return m_value->ToObject();
-    }
+  void Set(value::BooleanValue&& boolean) {
+    m_value = _SCN make_unique<value::BooleanValue>(std::move(boolean));
+  }
 
-    void Set(std::unique_ptr<value::Value> value) {
-        m_value = std::move(value);
-    }
+  void Set(value::NumberValue&& num) {
+    m_value = _SCN make_unique<value::NumberValue>(std::move(num));
+  }
 
-    //template <typename T>
-    //void Set(T&& val) {
-    //    m_value = std::make_unique<T>(std::move(val));
-    //}
+  void Set(value::StringValue&& str) {
+    m_value = _SCN make_unique<value::StringValue>(std::move(str));
+  }
 
-    void Set(nullptr_t) {
-        m_value = std::make_unique<value::Null>();
-    }
+  void Set(value::ArrayValue&& arr) {
+    m_value = _SCN make_unique<value::ArrayValue>(std::move(arr));
+  }
 
-    void Set(value::Boolean&& boolean) {
-        m_value = std::make_unique<value::Boolean>(std::move(boolean));
-    }
+  void Set(value::ObjectValue&& obj) {
+    m_value = _SCN make_unique<value::ObjectValue>(std::move(obj));
+  }
 
-    void Set(value::Number&& num) {
-        m_value = std::make_unique<value::Number>(std::move(num));
-    }
+  static Json MakeObject()
+  {
+    return Json(_SCN make_unique<yuJson::value::ObjectValue>());
+  }
 
-    void Set(value::String&& str) {
-        m_value = std::make_unique<value::String>(std::move(str));
-    }
-
-    void Set(value::Array&& arr) {
-        m_value = std::make_unique<value::Array>(std::move(arr));
-    }
-
-    void Set(value::Object&& obj) {
-        m_value = std::make_unique<value::Object>(std::move(obj));
-    }
+  static Json MakeArray()
+  {
+    return Json(_SCN make_unique<yuJson::value::ArrayValue>());
+  }
 
 public:
-    class Iterator {
-    public:
-        Iterator(Json* base){
-            m_base = base;
-            if (base) {
-                if (m_base->GetType() == value::ValueType::kArray) {
-                    m_obj_iter = m_base->GetObject().GetMap().begin();
-                }
-                else if (m_base->GetType() == value::ValueType::kObject) {
-                    m_arr_iter = m_base->GetArray().GetVector().begin();
-                }
-            }
+  class Iterator {
+  public:
+    Iterator(Json* base){
+      m_base = base;
+      if (base) {
+        if (m_base->GetType() == value::ValueType::kArray) {
+          m_obj_iter = m_base->GetObject().GetMap().begin();
         }
-        Iterator(const Iterator& other) {
-            m_base = other.m_base;
+        else if (m_base->GetType() == value::ValueType::kObject) {
+          m_arr_iter = m_base->GetArray().GetVector().begin();
         }
+      }
+    }
+    Iterator(const Iterator& other) {
+      m_base = other.m_base;
+    }
 
-        ~Iterator() { }
+    ~Iterator() { }
 
-        bool operator!=(const Iterator& other) const {
-            if (m_base->GetType() == value::ValueType::kArray) {
-                return m_base->GetObject().GetMap() == other.m_base->GetObject().GetMap();
-            }
-            else if (m_base->GetType() == value::ValueType::kObject) {
-                return m_base->GetArray().GetVector() == other.m_base->GetArray().GetVector();
-            }
-            return false;
-        }
+    bool operator!=(const Iterator& other) const {
+      if (m_base->GetType() == value::ValueType::kArray) {
+        return m_base->GetObject().GetMap() == other.m_base->GetObject().GetMap();
+      }
+      else if (m_base->GetType() == value::ValueType::kObject) {
+        return m_base->GetArray().GetVector() == other.m_base->GetArray().GetVector();
+      }
+      return false;
+    }
 
-        Json& operator*() const {
-            if (m_base->GetType() == value::ValueType::kArray) {
-                return (Json&)m_obj_iter->second;
-            }
-            else if (m_base->GetType() == value::ValueType::kObject) {
-                return (Json&)*m_arr_iter;
-            }
-            return *(Json*)nullptr;
-        }
+    Json& operator*() const {
+      if (m_base->GetType() == value::ValueType::kArray) {
+        return (Json&)m_obj_iter->second;
+      }
+      else if (m_base->GetType() == value::ValueType::kObject) {
+        return (Json&)*m_arr_iter;
+      }
+      return *(Json*)nullptr;
+    }
 
-        const Iterator& operator++() {
-            if (m_base->GetType() == value::ValueType::kArray) {
-                m_arr_iter++;
-            }
-            else if (m_base->GetType() == value::ValueType::kObject) {
-                m_obj_iter++;
-            }
-            return *this;
-        }
-    private:
-        union {
-            std::map<std::string, std::unique_ptr<value::Value>>::const_iterator m_obj_iter;
-            std::vector<std::unique_ptr<value::Value>>::const_iterator m_arr_iter;
-        };
-        Json* m_base;
+    const Iterator& operator++() {
+      if (m_base->GetType() == value::ValueType::kArray) {
+        m_arr_iter++;
+      }
+      else if (m_base->GetType() == value::ValueType::kObject) {
+        m_obj_iter++;
+      }
+      return *this;
+    }
+  private:
+    union {
+      value::ValuePtrtMap::const_iterator m_obj_iter;
+      value::ValuePtrVector::const_iterator m_arr_iter;
     };
+    Json* m_base;
+  };
 
 public:
-    Iterator begin() {
-        return Iterator(this);
-    }
+  Iterator begin() {
+    return Iterator(this);
+  }
 
-    Iterator end() {
-        return Iterator(nullptr);
-    }
+  Iterator end() {
+    return Iterator(nullptr);
+  }
 
 private:
-    void StrEscapr(std::string* str) const {
-        // 引号添加\转义，一个\修改为两个\\ 
-        *str = std::regex_replace(*str, std::regex(R"(\\)"), R"(\\)");
-        *str = std::regex_replace(*str, std::regex(R"(")"), R"(\")");
+  static _SCN string Replace(const _SCN string& str, const _SCN string& replace, const _SCN string& target) {
+    auto new_str = str;
+    size_t pos = 0;
+    pos = new_str.find(replace);
+    while (pos != -1) {
+      new_str = new_str.replace(pos, replace.size(), target.c_str());
+      pos = new_str.find(replace, pos + target.size() + 1);
+    }
+    return new_str;
+  }
+  void StrEscapr(_SCN string* str) const {
+    // 寮曞彿娣诲姞\杞箟锛屼竴涓猏淇敼涓轰袱涓猏\ 
+    *str = Replace(*str, R"(\)", R"(\\)");
+    *str = Replace(*str, R"(")", R"(\")");
+  }
+
+  void Print(value::ValueBase* value, bool format, size_t level, _SCN string* jsonStr) const {
+    _SCN string indent;
+    if (format) {
+      indent = _SCN string(level * kIndent, '  ');
     }
 
-    void Print(value::Value* value, bool format, size_t level, std::string* jsonStr) const {
-        std::string indent;
+    switch (value->Type()) {
+    case value::ValueType::kNull: {
+      *jsonStr += "null";
+      break;
+    }
+    case value::ValueType::kBoolean: {
+      *jsonStr += static_cast<value::BooleanValue*>(value)->Get() ? "true" : "false";
+      break;
+    }
+    case value::ValueType::kNumber: {
+      char buf[21]{ 0 };
+      _itoa_s(static_cast<value::NumberValue*>(value)->GetInt(), buf, 10);
+      *jsonStr += buf;
+      break;
+    }
+    case value::ValueType::kString: {
+      auto str = static_cast<value::StringValue*>(value)->Get();
+      StrEscapr(&str);
+      *jsonStr += "\"" + str + "\"";
+      break;
+    }
+    case value::ValueType::kArray: {
+      *jsonStr += '[';
+      if (format) {
+        indent += _SCN string(kIndent, '  ');
+      }
+      const auto& arr = static_cast<value::ArrayValue*>(value)->GetVector();
+      for (int i = 0; i < arr.size(); ) {
         if (format) {
-            indent = std::string(level * kIndent, '  ');
+          *jsonStr += '\n' + indent;
         }
-
-        switch (value->Type()) {
-        case value::ValueType::kNull: {
-            *jsonStr += "null";
-            break;
+        Print(arr[i].get(), format, level + 1, jsonStr);
+        if (++i < arr.size()) {
+          *jsonStr += ", ";
         }
-        case value::ValueType::kBoolean: {
-            *jsonStr += static_cast<value::Boolean*>(value)->Get() ? "true" : "false";
-            break;
+      }
+      if (format) {
+        for (int i = 0; i < kIndent; i++) {
+          indent.pop_back();
         }
-        case value::ValueType::kNumber: {
-            *jsonStr += std::to_string(static_cast<value::Number*>(value)->GetInt());
-            break;
-        }
-        case value::ValueType::kString: {
-            auto str = static_cast<value::String*>(value)->Get();
-            StrEscapr(&str);
-            *jsonStr += "\"" + str + "\"";
-            break;
-        }
-        case value::ValueType::kArray: {
-            *jsonStr += '[';
-            if (format) {
-                indent += std::string(kIndent, '  ');
-            }
-            const auto& arr = static_cast<value::Array*>(value)->GetVector();
-            for (int i = 0; i < arr.size(); ) {
-                if (format) {
-                    *jsonStr += '\n' + indent;
-                }
-                Print(arr[i].get(), format, level + 1, jsonStr);
-                if (++i < arr.size()) {
-                    *jsonStr += ", ";
-                }
-            }
-            if (format) {
-                for (int i = 0; i < kIndent; i++) {
-                    indent.pop_back();
-                }
-                *jsonStr += '\n' + indent;
-            }
-            *jsonStr += ']';
-            break;
-        }
-        case value::ValueType::kObject: {
-            *jsonStr += '{';
-            if (format) {
-                
-                indent += std::string(kIndent, '  ');
-            }
-
-            const auto& obj = static_cast<value::Object*>(value)->GetMap();
-            int i = 0;
-            for (const auto& it : obj) {
-                if (format) {
-                    *jsonStr += '\n' + indent;
-                }
-                auto key = it.first;
-                StrEscapr(&key);
-                *jsonStr += '\"' + key + "\":";
-
-                Print(it.second.get(), format, level + 1, jsonStr);
-                if (++i < obj.size()) {
-                    *jsonStr += ", ";
-                }
-
-            }
-            if (format) {
-                for (int i = 0; i < 4; i++) {
-                    indent.pop_back();
-                }
-                *jsonStr += '\n' + indent;
-            }
-            *jsonStr += '}';
-            break;
-        }
-        }
+        *jsonStr += '\n' + indent;
+      }
+      *jsonStr += ']';
+      break;
     }
+    case value::ValueType::kObject: {
+      *jsonStr += '{';
+      if (format) {
+        indent += _SCN string(kIndent, '  ');
+      }
+
+      const auto& obj = static_cast<value::ObjectValue*>(value)->GetMap();
+      int i = 0;
+      for (const auto& it : obj) {
+        if (format) {
+          *jsonStr += '\n' + indent;
+        }
+        auto key = it.first;
+        StrEscapr(&key);
+        *jsonStr += '\"' + key + "\":";
+
+        Print(it.second.get(), format, level + 1, jsonStr);
+        if (++i < obj.size()) {
+          *jsonStr += ", ";
+        }
+
+      }
+      if (format) {
+        for (int i = 0; i < 4; i++) {
+          indent.pop_back();
+        }
+        *jsonStr += '\n' + indent;
+      }
+      *jsonStr += '}';
+      break;
+    }
+    }
+  }
 
 private:
-    std::unique_ptr<value::Value> m_value;
+  value::ValuePtr m_value;
 
 private:
-    static const int kIndent = 4;
+  static const int kIndent = 4;
 };
-
-//using Json = Json<std::allocator>;
 
 } // namespace yuJson
 

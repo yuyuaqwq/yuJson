@@ -5,14 +5,18 @@
 
 namespace yuJson {
 namespace value {
-
-class Null : public Value {
+class NullValue : public ValueBase {
 public:
-    virtual ValueType Type() const noexcept {
-        return ValueType::kNull;
-    }
+  NullValue() { }
+
+  NullValue(std::nullptr_t) { }
+
+  virtual ValueType Type() const noexcept {
+    return ValueType::kNull;
+  }
 };
 
+using NullPtr = _SCN unique_ptr<NullValue>;
 } // namespace value
 } // namespace yuJson
 

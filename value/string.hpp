@@ -1,40 +1,37 @@
 #ifndef YUJSON_VALUE_STRING_H_
 #define YUJSON_VALUE_STRING_H_
 
-#include <string>
-
 #include <yuJson/value/value.hpp>
 
 namespace yuJson {
 namespace value {
-
-class String : public Value {
+class StringValue : public ValueBase {
 public:
-    explicit String(const char* str) : m_str(str) { }
-    explicit String(const std::string& str) : m_str(str) { }
-    String(String&& str) noexcept : m_str(str.Get()) { }
+  StringValue(const char* str) : m_str(str) { }
+  explicit StringValue(const _SCN string& str) : m_str(str) { }
+  StringValue(StringValue&& str) noexcept : m_str(str.Get()) { }
 
-    void operator=(String& str) = delete;
+  void operator=(StringValue& str) = delete;
 
-    void operator=(String&& str) noexcept {
-        this->m_str = std::move(str.Get());
-    }
+  void operator=(StringValue&& str) noexcept {
+    this->m_str = std::move(str.Get());
+  }
 
-    ~String() noexcept { }
+  ~StringValue() noexcept { }
 
-    virtual ValueType Type() const noexcept {
-        return ValueType::kString;
-    }
+  virtual ValueType Type() const noexcept {
+    return ValueType::kString;
+  }
 
-    std::string& Get() noexcept {
-        return m_str;
-    }
+  _SCN string& Get() noexcept {
+    return m_str;
+  }
 
 private:
-    std::string m_str;
+  _SCN string m_str;
 };
 
-
+using StringPtr = _SCN unique_ptr<StringValue>;
 } // namespace value
 } // namespace yuJson
 

@@ -7,135 +7,127 @@ namespace yuJson {
 namespace value {
 
 enum class ValueType {
-    kNull = 0,
-    kBoolean,
-    kNumber,
-    kString,
-    kArray,
-    kObject
+  kNull = 0,
+  kBoolean,
+  kNumber,
+  kString,
+  kArray,
+  kObject
 };
 
-class Null;
-class Boolean;
-class Number;
-class String;
-class Array;
-class Object;
+class NullValue;
+class BooleanValue;
+class NumberValue;
+class StringValue;
+class ArrayValue;
+class ObjectValue;
 
-class Value {
+class ValueBase {
 public:
-    class TypeError : public std::exception {
-    public:
-        TypeError(const char* message) : std::exception(message){
+  class TypeError : public std::exception {
+  public:
+    TypeError(const char* message) : std::exception(message){
 
-        }
-    };
+    }
+  };
 
 public:
-    Value() noexcept { }
-    virtual ~Value() noexcept { }
+  ValueBase() noexcept { }
+  virtual ~ValueBase() noexcept { }
 
-    virtual ValueType Type() const noexcept = 0;
+  virtual inline ValueType Type() const noexcept = 0;
 
-    bool IsValid() const noexcept {
-        return this != nullptr;
+  template <typename T>
+  T& To() {
+    return *(T*)this;// static_cast<ast::T*>(this);
+  }
+
+  bool IsNull() const noexcept {
+    return Type() == ValueType::kNull;
+  }
+
+  NullValue& ToNull() {
+    if (!IsNull()) {
+      throw TypeError("Not Null data");
     }
+    return *(NullValue*)this;// static_cast<ast::Boolean*>(this);
+  }
 
-    template <typename T>
-    T& To() {
-        return *(T*)this;// static_cast<ast::T*>(this);
-    }
+  bool IsBoolean() const noexcept {
+    return Type() == ValueType::kBoolean;
+  }
 
-    bool IsNull() const noexcept {
-        return Type() == ValueType::kNull;
+  BooleanValue& ToBoolean() {
+    if (!IsBoolean()) {
+      throw TypeError("Not Boolean data");
     }
+    return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
+  }
 
-    Null& ToNull() {
-        if (!IsNull()) {
-            throw TypeError("Not Null data");
-        }
-        return *(Null*)this;// static_cast<ast::Boolean*>(this);
-    }
+  bool IsNumber() const noexcept {
+    return Type() == ValueType::kNumber;
+  }
 
-    bool IsBoolean() const noexcept {
-        return Type() == ValueType::kBoolean;
+  NumberValue& ToNumber() {
+    if (!IsNumber()) {
+      throw TypeError("Not Number data");
     }
+    return *(NumberValue*)this; // static_cast<ast::Number*>(this);
+  }
 
-    Boolean& ToBoolean() {
-        if (!IsBoolean()) {
-            throw TypeError("Not Boolean data");
-        }
-        return *(Boolean*)this;// static_cast<ast::Boolean*>(this);
-    }
+  bool IsString() const noexcept {
+    return Type() == ValueType::kString;
+  }
 
-    bool IsNumber() const noexcept {
-        return IsValid() && Type() == ValueType::kNumber;
+  StringValue& ToString() {
+    if (!IsString()) {
+      throw TypeError("Not String data");
     }
+    return *(StringValue*)this; // static_cast<ast::String*>(this);
+  }
 
-    Number& ToNumber() {
-        if (!IsNumber()) {
-            throw TypeError("Not Number data");
-        }
-        return *(Number*)this; // static_cast<ast::Number*>(this);
-    }
+  bool IsArray() const noexcept {
+    return Type() == ValueType::kArray;
+  }
 
-    bool IsString() const noexcept {
-        return IsValid() && Type() == ValueType::kString;
+  ArrayValue& ToArray() {
+    if (!IsArray()) {
+      throw TypeError("Not Array data");
     }
+    return *(ArrayValue*)this; //static_cast<ast::Array*>(this);
+  }
 
-    String& ToString() {
-        if (!IsString()) {
-            throw TypeError("Not String data");
-        }
-        return *(String*)this; // static_cast<ast::String*>(this);
-    }
+  bool IsObject() const noexcept {
+    return Type() == ValueType::kObject;
+  }
 
-    bool IsArray() const noexcept {
-        return IsValid() && Type() == ValueType::kArray;
+  ObjectValue& ToObject() {
+    if (!IsObject()) {
+      throw TypeError("Not Object data");
     }
-
-    Array& ToArray() {
-        if (!IsArray()) {
-            throw TypeError("Not Array data");
-        }
-        return *(Array*)this; //static_cast<ast::Array*>(this);
-    }
-
-    bool IsObject() const noexcept {
-        return IsValid() && Type() == ValueType::kObject;
-    }
-
-    Object& ToObject() {
-        if (!IsObject()) {
-            throw TypeError("Not Object data");
-        }
-        return *(Object*)this; // static_cast<ast::Object*>(this);
-    }
+    return *(ObjectValue*)this; // static_cast<ast::Object*>(this);
+  }
 
 };
-
-inline std::unique_ptr<Boolean> CreateBoolean(Boolean&& boolean) {
-    return std::make_unique<Boolean>(std::move(boolean));
-}
-
-inline std::unique_ptr<Number> CreateNumber(Number&& num) {
-    return std::make_unique<Number>(std::move(num));
-}
-
-inline std::unique_ptr<String> CreateString(String&& str) {
-    return std::make_unique<String>(std::move(str));
-}
-
-inline std::unique_ptr<Array> CreateArray() {
-    return std::make_unique<Array>();
-}
-
-inline std::unique_ptr<Object> CreateObject() {
-    return std::make_unique<Object>();
-}
 
 } // namespace value
 } // namespace yuJson
+
+
+#include <vector>
+#include <map>
+#include <string>
+#include <memory>
+namespace yuJson{
+namespace value{
+
+using ValuePtr = _SCN unique_ptr<ValueBase>;
+using ValuePtrVector = _SCN vector<ValuePtr>;
+using ValuePtrtMap = _SCN map<_SCN string, ValuePtr>;
+
+}
+}
+
 
 #include <yuJson/value/null.hpp>
 #include <yuJson/value/boolean.hpp>
@@ -143,5 +135,4 @@ inline std::unique_ptr<Object> CreateObject() {
 #include <yuJson/value/string.hpp>
 #include <yuJson/value/array.hpp>
 #include <yuJson/value/object.hpp>
-
 #endif // YUJSON_VALUE_VALUE_H_

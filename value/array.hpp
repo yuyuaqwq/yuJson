@@ -1,101 +1,94 @@
 #ifndef YUJSON_VALUE_ARRAY_H_
 #define YUJSON_VALUE_ARRAY_H_
 
-#include <vector>
-#include <memory>
+#include <stdexcept>
 
 #include <yuJson/value/value.hpp>
 
 namespace yuJson {
+class Json;
 namespace value {
-
-class Array : public Value {
+class ArrayValue : public ValueBase {
 public:
-    Array() noexcept { }
-    Array(Array&& arr) noexcept : m_arr(std::move(arr.m_arr)) { }
-    ~Array() noexcept { }
+  ArrayValue() noexcept { }
+  ArrayValue(ArrayValue&& arr) noexcept : m_arr(std::move(arr.m_arr)) { }
+  ~ArrayValue() noexcept { }
 
-    Array(const Array&) = delete;
-    void operator=(const Array&) = delete;
+  ArrayValue(const ArrayValue&) = delete;
+  void operator=(const ArrayValue&) = delete;
 
-    virtual ValueType Type() const noexcept {
-        return ValueType::kArray;
-    }
+  virtual ValueType Type() const noexcept {
+    return ValueType::kArray;
+  }
+  const ValuePtrVector& GetVector() const noexcept {
+    return m_arr;
+  }
 
-    const std::vector<std::unique_ptr<Value>>& GetVector() const noexcept {
-        return m_arr;
-    }
+  Json& At(int i) {
+    return *(Json*)&m_arr.at(i);
+  }
 
-    Value& Get(int i) {
-        if (i < 0 || i >= m_arr.size()) {
-            return *(Value*)nullptr;
-        }
-        return (Value&)*m_arr[i];
-    }
+  Json& operator[](int i) {
+    return *(Json*)&m_arr[i];
+  }
 
-    std::unique_ptr<Value>* GetPtr(int i) {
-        if (i < 0 || i >= m_arr.size()) {
-            return nullptr;
-        }
-        return &m_arr[i];
-    }
+  void Pushback(ValuePtr&& value) {
+    m_arr.push_back(std::move(value));
+  }
 
-    void Pushback(std::unique_ptr<Value> value) {
-        m_arr.push_back(std::move(value));
-    }
+  void Pushback(nullptr_t) {
+    Pushback(_SCN make_unique<NullValue>());
+  }
 
-    void Pushback(nullptr_t) {
-        Pushback(std::make_unique<Null>());
-    }
+  void Pushback(BooleanValue&& boolean) {
+    Pushback(_SCN make_unique<BooleanValue>(std::move(boolean)));
+  }
 
-    void Pushback(Boolean&& boolean) {
-        Pushback(std::make_unique<Boolean>(std::move(boolean)));
-    }
+  void Pushback(NumberValue&& num) {
+    Pushback(_SCN make_unique<NumberValue>(std::move(num)));
+  }
 
-    void Pushback(Number&& num) {
-        Pushback(std::make_unique<Number>(std::move(num)));
-    }
+  void Pushback(StringValue&& str) {
+    Pushback(_SCN make_unique<StringValue>(std::move(str)));
+  }
 
-    void Pushback(String&& str) {
-        Pushback(std::make_unique<String>(std::move(str)));
-    }
+  void Pushback(ArrayValue&& arr) {
+    Pushback(_SCN make_unique<ArrayValue>(std::move(arr)));
+  }
 
-    void Pushback(Array&& arr) {
-        Pushback(std::make_unique<Array>(std::move(arr)));
-    }
+  void Pushback(ObjectValue&& obj);
 
-    void Pushback(Object&& obj);
+  void Set(int i, ValuePtr value) noexcept {
+    m_arr[i] = std::move(value);
+  }
 
-    void Set(int i, std::unique_ptr<Value> value) noexcept {
-        m_arr[i] = std::move(value);
-    }
+  void Set(int i, nullptr_t) noexcept {
+    Set(i, _SCN make_unique<NullValue>());
+  }
 
-    void Set(int i, nullptr_t) noexcept {
-        Set(i, std::make_unique<Null>());
-    }
+  void Set(int i, BooleanValue&& boolean) noexcept {
+    Set(i, _SCN make_unique<BooleanValue>(std::move(boolean)));
+  }
 
-    void Set(int i, Boolean&& boolean) noexcept {
-        Set(i, std::make_unique<Boolean>(std::move(boolean)));
-    }
+  void Set(int i, NumberValue&& num) noexcept {
+    Set(i, _SCN make_unique<NumberValue>(std::move(num)));
+  }
 
-    void Set(int i, Number&& num) noexcept {
-        Set(i, std::make_unique<Number>(std::move(num)));
-    }
+  void Set(int i, StringValue&& str) noexcept {
+    Set(i, _SCN make_unique<StringValue>(std::move(str)));
+  }
 
-    void Set(int i, String&& str) noexcept {
-        Set(i, std::make_unique<String>(std::move(str)));
-    }
+  void Set(int i, ArrayValue&& arr) noexcept {
+    Set(i, _SCN make_unique<ArrayValue>(std::move(arr)));
+  }
 
-    void Set(int i, Array&& arr) noexcept {
-        Set(i, std::make_unique<Array>(std::move(arr)));
-    }
-
-    void Set(int i, Object&& obj) noexcept;
+  void Set(int i, ObjectValue&& obj) noexcept;
 
 private:
-    std::vector<std::unique_ptr<Value>> m_arr;
+  ValuePtrVector m_arr;
 };
 
+using ArrayPtr = _SCN unique_ptr<ArrayValue>;
 } // namespace value
 } // namespace yuJson
 
