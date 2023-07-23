@@ -152,7 +152,6 @@ public:
                 }
                 if (skip) { 
                     skip = false; 
-                    // ֻ�������ŵ�ת��
                     if (c != '\"') {
                         token->str += "\\";
                     }

@@ -7,11 +7,12 @@
 #include <initializer_list>
 
 #include <yuJson/compiler/parser.hpp>
-#include <yuJson/value/value.hpp>
 
 namespace yuJson {
-
 class Json {
+private:
+    //using json_string = std::basic_string<char, std::char_traits<char>, allocatorT<char>>;
+
 public:
     Json() noexcept { }
     explicit Json(std::unique_ptr<value::Value> value) noexcept : m_value{ std::move(value) } { }
@@ -34,7 +35,8 @@ public:
             if (is_obj) {
                 m_value = std::make_unique<value::Object>();
                 for (auto iter = json.begin(); iter != json.end(); iter += 2) {
-                    m_value->ToObject().Set(iter->m_value->ToString().Get(), std::move(((Json*)iter + 1)->m_value));
+                    std::string key = iter->m_value->ToString().Get();
+                    m_value->ToObject().Set(key, std::move(((Json*)iter + 1)->m_value));
                 }
             }
         }
@@ -94,7 +96,7 @@ public:
     bool Parse(const char* jsonText) {
         compiler::Lexer lexer(jsonText);
         compiler::Parser parser(&lexer);
-        auto tempJson = parser.ParseJson();
+        auto tempJson = std::make_unique<Json>(parser.ParseValue());
         if (!tempJson->IsValid()) {
             return false;
         }
@@ -318,6 +320,7 @@ private:
         case value::ValueType::kObject: {
             *jsonStr += '{';
             if (format) {
+                
                 indent += std::string(kIndent, '  ');
             }
 
@@ -355,6 +358,8 @@ private:
 private:
     static const int kIndent = 4;
 };
+
+//using Json = Json<std::allocator>;
 
 } // namespace yuJson
 

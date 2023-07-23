@@ -7,7 +7,6 @@
 #include <yuJson/value/value.hpp>
 
 namespace yuJson {
-class Json;
 namespace compiler {
 
 /* EBNF
@@ -25,11 +24,6 @@ public:
     Parser(Lexer* lexer) : m_lexer(lexer) { }
 
 public:
-    std::unique_ptr<Json> ParseJson() {
-        return std::make_unique<Json>(ParseValue());
-    }
-
-private:
     std::unique_ptr<value::Value> ParseValue() {
         Token token;
         if (!m_lexer->NextToken(&token)) {
@@ -62,6 +56,7 @@ private:
 
     }
 
+private:
     std::unique_ptr<value::Array> ParseArray() {
         std::unique_ptr<value::Array> array = std::make_unique<value::Array>();
         Token token;
