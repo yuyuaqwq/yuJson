@@ -10,26 +10,24 @@
 #include <initializer_list>
 
 #include <yuJson/compiler/parser.hpp>
-#include <yuJson/value/make.hpp>
 
 namespace yuJson {
 class Json {
-private:
-    //using json_string = std::basic_string<char, std::char_traits<char>, allocatorT<char>>;
-
 public:
-  template<class T>
-  using type_limit_t = std::enable_if_t<
-    !std::is_convertible_v<T, value::ValuePtr> &&
-    !std::_Is_any_of_v<T, Json, Json&, Json&&>,
-    int>;
-
   Json() noexcept { }
   explicit Json(value::ValuePtr value) noexcept : m_value{ std::move(value) } { }
   Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
-  template<class T, type_limit_t<T> = 0>
-  Json(T value) : m_value{ value::make_value(value) } {}
-  Json(_SCN initializer_list<Json> jsons) {
+  Json(nullptr_t) : m_value{ _SCN make_unique<value::NullValue>() } { }
+  Json(bool b) : m_value{ _SCN make_unique<value::BooleanValue>(b) } { }
+  Json(int i) : m_value{ _SCN make_unique<value::NumberValue>(long long(i)) } { }
+  Json(unsigned int i) : m_value{ _SCN make_unique<value::NumberValue>(unsigned long long(i)) } { }
+  Json(double d) : m_value{ _SCN make_unique<value::NumberValue>(d) } { }
+  Json(const char* str) : m_value{ _SCN make_unique<value::StringValue>(str) } { }
+#ifdef WINNT
+  Json(_SCN vector<Json>& jsons) {
+#else
+  Json(std::initializer_list<Json> jsons) {
+#endif // WINNT
     if (jsons.size() % 2 == 0) {
       bool is_obj = true;
       for (auto iter = jsons.begin(); iter != jsons.end(); iter+=2) {
@@ -42,14 +40,22 @@ public:
         m_value = _SCN make_unique<value::ObjectValue>();
         for (auto iter = jsons.begin(); iter != jsons.end(); iter += 2) {
           _SCN string key = iter->m_value->ToString().Get();
+#ifdef WINNT
+          m_value->ToObject().Set(key, std::move((&*iter + 1)->m_value));
+#else
           m_value->ToObject().Set(key, std::move(((Json*)iter + 1)->m_value));
+#endif // WINNT
         }
       }
     }
     if (!IsValid()) {
       m_value = _SCN make_unique<value::ArrayValue>();
       for (auto iter = jsons.begin(); iter != jsons.end(); iter++) {
-        m_value->ToArray().Pushback(std::move(((Json*)iter)->m_value));
+#ifdef WINNT
+          m_value->ToArray().Pushback(std::move((&*iter)->m_value));
+#else
+          m_value->ToArray().Pushback(std::move(((Json*)iter)->m_value));
+#endif // WINNT
       }
     }
   }
