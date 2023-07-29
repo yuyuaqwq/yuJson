@@ -14,6 +14,12 @@
 namespace yuJson {
 class Json {
 public:
+  enum class ContainerType {
+    kArray,
+    kObject
+  };
+
+public:
   Json() noexcept { }
   explicit Json(value::ValuePtr value) noexcept : m_value{ std::move(value) } { }
   Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
@@ -23,6 +29,16 @@ public:
   Json(unsigned int i) : m_value{ _SCN make_unique<value::NumberValue>(unsigned long long(i)) } { }
   Json(double d) : m_value{ _SCN make_unique<value::NumberValue>(d) } { }
   Json(const char* str) : m_value{ _SCN make_unique<value::StringValue>(str) } { }
+  Json(ContainerType type) {
+    switch(type) {
+    case ContainerType::kArray:
+      m_value = _SCN make_unique<value::ArrayValue>();
+      break;
+    case ContainerType::kObject:
+      m_value = _SCN make_unique<value::ObjectValue>();
+      break;
+    }
+  }
 #ifdef WINNT
   Json(_SCN list<Json>& jsons) {
 #else
@@ -205,16 +221,6 @@ public:
 
   void Set(value::ObjectValue&& obj) {
     m_value = _SCN make_unique<value::ObjectValue>(std::move(obj));
-  }
-
-  static Json MakeObject()
-  {
-    return Json(_SCN make_unique<yuJson::value::ObjectValue>());
-  }
-
-  static Json MakeArray()
-  {
-    return Json(_SCN make_unique<yuJson::value::ArrayValue>());
   }
 
 public:

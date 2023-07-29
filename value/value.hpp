@@ -48,7 +48,7 @@ public:
 
   NullValue& ToNull() {
     if (!IsNull()) {
-      throw TypeError("Not Null data");
+      throw TypeError("not Null data");
     }
     return *(NullValue*)this;// static_cast<ast::Boolean*>(this);
   }
@@ -59,7 +59,7 @@ public:
 
   BooleanValue& ToBoolean() {
     if (!IsBoolean()) {
-      throw TypeError("Not Boolean data");
+      throw TypeError("not Boolean data");
     }
     return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
   }
@@ -70,7 +70,7 @@ public:
 
   NumberValue& ToNumber() {
     if (!IsNumber()) {
-      throw TypeError("Not Number data");
+      throw TypeError("not Number data");
     }
     return *(NumberValue*)this; // static_cast<ast::Number*>(this);
   }
@@ -81,7 +81,7 @@ public:
 
   StringValue& ToString() {
     if (!IsString()) {
-      throw TypeError("Not String data");
+      throw TypeError("not String data");
     }
     return *(StringValue*)this; // static_cast<ast::String*>(this);
   }
@@ -92,7 +92,7 @@ public:
 
   ArrayValue& ToArray() {
     if (!IsArray()) {
-      throw TypeError("Not Array data");
+      throw TypeError("not Array data");
     }
     return *(ArrayValue*)this; //static_cast<ast::Array*>(this);
   }
@@ -103,7 +103,7 @@ public:
 
   ObjectValue& ToObject() {
     if (!IsObject()) {
-      throw TypeError("Not Object data");
+      throw TypeError("not Object data");
     }
     return *(ObjectValue*)this; // static_cast<ast::Object*>(this);
   }
