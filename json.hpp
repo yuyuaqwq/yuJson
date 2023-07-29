@@ -24,13 +24,13 @@ public:
   Json(double d) : m_value{ _SCN make_unique<value::NumberValue>(d) } { }
   Json(const char* str) : m_value{ _SCN make_unique<value::StringValue>(str) } { }
 #ifdef WINNT
-  Json(_SCN vector<Json>& jsons) {
+  Json(_SCN list<Json>& jsons) {
 #else
   Json(std::initializer_list<Json> jsons) {
 #endif // WINNT
     if (jsons.size() % 2 == 0) {
       bool is_obj = true;
-      for (auto iter = jsons.begin(); iter != jsons.end(); iter+=2) {
+      for (auto iter = jsons.begin(); iter != jsons.end(); iter++, iter++) {
         if (!iter->m_value->IsString()) {
           is_obj = false;
           break;
@@ -38,7 +38,7 @@ public:
       }
       if (is_obj) {
         m_value = _SCN make_unique<value::ObjectValue>();
-        for (auto iter = jsons.begin(); iter != jsons.end(); iter += 2) {
+        for (auto iter = jsons.begin(); iter != jsons.end(); iter++, iter++) {
           _SCN string key = iter->m_value->ToString().Get();
 #ifdef WINNT
           m_value->ToObject().Set(key, std::move((&*iter + 1)->m_value));
