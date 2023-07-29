@@ -25,12 +25,12 @@ public:
     return m_obj;
   }
 
-  Json& At(const _SCN string& key) {
-    return *(Json*)&m_obj.at(key);
+  ValuePtr& At(const _SCN string& key) {
+    return m_obj.at(key);
   }
 
-  Json& operator[](const _SCN string& key) {
-    return *(Json*)&m_obj[key];
+  ValuePtr& operator[](const _SCN string& key) {
+    return m_obj[key];
   }
 
   bool Find(const _SCN string& key) const noexcept {

@@ -24,12 +24,12 @@ public:
     return m_arr;
   }
 
-  Json& At(int i) {
-    return *(Json*)&m_arr.at(i);
+  ValuePtr& At(int i) {
+    return m_arr.at(i);
   }
 
-  Json& operator[](int i) {
-    return *(Json*)&m_arr[i];
+  ValuePtr& operator[](int i) {
+    return m_arr[i];
   }
 
   void Pushback(ValuePtr&& value) {

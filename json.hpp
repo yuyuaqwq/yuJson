@@ -85,19 +85,19 @@ public:
   }
 
   Json& operator[](const char* str) {
-    return GetObject()[str];
+    return *(Json*)&(GetObject()[str]);
   }
 
   Json& operator[](int index) {
-    return GetArray()[index];
+    return *(Json*)&(GetArray()[index]);
   }
 
   Json& At(const char* str) {
-    return GetObject().At(str);
+    return *(Json*)&(GetObject().At(str));
   }
 
   Json& At(int index) {
-    return GetArray().At(index);
+    return *(Json*)&(GetArray().At(index));
   }
 
   bool operator==(const Json&& other) const {
@@ -141,29 +141,13 @@ public:
     return jsonStr;
   }
 
-  template <typename T>
-  T& Get() noexcept {
-    return *(T*)m_value.get();
-  }
 
   value::ValueType GetType() const noexcept {
     return m_value->Type();
   }
 
-  value::NullValue& GetNull() {
-    return m_value->ToNull();
-  }
-
-  value::BooleanValue& GetBoolean() {
-    return m_value->ToBoolean();
-  }
-
   bool& Boolean() {
     return m_value->ToBoolean().Get();
-  }
-
-  value::NumberValue& GetNumber() {
-    return m_value->ToNumber();
   }
 
   long long& Int() {
@@ -174,20 +158,8 @@ public:
     return m_value->ToNumber().GetFloat();
   }
 
-  value::StringValue& GetString() {
-    return m_value->ToString();
-  }
-
   _SCN string& String() {
     return m_value->ToString().Get();
-  }
-
-  value::ArrayValue& GetArray() {
-    return m_value->ToArray();
-  }
-
-  value::ObjectValue& GetObject() {
-    return m_value->ToObject();
   }
 
   void Set(_SCN unique_ptr<value::ValueBase> value) {
@@ -222,6 +194,37 @@ public:
   void Set(value::ObjectValue&& obj) {
     m_value = _SCN make_unique<value::ObjectValue>(std::move(obj));
   }
+
+  private:
+    template <typename T>
+    T& Get() noexcept {
+      return *(T*)m_value.get();
+    }
+
+    value::NullValue& GetNull() {
+      return m_value->ToNull();
+    }
+
+    value::BooleanValue& GetBoolean() {
+      return m_value->ToBoolean();
+    }
+
+    value::NumberValue& GetNumber() {
+      return m_value->ToNumber();
+    }
+
+    value::StringValue& GetString() {
+      return m_value->ToString();
+    }
+
+    value::ArrayValue& GetArray() {
+      return m_value->ToArray();
+    }
+
+    value::ObjectValue& GetObject() {
+      return m_value->ToObject();
+    }
+
 
 public:
   class Iterator {
