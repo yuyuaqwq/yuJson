@@ -31,19 +31,19 @@ public:
     }
     switch (token.type) {
     case TokenType::kNull: {
-      return _SCN make_unique<value::NullValue>();
+      return YUJSON_STD make_unique<value::NullValue>();
     }
     case TokenType::kTrue: {
-      return _SCN make_unique<value::BooleanValue>(true);
+      return YUJSON_STD make_unique<value::BooleanValue>(true);
     }
     case TokenType::kFalse: {
-      return _SCN make_unique<value::BooleanValue>(false);
+      return YUJSON_STD make_unique<value::BooleanValue>(false);
     }
     case TokenType::kNumber: {
-      return _SCN make_unique<value::NumberValue>(atoll(token.str.c_str()));
+      return YUJSON_STD make_unique<value::NumberValue>(atoll(token.str.c_str()));
     }
     case TokenType::kString: {
-      return _SCN make_unique<value::StringValue>(token.str);
+      return YUJSON_STD make_unique<value::StringValue>(token.str);
     }
     }
     if (token.type == TokenType::kLbrack) {
@@ -58,7 +58,7 @@ public:
 
 private:
   value::ArrayPtr ParseArray() {
-    value::ArrayPtr array = _SCN make_unique<value::ArrayValue>();
+    value::ArrayPtr array = YUJSON_STD make_unique<value::ArrayValue>();
     Token token;
     if (!m_lexer->LookAhead(&token)) {
       return nullptr;
@@ -87,7 +87,7 @@ private:
   }
 
   value::ObjectPtr ParseObject() {
-    value::ObjectPtr object = _SCN make_unique<value::ObjectValue>();
+    value::ObjectPtr object = YUJSON_STD make_unique<value::ObjectValue>();
     Token token;
     if (!m_lexer->NextToken(&token)) {
       return nullptr;
@@ -98,7 +98,7 @@ private:
     if (token.type != TokenType::kString) {
       return nullptr;
     }
-    _SCN string key = token.str;
+    YUJSON_STD string key = token.str;
     if (!m_lexer->NextToken(&token) || token.type != TokenType::kColon) {
       return nullptr;
     }
@@ -114,7 +114,7 @@ private:
       m_lexer->NextToken(nullptr);
 
       m_lexer->NextToken(&token);
-      _SCN string key = token.str;
+      YUJSON_STD string key = token.str;
 
       m_lexer->NextToken(&token);
       if (token.type != TokenType::kColon) {

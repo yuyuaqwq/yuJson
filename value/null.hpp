@@ -16,7 +16,7 @@ public:
   }
 };
 
-using NullPtr = _SCN unique_ptr<NullValue>;
+using NullPtr = YUJSON_STD unique_ptr<NullValue>;
 } // namespace value
 } // namespace yuJson
 

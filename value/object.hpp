@@ -25,48 +25,48 @@ public:
     return m_obj;
   }
 
-  ValuePtr& At(const _SCN string& key) {
+  ValuePtr& At(const YUJSON_STD string& key) {
     return m_obj.at(key);
   }
 
-  ValuePtr& operator[](const _SCN string& key) {
+  ValuePtr& operator[](const YUJSON_STD string& key) {
     return m_obj[key];
   }
 
-  bool Find(const _SCN string& key) const noexcept {
+  bool Find(const YUJSON_STD string& key) const noexcept {
     return m_obj.find(key) != m_obj.end();
   }
 
-  void Set(const _SCN string& key, ValuePtr value) {
+  void Set(const YUJSON_STD string& key, ValuePtr value) {
     auto& it = m_obj.operator[](key);
     it = std::move(value);
   }
 
-  void Set(const _SCN string& key, nullptr_t) {
-    Set(key, _SCN make_unique<value::NullValue>());
+  void Set(const YUJSON_STD string& key, nullptr_t) {
+    Set(key, YUJSON_STD make_unique<value::NullValue>());
   }
 
-  void Set(const _SCN string& key, BooleanValue&& boolean) {
-    Set(key, _SCN make_unique<value::BooleanValue>(std::move(boolean)));
+  void Set(const YUJSON_STD string& key, BooleanValue&& boolean) {
+    Set(key, YUJSON_STD make_unique<value::BooleanValue>(std::move(boolean)));
   }
 
-  void Set(const _SCN string& key, NumberValue&& num) {
-    Set(key, _SCN make_unique<value::NumberValue>(std::move(num)));
+  void Set(const YUJSON_STD string& key, NumberValue&& num) {
+    Set(key, YUJSON_STD make_unique<value::NumberValue>(std::move(num)));
   }
 
-  void Set(const _SCN string& key, StringValue&& str) {
-    Set(key, _SCN make_unique<value::StringValue>(std::move(str)));
+  void Set(const YUJSON_STD string& key, StringValue&& str) {
+    Set(key, YUJSON_STD make_unique<value::StringValue>(std::move(str)));
   }
 
-  void Set(const _SCN string& key, ArrayValue&& arr) {
-    Set(key, _SCN make_unique<value::ArrayValue>(std::move(arr)));
+  void Set(const YUJSON_STD string& key, ArrayValue&& arr) {
+    Set(key, YUJSON_STD make_unique<value::ArrayValue>(std::move(arr)));
   }
 
-  void Set(const _SCN string& key, ObjectValue&& obj) {
-    Set(key, _SCN make_unique<value::ObjectValue>(std::move(obj)));
+  void Set(const YUJSON_STD string& key, ObjectValue&& obj) {
+    Set(key, YUJSON_STD make_unique<value::ObjectValue>(std::move(obj)));
   }
 
-  void Delete(const _SCN string& key) noexcept {
+  void Delete(const YUJSON_STD string& key) noexcept {
     m_obj.erase(key);
   }
 
@@ -75,14 +75,14 @@ private:
 };
 
 inline void ArrayValue::Pushback(ObjectValue&& obj) {
-  Pushback(_SCN make_unique<ObjectValue>(std::move(obj)));
+  Pushback(YUJSON_STD make_unique<ObjectValue>(std::move(obj)));
 }
 
 inline void ArrayValue::Set(int i, ObjectValue&& obj) noexcept {
-  Set(i, _SCN make_unique<ObjectValue>(std::move(obj)));
+  Set(i, YUJSON_STD make_unique<ObjectValue>(std::move(obj)));
 }
 
-using ObjectPtr = _SCN unique_ptr<ObjectValue>;
+using ObjectPtr = YUJSON_STD unique_ptr<ObjectValue>;
 } // namespace value
 } // namespace yuJson
 

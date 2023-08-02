@@ -1,9 +1,9 @@
 #ifndef YUJSON_JSON_H_
 #define YUJSON_JSON_H_
 
-#ifndef _SCN
-#define _SCN std::
-#endif // _SCN
+#ifndef YUJSON_STD
+#define YUJSON_STD std::
+#endif // YUJSON_STD
 
 #include <string>
 #include <memory>
@@ -23,24 +23,24 @@ public:
   Json() noexcept { }
   explicit Json(value::ValuePtr value) noexcept : m_value{ std::move(value) } { }
   Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
-  Json(nullptr_t) : m_value{ _SCN make_unique<value::NullValue>() } { }
-  Json(bool b) : m_value{ _SCN make_unique<value::BooleanValue>(b) } { }
-  Json(int i) : m_value{ _SCN make_unique<value::NumberValue>(long long(i)) } { }
-  Json(unsigned int i) : m_value{ _SCN make_unique<value::NumberValue>(unsigned long long(i)) } { }
-  Json(double d) : m_value{ _SCN make_unique<value::NumberValue>(d) } { }
-  Json(const char* str) : m_value{ _SCN make_unique<value::StringValue>(str) } { }
+  Json(nullptr_t) : m_value{ YUJSON_STD make_unique<value::NullValue>() } { }
+  Json(bool b) : m_value{ YUJSON_STD make_unique<value::BooleanValue>(b) } { }
+  Json(int i) : m_value{ YUJSON_STD make_unique<value::NumberValue>(long long(i)) } { }
+  Json(unsigned int i) : m_value{ YUJSON_STD make_unique<value::NumberValue>(unsigned long long(i)) } { }
+  Json(double d) : m_value{ YUJSON_STD make_unique<value::NumberValue>(d) } { }
+  Json(const char* str) : m_value{ YUJSON_STD make_unique<value::StringValue>(str) } { }
   Json(ContainerType type) {
     switch(type) {
     case ContainerType::kArray:
-      m_value = _SCN make_unique<value::ArrayValue>();
+      m_value = YUJSON_STD make_unique<value::ArrayValue>();
       break;
     case ContainerType::kObject:
-      m_value = _SCN make_unique<value::ObjectValue>();
+      m_value = YUJSON_STD make_unique<value::ObjectValue>();
       break;
     }
   }
 #ifdef WINNT
-  Json(_SCN list<Json>& jsons) {
+  Json(YUJSON_STD list<Json>& jsons) {
 #else
   Json(std::initializer_list<Json> jsons) {
 #endif // WINNT
@@ -53,9 +53,9 @@ public:
         }
       }
       if (is_obj) {
-        m_value = _SCN make_unique<value::ObjectValue>();
+        m_value = YUJSON_STD make_unique<value::ObjectValue>();
         for (auto iter = jsons.begin(); iter != jsons.end(); iter++, iter++) {
-          _SCN string key = iter->m_value->ToString().Get();
+          YUJSON_STD string key = iter->m_value->ToString().Get();
 #ifdef WINNT
           m_value->ToObject().Set(key, std::move((&*iter + 1)->m_value));
 #else
@@ -65,7 +65,7 @@ public:
       }
     }
     if (!IsValid()) {
-      m_value = _SCN make_unique<value::ArrayValue>();
+      m_value = YUJSON_STD make_unique<value::ArrayValue>();
       for (auto iter = jsons.begin(); iter != jsons.end(); iter++) {
 #ifdef WINNT
           m_value->ToArray().Pushback(std::move((&*iter)->m_value));
@@ -132,11 +132,11 @@ public:
     return Json(parser.ParseValue());
   }
 
-  _SCN string Print(bool format = true) const {
+  YUJSON_STD string Print(bool format = true) const {
     if (!m_value.get()) {
       return "";
     }
-    _SCN string jsonStr;
+    YUJSON_STD string jsonStr;
     Print(m_value.get(), format, 0, &jsonStr);
     return jsonStr;
   }
@@ -158,44 +158,12 @@ public:
     return m_value->ToNumber().GetFloat();
   }
 
-  _SCN string& String() {
+  YUJSON_STD string& String() {
     return m_value->ToString().Get();
   }
 
-  void Set(_SCN unique_ptr<value::ValueBase> value) {
-    m_value = std::move(value);
-  }
-
-  template <typename T>
-  void Set(T&& val) {
-    m_value = _SCN make_unique<T>(std::move(val));
-  }
-
-  void Set(nullptr_t) {
-    m_value = _SCN make_unique<value::NullValue>();
-  }
-
-  void Set(value::BooleanValue&& boolean) {
-    m_value = _SCN make_unique<value::BooleanValue>(std::move(boolean));
-  }
-
-  void Set(value::NumberValue&& num) {
-    m_value = _SCN make_unique<value::NumberValue>(std::move(num));
-  }
-
-  void Set(value::StringValue&& str) {
-    m_value = _SCN make_unique<value::StringValue>(std::move(str));
-  }
-
-  void Set(value::ArrayValue&& arr) {
-    m_value = _SCN make_unique<value::ArrayValue>(std::move(arr));
-  }
-
-  void Set(value::ObjectValue&& obj) {
-    m_value = _SCN make_unique<value::ObjectValue>(std::move(obj));
-  }
-
   private:
+
     template <typename T>
     T& Get() noexcept {
       return *(T*)m_value.get();
@@ -293,7 +261,7 @@ public:
   }
 
 private:
-  static _SCN string Replace(const _SCN string& str, const _SCN string& replace, const _SCN string& target) {
+  static YUJSON_STD string Replace(const YUJSON_STD string& str, const YUJSON_STD string& replace, const YUJSON_STD string& target) {
     auto new_str = str;
     size_t pos = 0;
     pos = new_str.find(replace);
@@ -303,16 +271,16 @@ private:
     }
     return new_str;
   }
-  void StrEscapr(_SCN string* str) const {
+  void StrEscapr(YUJSON_STD string* str) const {
     // 引号添加\转义，一个\修改为两个\\ 
     *str = Replace(*str, R"(\)", R"(\\)");
     *str = Replace(*str, R"(")", R"(\")");
   }
 
-  void Print(value::ValueBase* value, bool format, size_t level, _SCN string* jsonStr) const {
-    _SCN string indent;
+  void Print(value::ValueBase* value, bool format, size_t level, YUJSON_STD string* jsonStr) const {
+    YUJSON_STD string indent;
     if (format) {
-      indent = _SCN string(level * kIndent, '  ');
+      indent = YUJSON_STD string(level * kIndent, '  ');
     }
 
     switch (value->Type()) {
@@ -339,7 +307,7 @@ private:
     case value::ValueType::kArray: {
       *jsonStr += '[';
       if (format) {
-        indent += _SCN string(kIndent, '  ');
+        indent += YUJSON_STD string(kIndent, '  ');
       }
       const auto& arr = static_cast<value::ArrayValue*>(value)->GetVector();
       for (int i = 0; i < arr.size(); ) {
@@ -363,7 +331,7 @@ private:
     case value::ValueType::kObject: {
       *jsonStr += '{';
       if (format) {
-        indent += _SCN string(kIndent, '  ');
+        indent += YUJSON_STD string(kIndent, '  ');
       }
 
       const auto& obj = static_cast<value::ObjectValue*>(value)->GetMap();

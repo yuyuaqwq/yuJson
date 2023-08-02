@@ -37,23 +37,23 @@ public:
   }
 
   void Pushback(nullptr_t) {
-    Pushback(_SCN make_unique<NullValue>());
+    Pushback(YUJSON_STD make_unique<NullValue>());
   }
 
   void Pushback(BooleanValue&& boolean) {
-    Pushback(_SCN make_unique<BooleanValue>(std::move(boolean)));
+    Pushback(YUJSON_STD make_unique<BooleanValue>(std::move(boolean)));
   }
 
   void Pushback(NumberValue&& num) {
-    Pushback(_SCN make_unique<NumberValue>(std::move(num)));
+    Pushback(YUJSON_STD make_unique<NumberValue>(std::move(num)));
   }
 
   void Pushback(StringValue&& str) {
-    Pushback(_SCN make_unique<StringValue>(std::move(str)));
+    Pushback(YUJSON_STD make_unique<StringValue>(std::move(str)));
   }
 
   void Pushback(ArrayValue&& arr) {
-    Pushback(_SCN make_unique<ArrayValue>(std::move(arr)));
+    Pushback(YUJSON_STD make_unique<ArrayValue>(std::move(arr)));
   }
 
   void Pushback(ObjectValue&& obj);
@@ -63,23 +63,23 @@ public:
   }
 
   void Set(int i, nullptr_t) noexcept {
-    Set(i, _SCN make_unique<NullValue>());
+    Set(i, YUJSON_STD make_unique<NullValue>());
   }
 
   void Set(int i, BooleanValue&& boolean) noexcept {
-    Set(i, _SCN make_unique<BooleanValue>(std::move(boolean)));
+    Set(i, YUJSON_STD make_unique<BooleanValue>(std::move(boolean)));
   }
 
   void Set(int i, NumberValue&& num) noexcept {
-    Set(i, _SCN make_unique<NumberValue>(std::move(num)));
+    Set(i, YUJSON_STD make_unique<NumberValue>(std::move(num)));
   }
 
   void Set(int i, StringValue&& str) noexcept {
-    Set(i, _SCN make_unique<StringValue>(std::move(str)));
+    Set(i, YUJSON_STD make_unique<StringValue>(std::move(str)));
   }
 
   void Set(int i, ArrayValue&& arr) noexcept {
-    Set(i, _SCN make_unique<ArrayValue>(std::move(arr)));
+    Set(i, YUJSON_STD make_unique<ArrayValue>(std::move(arr)));
   }
 
   void Set(int i, ObjectValue&& obj) noexcept;
@@ -88,7 +88,7 @@ private:
   ValuePtrVector m_arr;
 };
 
-using ArrayPtr = _SCN unique_ptr<ArrayValue>;
+using ArrayPtr = YUJSON_STD unique_ptr<ArrayValue>;
 } // namespace value
 } // namespace yuJson
 

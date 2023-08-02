@@ -121,9 +121,9 @@ public:
 namespace yuJson{
 namespace value{
 
-using ValuePtr = _SCN unique_ptr<ValueBase>;
-using ValuePtrVector = _SCN vector<ValuePtr>;
-using ValuePtrtMap = _SCN map<_SCN string, ValuePtr>;
+using ValuePtr = YUJSON_STD unique_ptr<ValueBase>;
+using ValuePtrVector = YUJSON_STD vector<ValuePtr>;
+using ValuePtrtMap = YUJSON_STD map<YUJSON_STD string, ValuePtr>;
 
 }
 }
