@@ -152,10 +152,12 @@ public:
   }
 
   bool IsNull() {
+    if (!IsValid()) return false;
     return m_value->IsNull();
   }
 
   bool IsBoolean() {
+    if (!IsValid()) return false;
     return m_value->IsBoolean();
   }
 
@@ -164,6 +166,7 @@ public:
   }
 
   bool IsNumber() {
+    if (!IsValid()) return false;
     return m_value->IsNumber();
   }
 
@@ -176,6 +179,7 @@ public:
   }
 
   bool IsString() {
+    if (!IsValid()) return false;
     return m_value->IsString();
   }
 
@@ -184,10 +188,12 @@ public:
   }
 
   bool IsArray() {
+    if (!IsValid()) return false;
     return m_value->IsArray();
   }
 
   bool IsObject() {
+    if (!IsValid()) return false;
     return m_value->IsObject();
   }
 
