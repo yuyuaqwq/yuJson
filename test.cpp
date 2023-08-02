@@ -5,12 +5,23 @@
 int main()
 {
 
-  auto obj = yuJson::Json(yuJson::Json::ContainerType::kObject);
+  auto obj = yuJson::Json::MakeObject();
   std::cout << obj.Print() << std::endl << std::endl;
   
   //auto& qqq = obj.GetObject().At("abc");
 
   //obj["aa"]["bb"];
+
+  std::cout << obj["str"].ConvertToInt(100);
+
+  obj["str"] = "111";
+  std::cout << obj["str"].ConvertToInt(100);
+  
+  std::cout << obj["int"].ConvertToString("emm");
+
+  obj["int"] = 10000;
+  std::cout << obj["int"].ConvertToString("emm");
+
 
   yuJson::Json json{ "awdwd", { "aa", 123 }, "emmm", 3333};
   json["cccccc"] = "qaq";

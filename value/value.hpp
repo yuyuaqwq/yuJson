@@ -48,7 +48,7 @@ public:
 
   NullValue& ToNull() {
     if (!IsNull()) {
-      throw TypeError("not Null data");
+      throw TypeError("Not Null data");
     }
     return *(NullValue*)this;// static_cast<ast::Boolean*>(this);
   }
@@ -57,11 +57,12 @@ public:
     return Type() == ValueType::kBoolean;
   }
 
+
   BooleanValue& ToBoolean() {
     if (!IsBoolean()) {
-      throw TypeError("not Boolean data");
+      throw TypeError("Not Boolean data");
     }
-    return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
+    return GetBoolean();
   }
 
   bool IsNumber() const noexcept {
@@ -70,9 +71,9 @@ public:
 
   NumberValue& ToNumber() {
     if (!IsNumber()) {
-      throw TypeError("not Number data");
+      throw TypeError("Not Number data");
     }
-    return *(NumberValue*)this; // static_cast<ast::Number*>(this);
+    return GetNumber();
   }
 
   bool IsString() const noexcept {
@@ -81,9 +82,9 @@ public:
 
   StringValue& ToString() {
     if (!IsString()) {
-      throw TypeError("not String data");
+      throw TypeError("Not String data");
     }
-    return *(StringValue*)this; // static_cast<ast::String*>(this);
+    return GetString();
   }
 
   bool IsArray() const noexcept {
@@ -92,7 +93,7 @@ public:
 
   ArrayValue& ToArray() {
     if (!IsArray()) {
-      throw TypeError("not Array data");
+      throw TypeError("Not Array data");
     }
     return *(ArrayValue*)this; //static_cast<ast::Array*>(this);
   }
@@ -103,10 +104,24 @@ public:
 
   ObjectValue& ToObject() {
     if (!IsObject()) {
-      throw TypeError("not Object data");
+      throw TypeError("Not Object data");
     }
     return *(ObjectValue*)this; // static_cast<ast::Object*>(this);
   }
+
+
+  BooleanValue& GetBoolean() {
+    return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
+  }
+
+  NumberValue& GetNumber() {
+    return *(NumberValue*)this; // static_cast<ast::Number*>(this);
+  }
+
+  StringValue& GetString() {
+    return *(StringValue*)this; // static_cast<ast::String*>(this);
+  }
+
 
 };
 

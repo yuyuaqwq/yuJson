@@ -13,7 +13,7 @@
 
 namespace yuJson {
 class Json {
-public:
+private:
   enum class ContainerType {
     kArray,
     kObject
@@ -29,16 +29,6 @@ public:
   Json(unsigned int i) : m_value{ YUJSON_STD make_unique<value::NumberValue>(unsigned long long(i)) } { }
   Json(double d) : m_value{ YUJSON_STD make_unique<value::NumberValue>(d) } { }
   Json(const char* str) : m_value{ YUJSON_STD make_unique<value::StringValue>(str) } { }
-  Json(ContainerType type) {
-    switch(type) {
-    case ContainerType::kArray:
-      m_value = YUJSON_STD make_unique<value::ArrayValue>();
-      break;
-    case ContainerType::kObject:
-      m_value = YUJSON_STD make_unique<value::ObjectValue>();
-      break;
-    }
-  }
 #ifdef WINNT
   Json(YUJSON_STD list<Json>& jsons) {
 #else
@@ -75,6 +65,26 @@ public:
       }
     }
   }
+
+private:
+  Json(ContainerType type) {
+    switch (type) {
+    case ContainerType::kArray:
+      m_value = YUJSON_STD make_unique<value::ArrayValue>();
+      break;
+    case ContainerType::kObject:
+      m_value = YUJSON_STD make_unique<value::ObjectValue>();
+      break;
+    }
+  }
+public:
+  static Json MakeObject() {
+    return Json(ContainerType::kObject);
+  }
+  static Json MakeArray() {
+    return Json(ContainerType::kArray);
+  }
+
   ~Json() noexcept { }
 
   Json(const Json&) = delete;
@@ -85,26 +95,26 @@ public:
   }
 
   Json& operator[](const char* str) {
-    return *(Json*)&(GetObject()[str]);
+    return *(Json*)&(m_value->ToObject()[str]);
   }
 
   Json& operator[](int index) {
-    return *(Json*)&(GetArray()[index]);
+    return *(Json*)&(m_value->ToArray()[index]);
   }
 
   Json& At(const char* str) {
-    return *(Json*)&(GetObject().At(str));
+    return *(Json*)&(m_value->ToObject().At(str));
   }
 
   Json& At(int index) {
-    return *(Json*)&(GetArray().At(index));
+    return *(Json*)&(m_value->ToArray().At(index));
   }
 
   bool operator==(const Json&& other) const {
-    if (GetType() != other.GetType()) {
+    if (m_value->Type() != other.m_value->Type()) {
       return false;
     }
-    switch (GetType()) {
+    switch (m_value->Type()) {
     case value::ValueType::kNull:
       return true;
     case value::ValueType::kBoolean:
@@ -119,7 +129,7 @@ public:
   }
 
   bool Find(const char* str) {
-    return GetObject().Find(str);
+    return m_value->ToObject().Find(str);
   }
 
   bool IsValid() noexcept {
@@ -141,13 +151,20 @@ public:
     return jsonStr;
   }
 
+  bool IsNull() {
+    return m_value->IsNull();
+  }
 
-  value::ValueType GetType() const noexcept {
-    return m_value->Type();
+  bool IsBoolean() {
+    return m_value->IsBoolean();
   }
 
   bool& Boolean() {
     return m_value->ToBoolean().Get();
+  }
+
+  bool IsNumber() {
+    return m_value->IsNumber();
   }
 
   long long& Int() {
@@ -158,39 +175,69 @@ public:
     return m_value->ToNumber().GetFloat();
   }
 
+  bool IsString() {
+    return m_value->IsString();
+  }
+
   YUJSON_STD string& String() {
     return m_value->ToString().Get();
   }
 
-  private:
+  bool IsArray() {
+    return m_value->IsArray();
+  }
 
+  bool IsObject() {
+    return m_value->IsObject();
+  }
+
+
+  long long ConvertToInt(long long defalut = 0) {
+    if (!IsValid()) return defalut;
+    switch (m_value->Type()) {
+    case value::ValueType::kNumber: {
+      return m_value->GetNumber().GetInt();
+    }
+    case value::ValueType::kString: {
+      return atoll(m_value->GetString().Get().c_str());
+    }
+    case value::ValueType::kNull: {
+      return defalut;
+    }
+    case value::ValueType::kBoolean: {
+      return m_value->GetBoolean().Get() ? 1 : 0;
+    }
+    defalut: {
+      throw value::ValueBase::TypeError("Object and Array cannot be converted to Int");
+    }
+    }
+  }
+
+  std::string ConvertToString(std::string defalut = "") {
+    if (!IsValid()) return defalut;
+    switch (m_value->Type()) {
+    case value::ValueType::kNumber: {
+      return YUJSON_STD to_string(m_value->GetNumber().GetInt());
+    }
+    case value::ValueType::kString: {
+      return m_value->GetString().Get().c_str();
+    }
+    case value::ValueType::kNull: {
+      return defalut;
+    }
+    case value::ValueType::kBoolean: {
+      return m_value->GetBoolean().Get() ? "true" : "false";
+    }
+    defalut: {
+      throw value::ValueBase::TypeError("Object and Array cannot be converted to String");
+    }
+    }
+  }
+
+  private:
     template <typename T>
     T& Get() noexcept {
       return *(T*)m_value.get();
-    }
-
-    value::NullValue& GetNull() {
-      return m_value->ToNull();
-    }
-
-    value::BooleanValue& GetBoolean() {
-      return m_value->ToBoolean();
-    }
-
-    value::NumberValue& GetNumber() {
-      return m_value->ToNumber();
-    }
-
-    value::StringValue& GetString() {
-      return m_value->ToString();
-    }
-
-    value::ArrayValue& GetArray() {
-      return m_value->ToArray();
-    }
-
-    value::ObjectValue& GetObject() {
-      return m_value->ToObject();
     }
 
 
@@ -200,11 +247,11 @@ public:
     Iterator(Json* base){
       m_base = base;
       if (base) {
-        if (m_base->GetType() == value::ValueType::kArray) {
-          m_obj_iter = m_base->GetObject().GetMap().begin();
+        if (m_base->IsArray()) {
+          m_obj_iter = m_base->m_value->ToObject().GetMap().begin();
         }
-        else if (m_base->GetType() == value::ValueType::kObject) {
-          m_arr_iter = m_base->GetArray().GetVector().begin();
+        else if (m_base->IsObject()) {
+          m_arr_iter = m_base->m_value->ToArray().GetVector().begin();
         }
       }
     }
@@ -215,30 +262,30 @@ public:
     ~Iterator() { }
 
     bool operator!=(const Iterator& other) const {
-      if (m_base->GetType() == value::ValueType::kArray) {
-        return m_base->GetObject().GetMap() == other.m_base->GetObject().GetMap();
+      if (m_base->IsArray()) {
+        return m_base->m_value->ToObject().GetMap() == other.m_base->m_value->ToObject().GetMap();
       }
-      else if (m_base->GetType() == value::ValueType::kObject) {
-        return m_base->GetArray().GetVector() == other.m_base->GetArray().GetVector();
+      else if (m_base->IsObject()) {
+        return m_base->m_value->ToArray().GetVector() == other.m_base->m_value->ToArray().GetVector();
       }
       return false;
     }
 
     Json& operator*() const {
-      if (m_base->GetType() == value::ValueType::kArray) {
+      if (m_base->IsArray()) {
         return (Json&)m_obj_iter->second;
       }
-      else if (m_base->GetType() == value::ValueType::kObject) {
+      else if (m_base->IsObject()) {
         return (Json&)*m_arr_iter;
       }
       return *(Json*)nullptr;
     }
 
     const Iterator& operator++() {
-      if (m_base->GetType() == value::ValueType::kArray) {
+      if (m_base->m_value->Type() == value::ValueType::kArray) {
         m_arr_iter++;
       }
-      else if (m_base->GetType() == value::ValueType::kObject) {
+      else if (m_base->m_value->Type() == value::ValueType::kObject) {
         m_obj_iter++;
       }
       return *this;
@@ -293,9 +340,10 @@ private:
       break;
     }
     case value::ValueType::kNumber: {
-      char buf[21]{ 0 };
-      _itoa_s(static_cast<value::NumberValue*>(value)->GetInt(), buf, 10);
-      *jsonStr += buf;
+      //char str[64];
+      //sprintf(str, "%lld", );
+      auto str = YUJSON_STD to_string(static_cast<value::NumberValue*>(value)->GetInt());
+      *jsonStr += str;
       break;
     }
     case value::ValueType::kString: {
