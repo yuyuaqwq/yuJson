@@ -40,7 +40,7 @@ public:
       return YUJSON_STD make_unique<value::BooleanValue>(false);
     }
     case TokenType::kNumber: {
-      return YUJSON_STD make_unique<value::NumberValue>(atoll(token.str.c_str()));
+      return YUJSON_STD make_unique<value::NumberValue>(YUJSON_STD stoll(token.str));
     }
     case TokenType::kString: {
       return YUJSON_STD make_unique<value::StringValue>(token.str);
