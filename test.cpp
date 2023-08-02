@@ -12,15 +12,15 @@ int main()
 
   //obj["aa"]["bb"];
 
-  std::cout << obj["str"].ConvertToInt(100);
+  std::cout << obj["str"].ConvertToInt(100) << std::endl;
 
   obj["str"] = "111";
-  std::cout << obj["str"].ConvertToInt(100);
+  std::cout << obj["str"].ConvertToInt(100) << std::endl;
   
-  std::cout << obj["int"].ConvertToString("emm");
+  std::cout << obj["int"].ConvertToString("emm") << std::endl;
 
   obj["int"] = 10000;
-  std::cout << obj["int"].ConvertToString("emm");
+  std::cout << obj["int"].ConvertToString("emm") << std::endl;
 
 
   yuJson::Json json{ "awdwd", { "aa", 123 }, "emmm", 3333};
