@@ -122,7 +122,9 @@ private:
       }
       object->Set(key, ParseValue());
     } while (true);
-    m_lexer->MatchToken(TokenType::kRcurly);
+    if (!m_lexer->MatchToken(TokenType::kRcurly)) {
+      return nullptr;
+    }
     return object;
   }
 
