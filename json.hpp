@@ -206,7 +206,9 @@ public:
       return m_value->GetNumber().GetInt();
     }
     case value::ValueType::kString: {
-      return YUJSON_STD stoll(m_value->GetString().Get());
+      auto& str = m_value->GetString().Get();
+      if (str.empty() || str[0] < '0' && str[0] > '9') return 0;
+      return YUJSON_STD stoll(str);
     }
     case value::ValueType::kNull: {
       return defalut;
