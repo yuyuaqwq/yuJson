@@ -323,7 +323,7 @@ private:
     pos = new_str.find(replace);
     while (pos != -1) {
       new_str = new_str.replace(pos, replace.size(), target.c_str());
-      pos = new_str.find(replace, pos + target.size() + 1);
+      pos = new_str.find(replace, pos + target.size());
     }
     return new_str;
   }
