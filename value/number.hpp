@@ -5,7 +5,7 @@
 
 namespace yuJson {
 namespace value {
-class NumberValue : public ValueBase {
+class NumberValue : public ValueInterface {
 public:
   //explicit Number(double num) noexcept : m_float(num) { }
   NumberValue(long long num) noexcept : m_int(num) { }

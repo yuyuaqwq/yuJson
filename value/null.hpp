@@ -5,7 +5,7 @@
 
 namespace yuJson {
 namespace value {
-class NullValue : public ValueBase {
+class NullValue : public ValueInterface {
 public:
   NullValue() { }
 

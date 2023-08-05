@@ -6,7 +6,7 @@
 namespace yuJson {
 namespace value {
 
-class BooleanValue : public ValueBase {
+class BooleanValue : public ValueInterface {
 public:
   BooleanValue(bool b) noexcept : m_bool(b) { }
   ~BooleanValue() noexcept { }

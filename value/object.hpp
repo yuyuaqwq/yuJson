@@ -8,7 +8,7 @@
 namespace yuJson {
 class Json;
 namespace value {
-class ObjectValue : public ValueBase {
+class ObjectValue : public ValueInterface {
 public:
   ObjectValue() noexcept { }
   ObjectValue(ObjectValue&& obj) noexcept : m_obj(std::move(obj.m_obj)) { }

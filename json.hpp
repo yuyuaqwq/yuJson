@@ -217,7 +217,7 @@ public:
       return m_value->GetBoolean().Get() ? 1 : 0;
     }
     defalut: {
-      throw value::ValueBase::TypeError("Object and Array cannot be converted to Int");
+      throw value::ValueTypeError("Object and Array cannot be converted to Int");
     }
     }
   }
@@ -238,7 +238,7 @@ public:
       return m_value->GetBoolean().Get() ? "true" : "false";
     }
     defalut: {
-      throw value::ValueBase::TypeError("Object and Array cannot be converted to String");
+      throw value::ValueTypeError("Object and Array cannot be converted to String");
     }
     }
   }
@@ -333,7 +333,7 @@ private:
     *str = Replace(*str, R"(")", R"(\")");
   }
 
-  void Print(value::ValueBase* value, bool format, size_t level, YUJSON_STD string* jsonStr) const {
+  void Print(value::ValueInterface* value, bool format, size_t level, YUJSON_STD string* jsonStr) const {
     YUJSON_STD string indent;
     if (format) {
       indent = YUJSON_STD string(level * kIndent, '  ');

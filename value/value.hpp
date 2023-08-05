@@ -15,6 +15,13 @@ enum class ValueType {
   kObject
 };
 
+class ValueTypeError : public std::exception {
+public:
+  ValueTypeError(const char* message) : std::exception(message) {
+
+  }
+};
+
 class NullValue;
 class BooleanValue;
 class NumberValue;
@@ -22,19 +29,14 @@ class StringValue;
 class ArrayValue;
 class ObjectValue;
 
-class ValueBase {
-public:
-  class TypeError : public std::exception {
-  public:
-    TypeError(const char* message) : std::exception(message){
-
-    }
-  };
+class ValueInterface {
+protected:
+  ValueInterface() noexcept { }
 
 public:
-  ValueBase() noexcept { }
-  virtual ~ValueBase() noexcept { }
+  virtual ~ValueInterface() noexcept { }
 
+public:
   virtual inline ValueType Type() const noexcept = 0;
 
   template <typename T>
@@ -48,7 +50,7 @@ public:
 
   NullValue& ToNull() {
     if (!IsNull()) {
-      throw TypeError("Not Null data");
+      throw ValueTypeError("Not Null data");
     }
     return *(NullValue*)this;// static_cast<ast::Boolean*>(this);
   }
@@ -60,7 +62,7 @@ public:
 
   BooleanValue& ToBoolean() {
     if (!IsBoolean()) {
-      throw TypeError("Not Boolean data");
+      throw ValueTypeError("Not Boolean data");
     }
     return GetBoolean();
   }
@@ -71,7 +73,7 @@ public:
 
   NumberValue& ToNumber() {
     if (!IsNumber()) {
-      throw TypeError("Not Number data");
+      throw ValueTypeError("Not Number data");
     }
     return GetNumber();
   }
@@ -82,7 +84,7 @@ public:
 
   StringValue& ToString() {
     if (!IsString()) {
-      throw TypeError("Not String data");
+      throw ValueTypeError("Not String data");
     }
     return GetString();
   }
@@ -93,7 +95,7 @@ public:
 
   ArrayValue& ToArray() {
     if (!IsArray()) {
-      throw TypeError("Not Array data");
+      throw ValueTypeError("Not Array data");
     }
     return *(ArrayValue*)this; //static_cast<ast::Array*>(this);
   }
@@ -104,7 +106,7 @@ public:
 
   ObjectValue& ToObject() {
     if (!IsObject()) {
-      throw TypeError("Not Object data");
+      throw ValueTypeError("Not Object data");
     }
     return *(ObjectValue*)this; // static_cast<ast::Object*>(this);
   }
@@ -136,7 +138,7 @@ public:
 namespace yuJson{
 namespace value{
 
-using ValuePtr = YUJSON_STD unique_ptr<ValueBase>;
+using ValuePtr = YUJSON_STD unique_ptr<ValueInterface>;
 using ValuePtrVector = YUJSON_STD vector<ValuePtr>;
 using ValuePtrtMap = YUJSON_STD map<YUJSON_STD string, ValuePtr>;
 
