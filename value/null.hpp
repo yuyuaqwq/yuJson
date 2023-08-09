@@ -7,13 +7,13 @@ namespace yuJson {
 namespace value {
 class NullValue : public ValueInterface {
 public:
-  NullValue() { }
+    NullValue() { }
 
-  NullValue(std::nullptr_t) { }
+    NullValue(std::nullptr_t) { }
 
-  virtual ValueType Type() const noexcept {
-    return ValueType::kNull;
-  }
+    virtual ValueType Type() const noexcept {
+        return ValueType::kNull;
+    }
 };
 
 using NullPtr = YUJSON_STD unique_ptr<NullValue>;

@@ -8,23 +8,23 @@ namespace value {
 
 class BooleanValue : public ValueInterface {
 public:
-  BooleanValue(bool b) noexcept : m_bool(b) { }
-  ~BooleanValue() noexcept { }
+    BooleanValue(bool b) noexcept : m_bool(b) { }
+    ~BooleanValue() noexcept { }
 
-  virtual ValueType Type() const noexcept {
-    return ValueType::kBoolean;
-  }
+    virtual ValueType Type() const noexcept {
+        return ValueType::kBoolean;
+    }
 
-  bool& Get() noexcept {
-    return m_bool;
-  }
-  
-  void Set(bool b) noexcept {
-    m_bool = b;
-  }
+    bool& Get() noexcept {
+        return m_bool;
+    }
+    
+    void Set(bool b) noexcept {
+        m_bool = b;
+    }
 
 private:
-  bool m_bool;
+    bool m_bool;
 };
 
 using BooleanPtr = YUJSON_STD unique_ptr<BooleanValue>;

@@ -7,19 +7,19 @@ namespace yuJson {
 namespace value {
 
 enum class ValueType {
-  kNull = 0,
-  kBoolean,
-  kNumber,
-  kString,
-  kArray,
-  kObject
+    kNull = 0,
+    kBoolean,
+    kNumber,
+    kString,
+    kArray,
+    kObject
 };
 
 class ValueTypeError : public std::exception {
 public:
-  ValueTypeError(const char* message) : std::exception(message) {
+    ValueTypeError(const char* message) : std::exception(message) {
 
-  }
+    }
 };
 
 class NullValue;
@@ -31,98 +31,98 @@ class ObjectValue;
 
 class ValueInterface {
 protected:
-  ValueInterface() noexcept { }
+    ValueInterface() noexcept { }
 
 public:
-  virtual ~ValueInterface() noexcept { }
+    virtual ~ValueInterface() noexcept { }
 
 public:
-  virtual inline ValueType Type() const noexcept = 0;
+    virtual inline ValueType Type() const noexcept = 0;
 
-  template <typename T>
-  T& To() {
-    return *(T*)this;// static_cast<ast::T*>(this);
-  }
-
-  bool IsNull() const noexcept {
-    return Type() == ValueType::kNull;
-  }
-
-  NullValue& ToNull() {
-    if (!IsNull()) {
-      throw ValueTypeError("Not Null data");
+    template <typename T>
+    T& To() {
+        return *(T*)this;// static_cast<ast::T*>(this);
     }
-    return *(NullValue*)this;// static_cast<ast::Boolean*>(this);
-  }
 
-  bool IsBoolean() const noexcept {
-    return Type() == ValueType::kBoolean;
-  }
-
-
-  BooleanValue& ToBoolean() {
-    if (!IsBoolean()) {
-      throw ValueTypeError("Not Boolean data");
+    bool IsNull() const noexcept {
+        return Type() == ValueType::kNull;
     }
-    return GetBoolean();
-  }
 
-  bool IsNumber() const noexcept {
-    return Type() == ValueType::kNumber;
-  }
-
-  NumberValue& ToNumber() {
-    if (!IsNumber()) {
-      throw ValueTypeError("Not Number data");
+    NullValue& ToNull() {
+        if (!IsNull()) {
+            throw ValueTypeError("Not Null data");
+        }
+        return *(NullValue*)this;// static_cast<ast::Boolean*>(this);
     }
-    return GetNumber();
-  }
 
-  bool IsString() const noexcept {
-    return Type() == ValueType::kString;
-  }
-
-  StringValue& ToString() {
-    if (!IsString()) {
-      throw ValueTypeError("Not String data");
+    bool IsBoolean() const noexcept {
+        return Type() == ValueType::kBoolean;
     }
-    return GetString();
-  }
 
-  bool IsArray() const noexcept {
-    return Type() == ValueType::kArray;
-  }
 
-  ArrayValue& ToArray() {
-    if (!IsArray()) {
-      throw ValueTypeError("Not Array data");
+    BooleanValue& ToBoolean() {
+        if (!IsBoolean()) {
+            throw ValueTypeError("Not Boolean data");
+        }
+        return GetBoolean();
     }
-    return *(ArrayValue*)this; //static_cast<ast::Array*>(this);
-  }
 
-  bool IsObject() const noexcept {
-    return Type() == ValueType::kObject;
-  }
-
-  ObjectValue& ToObject() {
-    if (!IsObject()) {
-      throw ValueTypeError("Not Object data");
+    bool IsNumber() const noexcept {
+        return Type() == ValueType::kNumber;
     }
-    return *(ObjectValue*)this; // static_cast<ast::Object*>(this);
-  }
+
+    NumberValue& ToNumber() {
+        if (!IsNumber()) {
+            throw ValueTypeError("Not Number data");
+        }
+        return GetNumber();
+    }
+
+    bool IsString() const noexcept {
+        return Type() == ValueType::kString;
+    }
+
+    StringValue& ToString() {
+        if (!IsString()) {
+            throw ValueTypeError("Not String data");
+        }
+        return GetString();
+    }
+
+    bool IsArray() const noexcept {
+        return Type() == ValueType::kArray;
+    }
+
+    ArrayValue& ToArray() {
+        if (!IsArray()) {
+            throw ValueTypeError("Not Array data");
+        }
+        return *(ArrayValue*)this; //static_cast<ast::Array*>(this);
+    }
+
+    bool IsObject() const noexcept {
+        return Type() == ValueType::kObject;
+    }
+
+    ObjectValue& ToObject() {
+        if (!IsObject()) {
+            throw ValueTypeError("Not Object data");
+        }
+        return *(ObjectValue*)this; // static_cast<ast::Object*>(this);
+    }
 
 
-  BooleanValue& GetBoolean() {
-    return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
-  }
+    BooleanValue& GetBoolean() {
+        return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
+    }
 
-  NumberValue& GetNumber() {
-    return *(NumberValue*)this; // static_cast<ast::Number*>(this);
-  }
+    NumberValue& GetNumber() {
+        return *(NumberValue*)this; // static_cast<ast::Number*>(this);
+    }
 
-  StringValue& GetString() {
-    return *(StringValue*)this; // static_cast<ast::String*>(this);
-  }
+    StringValue& GetString() {
+        return *(StringValue*)this; // static_cast<ast::String*>(this);
+    }
 
 
 };
