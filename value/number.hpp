@@ -7,14 +7,19 @@ namespace yuJson {
 namespace value {
 class NumberValue : public ValueInterface {
 public:
-    //explicit Number(double num) noexcept : m_float(num) { }
-    NumberValue(long long num) noexcept : m_int(num) { }
+#ifdef YUJSON_ENABLE_FLOAT
+    explicit NumberValue(double num) noexcept : m_float(num) { }
+#endif
+    explicit NumberValue(long long num) noexcept : m_int(num) { }
+    explicit NumberValue(unsigned long long num) noexcept : m_int((long long)num) { }
+    
     ~NumberValue() noexcept { }
 
     virtual ValueType Type() const noexcept {
         return ValueType::kNumber;
     }
 
+#ifdef YUJSON_ENABLE_FLOAT
     double& GetFloat() noexcept {
         return m_float;
     }
@@ -22,6 +27,7 @@ public:
     void SetFloat(double num) noexcept {
         m_float = num;
     }
+#endif
 
     long long& GetInt() noexcept {
         return m_int;
@@ -34,7 +40,9 @@ public:
 private:
     union
     {
+#ifdef YUJSON_ENABLE_FLOAT
         double m_float;
+#endif
         long long m_int;
     };
 

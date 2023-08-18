@@ -12,7 +12,8 @@ enum class TokenType {
     kNull,
     kTrue,
     kFalse,
-    kNumber,
+    kNumberInt,
+    kNumberFloat,
     kString,
     kLbrack,
     kRbrack,
@@ -125,17 +126,41 @@ public:
         }
 
         if (c >= '0' && c <= '9' || c == '-') {
-            token->type = TokenType::kNumber;
             token->str = "";
+            int i = 0;
+            bool is_float = false;
+            bool is_e = false;
+            int e_pos = 0;
             do {
-                if (c >= '0' && c <= '9' || c == '-') {
+#ifdef YUJSON_ENABLE_FLOAT
+                if (c >= '0' && c <= '9' || c == '-' && i == 0 || c == '+' && i == 0 || c == '.' && is_float == false) {
+                    token->str += YUJSON_STD string(1, c);
+                    if (c == '.') is_float = true;
+                }
+                else if (is_e == false && is_float && (c == 'e' || c == 'E')) {
+                    token->str += YUJSON_STD string(1, c);
+                    is_e = true;
+                    e_pos = i;
+                }
+                else if (is_e == true && i == e_pos+1 && (c == '+' || c == '-')) {
                     token->str += YUJSON_STD string(1, c);
                 }
-                else {
-                    SkipChar(-1);
-                    break;
+#else
+                if (c >= '0' && c <= '9' || c == '-' && i == 0 || c == '+' && i == 0) {
+                    token->str += YUJSON_STD string(1, c);
                 }
+#endif
+                else {
+                     SkipChar(-1);
+                     break;
+                }
+                ++i;
             } while (c = NextChar());
+            auto end_char = token->str.at(token->str.size() - 1);
+            if (is_float && (end_char < '0' || end_char > '9')) {
+                return false;
+            }
+            token->type = is_float ? TokenType::kNumberFloat : TokenType::kNumberInt;
             return true;
         }
 

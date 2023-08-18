@@ -5,6 +5,8 @@
 #define YUJSON_STD std::
 #endif // YUJSON_STD
 
+// #define YUJSON_ENABLE_FLOAT
+
 #include <string>
 #include <memory>
 #include <initializer_list>
@@ -175,10 +177,11 @@ public:
     long long& Int() {
         return m_value->ToNumber().GetInt();
     }
-
+#ifdef YUJSON_ENABLE_FLOAT
     double& Float() {
         return m_value->ToNumber().GetFloat();
     }
+#endif
 
     bool IsString() {
         if (!IsValid()) return false;

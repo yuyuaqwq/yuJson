@@ -9,7 +9,7 @@ class NullValue : public ValueInterface {
 public:
     NullValue() { }
 
-    NullValue(std::nullptr_t) { }
+    explicit NullValue(std::nullptr_t) { }
 
     virtual ValueType Type() const noexcept {
         return ValueType::kNull;
