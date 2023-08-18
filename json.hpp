@@ -29,6 +29,7 @@ public:
     Json(unsigned int i) : m_value{ YUJSON_STD make_unique<value::NumberValue>(unsigned long long(i)) } { }
     Json(double d) : m_value{ YUJSON_STD make_unique<value::NumberValue>(d) } { }
     Json(const char* str) : m_value{ YUJSON_STD make_unique<value::StringValue>(str) } { }
+    Json(const unsigned char* str) : m_value{ YUJSON_STD make_unique<value::StringValue>(str) } { }
     Json(YUJSON_STD string str) : m_value{ YUJSON_STD make_unique<value::StringValue>(str) } { }
 #ifdef WINNT
     Json(YUJSON_STD list<Json>& jsons) {
