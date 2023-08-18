@@ -40,11 +40,11 @@ public:
             return YUJSON_STD make_unique<value::BooleanValue>(false);
         }
         case TokenType::kNumberInt: {
-            return YUJSON_STD make_unique<value::NumberValue>(YUJSON_STD stoll(token.str));
+            return YUJSON_STD make_unique<value::NumberIntValue>(YUJSON_STD stoll(token.str));
         }
 #ifdef YUJSON_ENABLE_FLOAT
         case TokenType::kNumberFloat: {
-            return YUJSON_STD make_unique<value::NumberValue>(YUJSON_STD stod(token.str));
+            return YUJSON_STD make_unique<value::NumberFloatValue>(YUJSON_STD stod(token.str));
         }
 #endif
         case TokenType::kString: {

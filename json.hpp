@@ -12,6 +12,7 @@
 #include <initializer_list>
 
 #include <yuJson/compiler/parser.hpp>
+#include <yuJson/value/value.hpp>
 
 namespace yuJson {
 class Json {
@@ -27,9 +28,11 @@ public:
     Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
     Json(nullptr_t) : m_value{ YUJSON_STD make_unique<value::NullValue>() } { }
     Json(bool b) : m_value{ YUJSON_STD make_unique<value::BooleanValue>(b) } { }
-    Json(int i) : m_value{ YUJSON_STD make_unique<value::NumberValue>(long long(i)) } { }
-    Json(unsigned int i) : m_value{ YUJSON_STD make_unique<value::NumberValue>(unsigned long long(i)) } { }
-    Json(double d) : m_value{ YUJSON_STD make_unique<value::NumberValue>(d) } { }
+    Json(int i) : m_value{ YUJSON_STD make_unique<value::NumberIntValue>(long long(i)) } { }
+    Json(unsigned int i) : m_value{ YUJSON_STD make_unique<value::NumberIntValue>(unsigned long long(i)) } { }
+#ifdef YUJSON_ENABLE_FLOAT
+    Json(double d) : m_value{ YUJSON_STD make_unique<value::NumberFloatValue>(d) } { }
+#endif
     Json(const char* str) : m_value{ YUJSON_STD make_unique<value::StringValue>(str) } { }
     Json(const unsigned char* str) : m_value{ YUJSON_STD make_unique<value::StringValue>((char*)str) } { }
     Json(YUJSON_STD string str) : m_value{ YUJSON_STD make_unique<value::StringValue>(str) } { }
@@ -123,8 +126,12 @@ public:
             return true;
         case value::ValueType::kBoolean:
             return    m_value->ToBoolean().Get() == other.m_value->ToBoolean().Get();
-        case value::ValueType::kNumber:
-            return m_value->ToNumber().GetInt() == other.m_value->ToNumber().GetInt();
+        case value::ValueType::kNumberInt:
+            return m_value->ToNumberInt().GetInt() == other.m_value->ToNumberInt().GetInt();
+#ifdef YUJSON_ENABLE_FLOAT
+        case value::ValueType::kNumberFloat:
+            return m_value->ToNumberFloat().GetFloat() == other.m_value->ToNumberFloat().GetFloat();
+#endif
         case value::ValueType::kString:
             return m_value->ToString().Get() == other.m_value->ToString().Get();
         default:
@@ -171,15 +178,15 @@ public:
 
     bool IsNumber() {
         if (!IsValid()) return false;
-        return m_value->IsNumber();
+        return m_value->IsNumberInt() || m_value->IsNumberFloat();
     }
 
     long long& Int() {
-        return m_value->ToNumber().GetInt();
+        return m_value->ToNumberInt().GetInt();
     }
 #ifdef YUJSON_ENABLE_FLOAT
     double& Float() {
-        return m_value->ToNumber().GetFloat();
+        return m_value->ToNumberFloat().GetFloat();
     }
 #endif
 
@@ -206,9 +213,13 @@ public:
     long long ConvertToInt(long long defalut = 0) {
         if (!IsValid()) return defalut;
         switch (m_value->Type()) {
-        case value::ValueType::kNumber: {
-            return m_value->GetNumber().GetInt();
+        case value::ValueType::kNumberInt: {
+            return m_value->GetNumberInt().GetInt();
         }
+#ifdef YUJSON_ENABLE_FLOAT
+        case value::ValueType::kNumberFloat:
+            return m_value->ToNumberFloat().GetFloat();
+#endif                   
         case value::ValueType::kString: {
             auto& str = m_value->GetString().Get();
             if (str.empty() || str[0] < '0' && str[0] > '9') return 0;
@@ -229,9 +240,13 @@ public:
     std::string ConvertToString(std::string defalut = "") {
         if (!IsValid()) return defalut;
         switch (m_value->Type()) {
-        case value::ValueType::kNumber: {
-            return YUJSON_STD to_string(m_value->GetNumber().GetInt());
+        case value::ValueType::kNumberInt: {
+            return YUJSON_STD to_string(m_value->GetNumberInt().GetInt());
         }
+#ifdef YUJSON_ENABLE_FLOAT
+        case value::ValueType::kNumberFloat:
+            return YUJSON_STD to_string(m_value->ToNumberFloat().GetFloat());
+#endif    
         case value::ValueType::kString: {
             return m_value->GetString().Get().c_str();
         }
@@ -352,13 +367,20 @@ private:
             *jsonStr += static_cast<value::BooleanValue*>(value)->Get() ? "true" : "false";
             break;
         }
-        case value::ValueType::kNumber: {
+        case value::ValueType::kNumberInt: {
             //char str[64];
             //sprintf(str, "%lld", );
-            auto str = YUJSON_STD to_string(static_cast<value::NumberValue*>(value)->GetInt());
+            auto str = YUJSON_STD to_string(static_cast<value::NumberIntValue*>(value)->GetInt());
             *jsonStr += str;
             break;
         }
+#ifdef YUJSON_ENABLE_FLOAT
+        case value::ValueType::kNumberFloat: {
+            auto str = YUJSON_STD to_string(static_cast<value::NumberFloatValue*>(value)->GetFloat());
+            *jsonStr += str;
+            break;
+        }
+#endif 
         case value::ValueType::kString: {
             auto str = static_cast<value::StringValue*>(value)->Get();
             StrEscapr(&str);

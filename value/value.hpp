@@ -9,7 +9,8 @@ namespace value {
 enum class ValueType {
     kNull = 0,
     kBoolean,
-    kNumber,
+    kNumberInt,
+    kNumberFloat,
     kString,
     kArray,
     kObject
@@ -24,7 +25,10 @@ public:
 
 class NullValue;
 class BooleanValue;
-class NumberValue;
+#ifdef YUJSON_ENABLE_FLOAT
+class NumberFloatValue;
+#endif
+class NumberIntValue;
 class StringValue;
 class ArrayValue;
 class ObjectValue;
@@ -67,15 +71,26 @@ public:
         return GetBoolean();
     }
 
-    bool IsNumber() const noexcept {
-        return Type() == ValueType::kNumber;
+    bool IsNumberInt() const noexcept {
+        return Type() == ValueType::kNumberInt;
     }
 
-    NumberValue& ToNumber() {
-        if (!IsNumber()) {
+    bool IsNumberFloat() const noexcept {
+        return Type() == ValueType::kNumberFloat;
+    }
+
+    NumberIntValue& ToNumberInt() {
+        if (!IsNumberInt()) {
             throw ValueTypeError("Not Number data");
         }
-        return GetNumber();
+        return GetNumberInt();
+    }
+
+    NumberFloatValue& ToNumberFloat() {
+        if (!IsNumberFloat()) {
+            throw ValueTypeError("Not Number data");
+        }
+        return GetNumberFloat();
     }
 
     bool IsString() const noexcept {
@@ -116,9 +131,15 @@ public:
         return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
     }
 
-    NumberValue& GetNumber() {
-        return *(NumberValue*)this; // static_cast<ast::Number*>(this);
+    NumberIntValue& GetNumberInt() {
+        return *(NumberIntValue*)this; // static_cast<ast::Number*>(this);
     }
+
+#ifdef YUJSON_ENABLE_FLOAT
+    NumberFloatValue& GetNumberFloat() {
+        return *(NumberFloatValue*)this; // static_cast<ast::Number*>(this);
+    }
+#endif
 
     StringValue& GetString() {
         return *(StringValue*)this; // static_cast<ast::String*>(this);
@@ -148,7 +169,10 @@ using ValuePtrtMap = YUJSON_STD map<YUJSON_STD string, ValuePtr>;
 
 #include <yuJson/value/null.hpp>
 #include <yuJson/value/boolean.hpp>
-#include <yuJson/value/number.hpp>
+#include <yuJson/value/number_int.hpp>
+#ifdef YUJSON_ENABLE_FLOAT
+#include <yuJson/value/number_float.hpp>
+#endif
 #include <yuJson/value/string.hpp>
 #include <yuJson/value/array.hpp>
 #include <yuJson/value/object.hpp>

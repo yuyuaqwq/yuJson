@@ -36,53 +36,9 @@ public:
         m_arr.push_back(std::move(value));
     }
 
-    void Pushback(nullptr_t) {
-        Pushback(YUJSON_STD make_unique<NullValue>());
-    }
-
-    void Pushback(BooleanValue&& boolean) {
-        Pushback(YUJSON_STD make_unique<BooleanValue>(std::move(boolean)));
-    }
-
-    void Pushback(NumberValue&& num) {
-        Pushback(YUJSON_STD make_unique<NumberValue>(std::move(num)));
-    }
-
-    void Pushback(StringValue&& str) {
-        Pushback(YUJSON_STD make_unique<StringValue>(std::move(str)));
-    }
-
-    void Pushback(ArrayValue&& arr) {
-        Pushback(YUJSON_STD make_unique<ArrayValue>(std::move(arr)));
-    }
-
-    void Pushback(ObjectValue&& obj);
-
     void Set(int i, ValuePtr value) noexcept {
         m_arr[i] = std::move(value);
     }
-
-    void Set(int i, nullptr_t) noexcept {
-        Set(i, YUJSON_STD make_unique<NullValue>());
-    }
-
-    void Set(int i, BooleanValue&& boolean) noexcept {
-        Set(i, YUJSON_STD make_unique<BooleanValue>(std::move(boolean)));
-    }
-
-    void Set(int i, NumberValue&& num) noexcept {
-        Set(i, YUJSON_STD make_unique<NumberValue>(std::move(num)));
-    }
-
-    void Set(int i, StringValue&& str) noexcept {
-        Set(i, YUJSON_STD make_unique<StringValue>(std::move(str)));
-    }
-
-    void Set(int i, ArrayValue&& arr) noexcept {
-        Set(i, YUJSON_STD make_unique<ArrayValue>(std::move(arr)));
-    }
-
-    void Set(int i, ObjectValue&& obj) noexcept;
 
 private:
     ValuePtrVector m_arr;

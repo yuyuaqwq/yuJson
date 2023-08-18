@@ -42,30 +42,6 @@ public:
         it = std::move(value);
     }
 
-    void Set(const YUJSON_STD string& key, nullptr_t) {
-        Set(key, YUJSON_STD make_unique<value::NullValue>());
-    }
-
-    void Set(const YUJSON_STD string& key, BooleanValue&& boolean) {
-        Set(key, YUJSON_STD make_unique<value::BooleanValue>(std::move(boolean)));
-    }
-
-    void Set(const YUJSON_STD string& key, NumberValue&& num) {
-        Set(key, YUJSON_STD make_unique<value::NumberValue>(std::move(num)));
-    }
-
-    void Set(const YUJSON_STD string& key, StringValue&& str) {
-        Set(key, YUJSON_STD make_unique<value::StringValue>(std::move(str)));
-    }
-
-    void Set(const YUJSON_STD string& key, ArrayValue&& arr) {
-        Set(key, YUJSON_STD make_unique<value::ArrayValue>(std::move(arr)));
-    }
-
-    void Set(const YUJSON_STD string& key, ObjectValue&& obj) {
-        Set(key, YUJSON_STD make_unique<value::ObjectValue>(std::move(obj)));
-    }
-
     void Delete(const YUJSON_STD string& key) noexcept {
         m_obj.erase(key);
     }
@@ -73,14 +49,6 @@ public:
 private:
     ValuePtrtMap m_obj;
 };
-
-inline void ArrayValue::Pushback(ObjectValue&& obj) {
-    Pushback(YUJSON_STD make_unique<ObjectValue>(std::move(obj)));
-}
-
-inline void ArrayValue::Set(int i, ObjectValue&& obj) noexcept {
-    Set(i, YUJSON_STD make_unique<ObjectValue>(std::move(obj)));
-}
 
 using ObjectPtr = YUJSON_STD unique_ptr<ObjectValue>;
 } // namespace value
