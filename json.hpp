@@ -314,6 +314,30 @@ public:
         }
     }
 
+#ifdef YUJSON_ENABLE_FLOAT
+    double ConvertToFloat(double defalut = 0.0) {
+        if (!IsValid()) return defalut;
+        switch ((*this)->Type()) {
+        case value::ValueType::kNumberInt: {
+            return (*this)->GetNumberInt().GetInt();
+        }
+        case value::ValueType::kNumberFloat:
+            return (*this)->ToNumberFloat().GetFloat();             
+        case value::ValueType::kString: {
+            auto& str = (*this)->GetString().Get();
+            if (str.empty() || str[0] < '0' && str[0] > '9') return 0;
+            return YUJSON_STD stod(str);
+        }
+        case value::ValueType::kNull: {
+            return defalut;
+        }
+        defalut: {
+            throw value::ValueTypeError("Object and Array cannot be converted to Float");
+        }
+        }
+    }
+#endif
+
     std::string ConvertToString(std::string defalut = "") {
         if (!IsValid()) return defalut;
         switch ((*this)->Type()) {
