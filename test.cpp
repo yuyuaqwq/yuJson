@@ -1,4 +1,5 @@
 #include <iostream>
+#define YUJSON_ENABLE_FLOAT
 #include <yuJson/json.hpp>
 
 

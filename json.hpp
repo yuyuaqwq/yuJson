@@ -131,7 +131,7 @@ public:
     Json(int i) : value::ValuePtr{ YUJSON_STD make_unique<value::NumberIntValue>(long long(i)) } { }
     Json(unsigned int i) : value::ValuePtr{ YUJSON_STD make_unique<value::NumberIntValue>(unsigned long long(i)) } { }
 #ifdef YUJSON_ENABLE_FLOAT
-    Json(double d) : m_value{ YUJSON_STD make_unique<value::NumberFloatValue>(d) } { }
+    Json(double d) : value::ValuePtr{ YUJSON_STD make_unique<value::NumberFloatValue>(d) } { }
 #endif
     Json(const char* str) : value::ValuePtr{ YUJSON_STD make_unique<value::StringValue>(str) } { }
     Json(const unsigned char* str) : value::ValuePtr{ YUJSON_STD make_unique<value::StringValue>((char*)str) } { }
@@ -211,6 +211,21 @@ public:
         return (*this)->ToObject().Find(str);
     }
 
+    size_t Size() {
+        if (IsArray()) {
+            return (*this)->ToArray().GetVector().size();
+        }
+        else if (IsObject()) {
+            return (*this)->ToObject().GetMap().size();
+        }
+        else if (IsString()) {
+            return String().size();
+        }
+        else {
+            throw value::ValueTypeError("Unable to view the type of size");
+        }
+    }
+
     bool IsValid() noexcept {
         return this->get() != nullptr;
     }
@@ -280,7 +295,7 @@ public:
         }
 #ifdef YUJSON_ENABLE_FLOAT
         case value::ValueType::kNumberFloat:
-            return m_value->ToNumberFloat().GetFloat();
+            return (*this)->ToNumberFloat().GetFloat();
 #endif                   
         case value::ValueType::kString: {
             auto& str = (*this)->GetString().Get();
@@ -327,7 +342,7 @@ public:
 private:
     template <typename T>
     T& Get() noexcept {
-        return *(T*)m_value.get();
+        return *(T*)this->get();
     }
 
 private:
