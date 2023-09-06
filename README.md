@@ -1,22 +1,14 @@
 # yuJson
-基于递归下降的Json解析库
+轻量级Json数据交互库
+
+# 特性
+- `only header`
+- 仅1k代码量
+- 接口友好
+- 支持 Windows Kernel Mode
 
 # 引用
 仅需包含json.hpp文件
 
 # 快速入门
-
-```C++
-// 创建json中的对象
-yuJson::Json obj = { "key","value", "rmb",99999 };
-obj["key"] = "test";
-obj["rmb"] = { "www","qvq" };
-std::cout << obj.Print() << std::endl;
-
-// 创建json中的列表
-yuJson::Json json = { 1, 2, 3, 4, "hello world" };
-
-// 如何分辨创建的是对象还是列表？
-// 初始化列表中 element_count % 2 == 0，且key对应槽为string则创建对象
-
-```
+参考 `test.cpp` 文件

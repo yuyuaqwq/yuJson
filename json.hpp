@@ -17,6 +17,15 @@
 namespace yuJson {
 class Json {
 public:
+#ifdef WINNT
+    friend Json Object(YUJSON_STD list<Json>& json_list) {
+    friend Json Array(YUJSON_STD list<Json>&json_list) {
+#else
+    friend Json Object(YUJSON_STD initializer_list<Json> json_list);
+    friend Json Array(YUJSON_STD initializer_list<Json> json_list);
+#endif
+
+public:
     Json() noexcept { }
     explicit Json(value::ValuePtr value) noexcept : m_value{ std::move(value) } { }
     Json(Json&& json) noexcept : m_value{ std::move(json.m_value) } { }
@@ -31,7 +40,7 @@ public:
     Json(const unsigned char* str) : m_value{ YUJSON_STD make_unique<value::StringValue>((char*)str) } { }
     Json(YUJSON_STD string str) : m_value{ YUJSON_STD make_unique<value::StringValue>(str) } { }
 #ifdef WINNT
-    Json(YUJSON_STD list<Json>& jsons) {
+    Json(YUJSON_STD list<Json>& json_list) {
 #else
     Json(std::initializer_list<Json> json_list) {
 #endif // WINNT
@@ -52,40 +61,6 @@ public:
             auto arr_json = Array(json_list);
             m_value = std::move(arr_json.m_value);
         }
-    }
-public:
-#ifdef WINNT
-    static Json Object(YUJSON_STD list<Json>&jsons) {
-#else
-    static Json Object(std::initializer_list<Json> json_list) {
-#endif
-        Json json;
-        json.m_value = YUJSON_STD make_unique<value::ObjectValue>();
-        for (auto iter = json_list.begin(); iter != json_list.end(); iter++, iter++) {
-            YUJSON_STD string key = iter->m_value->ToString().Get();
-#ifdef WINNT
-            json.m_value->ToObject().Set(key, std::move((&*iter + 1)->m_value));
-#else
-            json.m_value->ToObject().Set(key, std::move(((Json*)iter + 1)->m_value));
-#endif // WINNT
-        }
-        return json;
-    }
-#ifdef WINNT
-    static Json Object(YUJSON_STD list<Json>& jsons) {
-#else
-    static Json Array(std::initializer_list<Json> json_list) {
-#endif
-        Json json;
-        json.m_value = YUJSON_STD make_unique<value::ArrayValue>();
-        for (auto iter = json_list.begin(); iter != json_list.end(); iter++) {
-#ifdef WINNT
-            json.m_value->ToArray().Pushback(std::move((&*iter)->m_value));
-#else
-            json.m_value->ToArray().Pushback(std::move(((Json*)iter)->m_value));
-#endif // WINNT
-        }
-        return json;
     }
 
     ~Json() noexcept { }
@@ -141,12 +116,6 @@ public:
 
     bool IsValid() noexcept {
         return m_value.get() != nullptr;
-    }
-
-    static Json Parse(const char* jsonText) {
-        compiler::Lexer lexer(jsonText);
-        compiler::Parser parser(&lexer);
-        return Json(parser.ParseValue());
     }
 
     YUJSON_STD string Print(bool format = true) const {
@@ -477,6 +446,46 @@ private:
 private:
     static const int kIndent = 4;
 };
+
+static inline Json Parse(const char* jsonText) {
+    compiler::Lexer lexer(jsonText);
+    compiler::Parser parser(&lexer);
+    return Json(parser.ParseValue());
+}
+
+#ifdef WINNT
+static inline Json Object(YUJSON_STD list<Json>& json_list) {
+#else
+static inline Json Object(YUJSON_STD initializer_list<Json> json_list) {
+#endif
+    Json json;
+    json.m_value = YUJSON_STD make_unique<value::ObjectValue>();
+    for (auto iter = json_list.begin(); iter != json_list.end(); iter++, iter++) {
+        YUJSON_STD string key = iter->m_value->ToString().Get();
+#ifdef WINNT
+        json.m_value->ToObject().Set(key, std::move((&*iter + 1)->m_value));
+#else
+        json.m_value->ToObject().Set(key, std::move(((Json*)iter + 1)->m_value));
+#endif // WINNT
+    }
+    return json;
+}
+#ifdef WINNT
+static inline Json Array(YUJSON_STD list<Json>& json_list) {
+#else
+static inline Json Array(YUJSON_STD initializer_list<Json> json_list) {
+#endif
+    Json json;
+    json.m_value = YUJSON_STD make_unique<value::ArrayValue>();
+    for (auto iter = json_list.begin(); iter != json_list.end(); iter++) {
+#ifdef WINNT
+        json.m_value->ToArray().Pushback(std::move((&*iter)->m_value));
+#else
+        json.m_value->ToArray().Pushback(std::move(((Json*)iter)->m_value));
+#endif // WINNT
+    }
+    return json;
+}
 
 } // namespace yuJson
 
