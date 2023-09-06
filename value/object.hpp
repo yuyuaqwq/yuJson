@@ -37,7 +37,7 @@ public:
         return m_obj.find(key) != m_obj.end();
     }
 
-    void Set(const YUJSON_STD string& key, ValuePtr value) {
+    void Set(const YUJSON_STD string& key, ValuePtr&& value) {
         auto& it = m_obj.operator[](key);
         it = std::move(value);
     }

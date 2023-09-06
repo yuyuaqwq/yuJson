@@ -2,9 +2,7 @@
 #include <yuJson/json.hpp>
 
 
-int main()
-{
-
+int main() {
     /*
     * build
     */
@@ -14,13 +12,14 @@ int main()
     auto obj_build = yuJson::Object({"key", "value"});
     std::cout << obj_build.Print() << std::endl << std::endl;
     
-    yuJson::Json json{ 
+    yuJson::Json json { 
         "int", 123, 
         "arr", yuJson::Array({ "1", 2 }),
         "obj", { "key", "value" },
         "str", "2333" 
     };
     std::cout << json.Print() << std::endl << std::endl;
+
 
     /*
     * value get, set, convert
