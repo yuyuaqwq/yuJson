@@ -42,6 +42,12 @@ int main() {
     json["int"] = 10000;
     std::cout << json["int"].ConvertToString() << std::endl;
 
+    // Json can also be a non container type
+    yuJson::Json str = "abc";
+    std::cout << str.Print() << std::endl;
+
+    yuJson::Json int_ = 123321;
+    std::cout << int_.Print() << std::endl;
 
 
     /*
