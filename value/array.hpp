@@ -20,7 +20,7 @@ public:
     virtual ValueType Type() const noexcept {
         return ValueType::kArray;
     }
-    const ValuePtrVector& GetVector() const noexcept {
+    ValuePtrVector& GetVector() noexcept {
         return m_arr;
     }
 

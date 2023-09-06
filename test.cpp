@@ -5,9 +5,17 @@
 int main()
 {
 
-    auto obj = yuJson::Json::MakeObject();
+    auto arr = yuJson::Json::Array({ "emm", "123" });
+    std::cout << arr.Print() << std::endl << std::endl;
+
+    auto obj = yuJson::Json::Object({"emm", "123"});
     std::cout << obj.Print() << std::endl << std::endl;
     
+    yuJson::Json test = {
+        "emm",  yuJson::Json::Array({ "hello", {"world", "??"}})
+    };
+
+
     //auto& qqq = obj.GetObject().At("abc");
 
     //obj["aa"]["bb"];
@@ -30,11 +38,20 @@ int main()
 
     auto cac = yuJson::Json::Parse("{a}");
     if (cac.IsValid()) {
-        printf("valid");
+        std::cout << "valid" << std::endl << std::endl;
+    }
+    for (auto& sub_json : json) {
+        std::cout << sub_json.key() << ":";
+        sub_json.value() = "??";
+        std::cout << sub_json.value().Print() << std::endl << std::endl;
     }
 
     json = {1, 2};
     std::cout << json.Print() << std::endl << std::endl;
+
+    for (auto& sub_json : json) {
+        std::cout << sub_json.value().Print() << std::endl << std::endl;
+    }
 
     json = yuJson::Json::Parse(R"({ "qvq":     ["233", 123, "emm", {"qa\q":"sb", "emmm":true}] })");
     std::cout << json.Print() << std::endl << std::endl;
@@ -43,6 +60,8 @@ int main()
     std::cout << (json.Find("qaq") ? "exist" : "non-existent") << std::endl << std::endl;
 
     std::cout << json["qvq"][3].Print() << std::endl << std::endl;
+
+    
 
     //std::cout << json["qvq"][3]["emmm"].GetBoolean() << std::endl << std::endl;
     std::cout << json.Print() << std::endl << std::endl;

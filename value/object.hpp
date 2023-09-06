@@ -21,7 +21,7 @@ public:
         return ValueType::kObject;
     }
 
-    const ValuePtrtMap& GetMap() const noexcept {
+    ValuePtrtMap& GetMap() noexcept {
         return m_obj;
     }
 
