@@ -2,8 +2,8 @@
 轻量级Json数据交互库
 
 # 特性
-- `only header`
-- 仅1k代码量
+- Header-only
+- 仅1k行代码
 - 接口友好
 - 支持 Windows Kernel Mode
 
