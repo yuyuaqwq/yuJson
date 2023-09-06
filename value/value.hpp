@@ -85,14 +85,14 @@ public:
         }
         return GetNumberInt();
     }
-
+#ifdef YUJSON_ENABLE_FLOAT
     NumberFloatValue& ToNumberFloat() {
         if (!IsNumberFloat()) {
             throw ValueTypeError("Not Number data");
         }
         return GetNumberFloat();
     }
-
+#endif
     bool IsString() const noexcept {
         return Type() == ValueType::kString;
     }
