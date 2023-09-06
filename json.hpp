@@ -15,7 +15,7 @@
 #include <yuJson/value/value.hpp>
 
 namespace yuJson {
-class Json : protected value::ValuePtr {
+class Json : private value::ValuePtr {
 public:
 #ifdef WINNT
     friend Json Object(YUJSON_STD list<Json>& json_list) {
