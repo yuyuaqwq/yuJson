@@ -447,8 +447,8 @@ private:
     static const int kIndent = 4;
 };
 
-static inline Json Parse(const char* jsonText) {
-    compiler::Lexer lexer(jsonText);
+static inline Json Parse(const YUJSON_STD string& json_text) {
+    compiler::Lexer lexer(json_text);
     compiler::Parser parser(&lexer);
     return Json(parser.ParseValue());
 }
