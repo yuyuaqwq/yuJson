@@ -79,6 +79,10 @@ int main() {
     std::cout << json["qvq"][3].Print() << std::endl << std::endl;
 
 
+    json = yuJson::Parse(R"({"\uD83C\uDF0D": "hello world!"})");
+    std::cout << json.Print() << std::endl << std::endl;
+
+
     /*
     * iterator
     */

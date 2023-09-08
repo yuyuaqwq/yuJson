@@ -167,22 +167,97 @@ public:
         if (c == '\"') {
             token->type = TokenType::kString;
             token->str = "";
-            bool skip = false;
+            bool escape = false;
             while (c = NextChar()) {
                 if (c == '\\') {
-                    skip = true;
+                    escape = true;
                     continue;
                 }
-                if (skip == false && c == '\"') {
+                if (escape == false && c == '\"') {
                     break;
                 }
-                if (skip) { 
-                    skip = false; 
-                    if (c != '\"') {
-                        token->str += "\\";
+                if (escape) {
+                    escape = false;
+                    if (c == '\"' || c == '/' || c == '\\') {
+                        token->str += c;
+                    }
+                    else if (c == 'b') {
+                        token->str += '\b';
+                    }
+                    else if (c == 'f') {
+                        token->str += '\f';
+                    }
+                    else if (c == 'n') {
+                        token->str += '\n';
+                    }
+                    else if (c == 'r') {
+                        token->str += '\r';
+                    }
+                    else if (c == 'u') {
+                        auto make_unicode_hex = [&](int& hex) -> bool {
+                            YUJSON_STD string hex_str;
+                            for (size_t i = 0; i < 4; i++) {
+                                auto hex_c = NextChar();
+                                if (hex_c) {
+                                    hex_str += hex_c;
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+                            hex = YUJSON_STD stoi(hex_str, nullptr, 16);
+                            return true;
+                        };
+                        
+                        int hex_high;
+                        if (!make_unicode_hex(hex_high)) {
+                            return false;
+                        }
+                        int codepoint;
+                        if (hex_high >= 0xd800 && hex_high <= 0xdbff) {
+                            if (!MatchStr("\\u")) {
+                                return false;
+                            }
+                            int hex_low;
+                            if (!make_unicode_hex(hex_low)) {
+                                return false;
+                            }
+                            if (hex_low < 0xdc00 || hex_low > 0xe000) {
+                                return false;
+                            }
+                            codepoint = 0x10000 + (hex_high - 0xD800) * 0x400 + (hex_low - 0xDC00);
+                        }
+                        else {
+                            codepoint = hex_high;
+                        }
+
+                        if (codepoint >= 0x10000 && codepoint <= 0x1ffff) {
+                            token->str += 0xf0 | ((codepoint >> 18) & 0x07);
+                            token->str += 0x80 | ((codepoint >> 12) & 0x3f);
+                            token->str += 0x80 | ((codepoint >> 6) & 0x3f);
+                            token->str += 0x80 | ((codepoint) & 0x3f);
+                        }
+                        else if (codepoint >= 0x800 && codepoint <= 0xffff) {
+                            token->str += 0xe0 | ((codepoint >> 12) & 0x0f);
+                            token->str += 0x80 | ((codepoint >> 6) & 0x3f);
+                            token->str += 0x80 | ((codepoint) & 0x3f);
+                        }
+                        else if (codepoint < 0x7ff) {
+                            token->str += 0xe0 | ((codepoint >> 6) & 0x0f);
+                            token->str += 0x80 | (codepoint & 0x3f);
+                        }
+                        else if (codepoint < 0x7f) {
+                            token->str += codepoint;
+                        }
+                        else {
+                            return false;
+                        }
+                        
                     }
                 }
-                token->str += c;
+                else {
+                    token->str += c;
+                }
             };
             if (c != '\"') {
                 return false;

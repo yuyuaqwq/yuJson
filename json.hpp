@@ -385,6 +385,11 @@ private:
         // 引号添加\转义，一个\修改为两个\\ 
         *str = Replace(*str, R"(\)", R"(\\)");
         *str = Replace(*str, R"(")", R"(\")");
+        *str = Replace(*str, R"(/)", R"(\/)");
+        *str = Replace(*str, "\b", R"(\b)");
+        *str = Replace(*str, "\r", R"(\r)");
+        *str = Replace(*str, "\n", R"(\n)");
+        *str = Replace(*str, "\t", R"(\t)");
     }
 
     void Print(value::ValueInterface* value, bool format, size_t level, YUJSON_STD string* jsonStr) const {
