@@ -243,7 +243,7 @@ public:
                             token->str += 0x80 | ((codepoint) & 0x3f);
                         }
                         else if (codepoint < 0x7ff) {
-                            token->str += 0xe0 | ((codepoint >> 6) & 0x0f);
+                            token->str += 0xc0 | ((codepoint >> 6) & 0x0f);
                             token->str += 0x80 | (codepoint & 0x3f);
                         }
                         else if (codepoint < 0x7f) {
