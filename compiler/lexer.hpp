@@ -231,7 +231,7 @@ public:
                             codepoint = hex_high;
                         }
 
-                        if (codepoint >= 0x10000 && codepoint <= 0x1ffff) {
+                        if (codepoint >= 0x10000 && codepoint <= 0x10ffff) {
                             token->str += 0xf0 | ((codepoint >> 18) & 0x07);
                             token->str += 0x80 | ((codepoint >> 12) & 0x3f);
                             token->str += 0x80 | ((codepoint >> 6) & 0x3f);
