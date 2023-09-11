@@ -1,5 +1,5 @@
-#ifndef YUJSON_VALUE_OBJECT_H_
-#define YUJSON_VALUE_OBJECT_H_
+#ifndef YUJSON_VALUE_OBJECT_HPP_
+#define YUJSON_VALUE_OBJECT_HPP_
 
 #include <stdexcept>
 
@@ -54,4 +54,4 @@ using ObjectPtr = YUJSON_STD unique_ptr<ObjectValue>;
 } // namespace value
 } // namespace yuJson
 
-#endif // YUJSON_VALUE_OBJECT_H_
+#endif // YUJSON_VALUE_OBJECT_HPP_

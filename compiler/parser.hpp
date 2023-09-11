@@ -1,5 +1,5 @@
-#ifndef YUJSON_COMPILER_PARSER_H_
-#define YUJSON_COMPILER_PARSER_H_
+#ifndef YUJSON_COMPILER_PARSER_HPP_
+#define YUJSON_COMPILER_PARSER_HPP_
 
 #include <memory>
 
@@ -42,7 +42,7 @@ public:
         case TokenType::kNumberInt: {
             return YUJSON_STD make_unique<value::NumberIntValue>(YUJSON_STD stoll(token.str));
         }
-#ifdef YUJSON_ENABLE_FLOAT
+#ifnde YUJSON_DISABLE_FLOAT
         case TokenType::kNumberFloat: {
             return YUJSON_STD make_unique<value::NumberFloatValue>(YUJSON_STD stod(token.str));
         }
@@ -141,4 +141,4 @@ private:
 } // namespace compiler
 } // namespace yuJson
 
-#endif // YUJSON_COMPILER_PARSER_H_
+#endif // YUJSON_COMPILER_PARSER_HPP_

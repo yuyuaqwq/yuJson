@@ -1,5 +1,5 @@
-#ifndef YUJSON_VALUE_NUMBER_INT_H_
-#define YUJSON_VALUE_NUMBER_INT_H_
+#ifndef YUJSON_VALUE_NUMBER_INT_HPP_
+#define YUJSON_VALUE_NUMBER_INT_HPP_
 
 #include <yuJson/value/value.hpp>
 
@@ -33,4 +33,4 @@ using NumberIntPtr = YUJSON_STD unique_ptr<NumberIntValue>;
 } // namespace value
 } // namespace yuJson
 
-#endif // YUJSON_VALUE_NUMBER_INT_H_
+#endif // YUJSON_VALUE_NUMBER_INT_HPP_

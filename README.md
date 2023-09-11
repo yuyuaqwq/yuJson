@@ -1,9 +1,9 @@
 # yuJson
-轻量级Json数据交互库
+轻量级C++ Json数据交互库
 
 # 特性
-- Header-only
-- 仅1k行代码
+- header-only
+- 精致小巧
 - 接口友好
 - 支持 Windows Kernel Mode
 

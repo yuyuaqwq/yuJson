@@ -1,5 +1,5 @@
-#ifndef YUJSON_VALUE_ARRAY_H_
-#define YUJSON_VALUE_ARRAY_H_
+#ifndef YUJSON_VALUE_ARRAY_HPP_
+#define YUJSON_VALUE_ARRAY_HPP_
 
 #include <stdexcept>
 
@@ -48,4 +48,4 @@ using ArrayPtr = YUJSON_STD unique_ptr<ArrayValue>;
 } // namespace value
 } // namespace yuJson
 
-#endif // YUJSON_VALUE_ARRAY_H_
+#endif // YUJSON_VALUE_ARRAY_HPP_

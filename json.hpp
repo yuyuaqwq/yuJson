@@ -1,11 +1,11 @@
-#ifndef YUJSON_JSON_H_
-#define YUJSON_JSON_H_
+#ifndef YUJSON_JSON_HPP_
+#define YUJSON_JSON_HPP_
 
 #ifndef YUJSON_STD
 #define YUJSON_STD std::
 #endif // YUJSON_STD
 
-// #define YUJSON_ENABLE_FLOAT
+// #define YUJSON_DISABLE_FLOAT
 
 #include <string>
 #include <memory>
@@ -130,7 +130,7 @@ public:
     Json(bool b) : value::ValuePtr{ YUJSON_STD make_unique<value::BooleanValue>(b) } { }
     Json(int i) : value::ValuePtr{ YUJSON_STD make_unique<value::NumberIntValue>(long long(i)) } { }
     Json(unsigned int i) : value::ValuePtr{ YUJSON_STD make_unique<value::NumberIntValue>(unsigned long long(i)) } { }
-#ifdef YUJSON_ENABLE_FLOAT
+#ifnde YUJSON_DISABLE_FLOAT
     Json(double d) : value::ValuePtr{ YUJSON_STD make_unique<value::NumberFloatValue>(d) } { }
 #endif
     Json(const char* str) : value::ValuePtr{ YUJSON_STD make_unique<value::StringValue>(str) } { }
@@ -196,7 +196,7 @@ public:
             return (*this)->ToBoolean().Get() == other->ToBoolean().Get();
         case value::ValueType::kNumberInt:
             return (*this)->ToNumberInt().GetInt() == other->ToNumberInt().GetInt();
-#ifdef YUJSON_ENABLE_FLOAT
+#ifnde YUJSON_DISABLE_FLOAT
         case value::ValueType::kNumberFloat:
             return (*this)->ToNumberFloat().GetFloat() == other->ToNumberFloat().GetFloat();
 #endif
@@ -261,7 +261,7 @@ public:
     long long& Int() {
         return (*this)->ToNumberInt().GetInt();
     }
-#ifdef YUJSON_ENABLE_FLOAT
+#ifnde YUJSON_DISABLE_FLOAT
     double& Float() {
         return (*this)->ToNumberFloat().GetFloat();
     }
@@ -293,7 +293,7 @@ public:
         case value::ValueType::kNumberInt: {
             return (*this)->GetNumberInt().GetInt();
         }
-#ifdef YUJSON_ENABLE_FLOAT
+#ifnde YUJSON_DISABLE_FLOAT
         case value::ValueType::kNumberFloat:
             return (*this)->ToNumberFloat().GetFloat();
 #endif                   
@@ -314,7 +314,7 @@ public:
         }
     }
 
-#ifdef YUJSON_ENABLE_FLOAT
+#ifnde YUJSON_DISABLE_FLOAT
     double ConvertToFloat(double defalut = 0.0) {
         if (!IsValid()) return defalut;
         switch ((*this)->Type()) {
@@ -344,7 +344,7 @@ public:
         case value::ValueType::kNumberInt: {
             return YUJSON_STD to_string((*this)->GetNumberInt().GetInt());
         }
-#ifdef YUJSON_ENABLE_FLOAT
+#ifnde YUJSON_DISABLE_FLOAT
         case value::ValueType::kNumberFloat:
             return YUJSON_STD to_string((*this)->ToNumberFloat().GetFloat());
 #endif    
@@ -414,7 +414,7 @@ private:
             *jsonStr += str;
             break;
         }
-#ifdef YUJSON_ENABLE_FLOAT
+#ifnde YUJSON_DISABLE_FLOAT
         case value::ValueType::kNumberFloat: {
             auto str = YUJSON_STD to_string(static_cast<value::NumberFloatValue*>(value)->GetFloat());
             *jsonStr += str;
@@ -529,4 +529,4 @@ static inline Json Array(YUJSON_STD initializer_list<Json> json_list) {
 
 } // namespace yuJson
 
-#endif // YUJSON_JSON_H_
+#endif // YUJSON_JSON_HPP_

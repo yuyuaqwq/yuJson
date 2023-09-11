@@ -1,5 +1,5 @@
-#ifndef YUJSON_VALUE_BOOLEAN_H_
-#define YUJSON_VALUE_BOOLEAN_H_
+#ifndef YUJSON_VALUE_BOOLEAN_HPP_
+#define YUJSON_VALUE_BOOLEAN_HPP_
 
 #include <yuJson/value/value.hpp>
 
@@ -31,4 +31,4 @@ using BooleanPtr = YUJSON_STD unique_ptr<BooleanValue>;
 } // namespace value
 } // namespace yuJson
 
-#endif // YUJSON_VALUE_BOOLEAN_H_
+#endif // YUJSON_VALUE_BOOLEAN_HPP_

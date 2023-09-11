@@ -1,5 +1,5 @@
-#ifndef YUJSON_COMPILER_LEXER_H_
-#define YUJSON_COMPILER_LEXER_H_
+#ifndef YUJSON_COMPILER_LEXER_HPP_
+#define YUJSON_COMPILER_LEXER_HPP_
 
 #include <string>
 
@@ -132,7 +132,7 @@ public:
             bool is_e = false;
             int e_pos = 0;
             do {
-#ifdef YUJSON_ENABLE_FLOAT
+#ifnde YUJSON_DISABLE_FLOAT
                 if (c >= '0' && c <= '9' || c == '-' && i == 0 || c == '+' && i == 0 || c == '.' && is_float == false) {
                     token->str += YUJSON_STD string(1, c);
                     if (c == '.') is_float = true;
@@ -288,4 +288,4 @@ private:
 } // namespace compiler
 } // namespace yuJson
 
-#endif // YUJSON_COMPILER_LEXER_H_
+#endif // YUJSON_COMPILER_LEXER_HPP_

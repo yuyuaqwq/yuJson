@@ -1,5 +1,5 @@
-#ifndef YUJSON_VALUE_NULL_H_
-#define YUJSON_VALUE_NULL_H_
+#ifndef YUJSON_VALUE_NULL_HPP_
+#define YUJSON_VALUE_NULL_HPP_
 
 #include <yuJson/value/value.hpp>
 
@@ -20,4 +20,4 @@ using NullPtr = YUJSON_STD unique_ptr<NullValue>;
 } // namespace value
 } // namespace yuJson
 
-#endif // YUJSON_VALUE_NULL_H_
+#endif // YUJSON_VALUE_NULL_HPP_

@@ -1,5 +1,5 @@
-#ifndef YUJSON_VALUE_NUMBER_FLOAT_H_
-#define YUJSON_VALUE_NUMBER_FLOAT_H_
+#ifndef YUJSON_VALUE_NUMBER_FLOAT_HPP_
+#define YUJSON_VALUE_NUMBER_FLOAT_HPP_
 
 #include <yuJson/value/value.hpp>
 
@@ -32,4 +32,4 @@ using NumberFloatPtr = YUJSON_STD unique_ptr<NumberFloatValue>;
 } // namespace value
 } // namespace yuJson
 
-#endif // YUJSON_VALUE_NUMBER_FLOAT_H_
+#endif // YUJSON_VALUE_NUMBER_FLOAT_HPP_
