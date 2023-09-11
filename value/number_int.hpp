@@ -16,14 +16,13 @@ public:
         return ValueType::kNumberInt;
     }
 
-    long long& GetInt() noexcept {
+    long long& Get() noexcept {
         return m_int;
     }
 
-    void SetInt(long long num) noexcept {
+    void Set(long long num) noexcept {
         m_int = num;
     }
-
 
 private:
     long long m_int;

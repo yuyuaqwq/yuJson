@@ -15,11 +15,11 @@ public:
         return ValueType::kNumberFloat;
     }
 
-    double& GetFloat() noexcept {
+    double& Get() noexcept {
         return m_float;
     }
 
-    void SetFloat(double num) noexcept {
+    void Set(double num) noexcept {
         m_float = num;
     }
 

@@ -145,7 +145,6 @@ public:
         return *(StringValue*)this; // static_cast<ast::String*>(this);
     }
 
-
 };
 
 } // namespace value

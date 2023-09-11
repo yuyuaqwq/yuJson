@@ -72,8 +72,8 @@ int main() {
     json = yuJson::Parse(R"({ "qvq":     ["233", 123, "emm", {"qa\q":"sb", "emmm":true}] })");
     std::cout << json.Print() << std::endl << std::endl;
 
-    std::cout << (json.Find("qvq") ? "exist" : "non-existent") << std::endl << std::endl;
-    std::cout << (json.Find("qaq") ? "exist" : "non-existent") << std::endl << std::endl;
+    std::cout << (json.find("qvq") != json.end() ? "exist" : "non-existent") << std::endl << std::endl;
+    std::cout << (json.find("qaq") != json.end() ? "exist" : "non-existent") << std::endl << std::endl;
 
     std::cout << json["qvq"][3].Print() << std::endl << std::endl;
 

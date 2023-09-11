@@ -33,7 +33,7 @@ public:
         return m_obj[key];
     }
 
-    bool Find(const YUJSON_STD string& key) const noexcept {
+    bool Exist(const YUJSON_STD string& key) noexcept {
         return m_obj.find(key) != m_obj.end();
     }
 
