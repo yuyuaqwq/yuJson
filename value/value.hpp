@@ -25,7 +25,7 @@ public:
 
 class NullValue;
 class BooleanValue;
-#ifnde YUJSON_DISABLE_FLOAT
+#ifndef YUJSON_DISABLE_FLOAT
 class NumberFloatValue;
 #endif
 class NumberIntValue;
@@ -85,7 +85,7 @@ public:
         }
         return GetNumberInt();
     }
-#ifnde YUJSON_DISABLE_FLOAT
+#ifndef YUJSON_DISABLE_FLOAT
     NumberFloatValue& ToNumberFloat() {
         if (!IsNumberFloat()) {
             throw ValueTypeError("Not Number data");
@@ -135,7 +135,7 @@ public:
         return *(NumberIntValue*)this; // static_cast<ast::Number*>(this);
     }
 
-#ifnde YUJSON_DISABLE_FLOAT
+#ifndef YUJSON_DISABLE_FLOAT
     NumberFloatValue& GetNumberFloat() {
         return *(NumberFloatValue*)this; // static_cast<ast::Number*>(this);
     }
@@ -170,7 +170,7 @@ using ValuePtrtMap = YUJSON_STD map<YUJSON_STD string, ValuePtr>;
 #include <yuJson/value/null.hpp>
 #include <yuJson/value/boolean.hpp>
 #include <yuJson/value/number_int.hpp>
-#ifnde YUJSON_DISABLE_FLOAT
+#ifndef YUJSON_DISABLE_FLOAT
 #include <yuJson/value/number_float.hpp>
 #endif
 #include <yuJson/value/string.hpp>

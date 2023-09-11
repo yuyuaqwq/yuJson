@@ -132,7 +132,7 @@ public:
             bool is_e = false;
             int e_pos = 0;
             do {
-#ifnde YUJSON_DISABLE_FLOAT
+#ifndef YUJSON_DISABLE_FLOAT
                 if (c >= '0' && c <= '9' || c == '-' && i == 0 || c == '+' && i == 0 || c == '.' && is_float == false) {
                     token->str += YUJSON_STD string(1, c);
                     if (c == '.') is_float = true;

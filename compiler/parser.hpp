@@ -42,7 +42,7 @@ public:
         case TokenType::kNumberInt: {
             return YUJSON_STD make_unique<value::NumberIntValue>(YUJSON_STD stoll(token.str));
         }
-#ifnde YUJSON_DISABLE_FLOAT
+#ifndef YUJSON_DISABLE_FLOAT
         case TokenType::kNumberFloat: {
             return YUJSON_STD make_unique<value::NumberFloatValue>(YUJSON_STD stod(token.str));
         }
