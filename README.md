@@ -1,5 +1,5 @@
 # yuJson
-轻量级C++ Json数据交互库
+小巧的C++ Json数据交互库
 
 # 特性
 - header-only
