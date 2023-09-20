@@ -131,7 +131,7 @@ public:
 
 public:
     Json() noexcept { }
-    explicit Json(value::ValuePtr&& value) noexcept : value::ValuePtr{ std::move(value) } { }
+    explicit Json(value::ValuePtr value) noexcept : value::ValuePtr{ std::move(value) } { }
     Json(Json&& json) noexcept : value::ValuePtr{ std::move(json) } { }
     Json(nullptr_t) : value::ValuePtr{ YUJSON_STD make_unique<value::NullValue>() } { }
     Json(bool b) : value::ValuePtr{ YUJSON_STD make_unique<value::BooleanValue>(b) } { }

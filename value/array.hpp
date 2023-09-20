@@ -32,11 +32,11 @@ public:
         return m_arr[i];
     }
 
-    void Pushback(ValuePtr&& value) {
+    void Pushback(ValuePtr value) {
         m_arr.push_back(std::move(value));
     }
 
-    void Set(int i, ValuePtr&& value) noexcept {
+    void Set(int i, ValuePtr value) noexcept {
         m_arr[i] = std::move(value);
     }
 
