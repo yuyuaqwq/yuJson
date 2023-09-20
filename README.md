@@ -1,11 +1,10 @@
 # yuJson
-小巧的C++ Json数据交互库
+C++ Json数据交互库
 
 # 特性
 - header-only
-- 精致小巧
+- 精致小巧，仅1.2k代码
 - 接口友好
-- 支持 Windows Kernel Mode
 
 # 引用
 仅需包含json.hpp文件
