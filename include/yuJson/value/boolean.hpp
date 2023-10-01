@@ -8,7 +8,7 @@ namespace value {
 
 class BooleanValue : public ValueInterface {
 public:
-    explicit BooleanValue(bool b) noexcept : m_bool(b) { }
+    explicit BooleanValue(bool b) noexcept : bool_(b) { }
     ~BooleanValue() noexcept { }
 
     virtual ValueType Type() const noexcept {
@@ -16,18 +16,18 @@ public:
     }
 
     bool& Get() noexcept {
-        return m_bool;
+        return bool_;
     }
     
     void Set(bool b) noexcept {
-        m_bool = b;
+        bool_ = b;
     }
 
 private:
-    bool m_bool;
+    bool bool_;
 };
 
-using BooleanPtr = YUJSON_STD unique_ptr<BooleanValue>;
+using BooleanPtr = std::unique_ptr<BooleanValue>;
 } // namespace value
 } // namespace yuJson
 

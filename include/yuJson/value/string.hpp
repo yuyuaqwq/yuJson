@@ -7,13 +7,13 @@ namespace yuJson {
 namespace value {
 class StringValue : public ValueInterface {
 public:
-    explicit StringValue(const YUJSON_STD string& str) : m_str(str) { }
-    StringValue(StringValue&& str) noexcept : m_str(str.Get()) { }
+    explicit StringValue(const std::string& str) : str_(str) { }
+    StringValue(StringValue&& str) noexcept : str_(str.Get()) { }
 
     void operator=(StringValue& str) = delete;
 
     void operator=(StringValue&& str) noexcept {
-        this->m_str = std::move(str.Get());
+        this->str_ = std::move(str.Get());
     }
 
     ~StringValue() noexcept { }
@@ -22,15 +22,15 @@ public:
         return ValueType::kString;
     }
 
-    YUJSON_STD string& Get() noexcept {
-        return m_str;
+    std::string& Get() noexcept {
+        return str_;
     }
 
 private:
-    YUJSON_STD string m_str;
+    std::string str_;
 };
 
-using StringPtr = YUJSON_STD unique_ptr<StringValue>;
+using StringPtr = std::unique_ptr<StringValue>;
 } // namespace value
 } // namespace yuJson
 

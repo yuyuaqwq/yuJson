@@ -1,10 +1,6 @@
 #ifndef YUJSON_JSON_HPP_
 #define YUJSON_JSON_HPP_
 
-#ifndef YUJSON_STD
-#define YUJSON_STD std::
-#endif // YUJSON_STD
-
 // #define YUJSON_DISABLE_FLOAT
 
 #include <string>
@@ -17,13 +13,8 @@
 namespace yuJson {
 class Json : private value::ValuePtr {
 public:
-#ifdef WINNT
-    friend Json Object(YUJSON_STD list<Json>& json_list) {
-    friend Json Array(YUJSON_STD list<Json>&json_list) {
-#else
-    friend Json Object(YUJSON_STD initializer_list<Json> json_list);
-    friend Json Array(YUJSON_STD initializer_list<Json> json_list);
-#endif
+    friend Json Object(std::initializer_list<Json> json_list);
+    friend Json Array(std::initializer_list<Json> json_list);
 
 public:
     class Iterator {
@@ -31,13 +22,13 @@ public:
         friend class Json;
     public:
         Iterator(Json* base) {
-            m_base = base;
+            base_ = base;
             if (base) {
-                if (m_base->IsArray()) {
-                    m_arr_iter = (*m_base)->ToArray().GetVector().begin();
+                if (base_->IsArray()) {
+                    arr_iter_ = (*base_)->ToArray().GetVector().begin();
                 }
-                else if (m_base->IsObject()) {
-                    m_obj_iter = (*m_base)->ToObject().GetMap().begin();
+                else if (base_->IsObject()) {
+                    obj_iter_ = (*base_)->ToObject().GetMap().begin();
                 }
                 else {
                     throw value::ValueTypeError("Non container types cannot iterate");
@@ -45,42 +36,64 @@ public:
             }
         }
         Iterator(Json* base, const value::ValuePtrtMap::iterator& obj_iter) {
-            m_base = base;
-            m_obj_iter = obj_iter;
+            base_ = base;
+            new(&obj_iter_) decltype(obj_iter_);
+            obj_iter_ = obj_iter;
         }
         Iterator(Json* base, const value::ValuePtrVector::iterator& arr_iter) {
-            m_base = base;
-            m_arr_iter = arr_iter;
+            base_ = base;
+            new(&arr_iter_) decltype(arr_iter_);
+            arr_iter_ = arr_iter;
         }
         Iterator(const Iterator& other) noexcept {
             operator=(other);
         }
-        void operator=(const Iterator& other) {
-            m_base = other.m_base;
-            if (other.m_base->IsObject()) {
-                m_obj_iter = other.m_obj_iter;
+
+        template<class T>
+        inline void Destroy(T* ptr) {
+            ptr->~T();
+        }
+
+        ~Iterator() {
+            if (base_) {
+                if (base_->IsObject()) {
+                    Destroy(&obj_iter_);
+                }
+                else if (base_->IsArray()) {
+                    Destroy(&arr_iter_);
+                }
+                else {
+                    throw value::ValueTypeError("Non container types cannot iterate");
+                }
             }
-            else if (m_base->IsArray()) {
-                m_arr_iter = other.m_arr_iter;
+        }
+        void operator=(const Iterator& other) {
+            base_ = other.base_;
+            if (other.base_->IsObject()) {
+                new(&obj_iter_) decltype(obj_iter_);
+                obj_iter_ = other.obj_iter_;
+            }
+            else if (base_->IsArray()) {
+                new(&arr_iter_) decltype(arr_iter_);
+                arr_iter_ = other.arr_iter_;
             }
             else {
                 throw value::ValueTypeError("Non container types cannot iterate");
             }
         }
-        ~Iterator() { }
 
         bool operator!=(const Iterator& other) const {
-            if (m_base == nullptr && other.m_base == nullptr) {
+            if (base_ == nullptr && other.base_ == nullptr) {
                 return false;
             }
-            if (other.m_base == nullptr || m_base == nullptr) {
+            if (other.base_ == nullptr || base_ == nullptr) {
                 return true;
             }
-            if (m_base->IsArray()) {
-                return (*m_base)->ToArray().GetVector() == (*other.m_base)->ToArray().GetVector();
+            if (base_->IsArray()) {
+                return (*base_)->ToArray().GetVector() == (*other.base_)->ToArray().GetVector();
             }
-            else if (m_base->IsObject()) {
-                return (*m_base)->ToObject().GetMap() == (*other.m_base)->ToObject().GetMap();
+            else if (base_->IsObject()) {
+                return (*base_)->ToObject().GetMap() == (*other.base_)->ToObject().GetMap();
             }
             throw value::ValueTypeError("Non container types cannot iterate");
         }
@@ -90,64 +103,62 @@ public:
         }
 
         const Iterator& operator++() {
-            if ((*m_base)->Type() == value::ValueType::kArray) {
-                m_arr_iter++;
-                if (m_arr_iter == (*m_base)->ToArray().GetVector().end()) {
-                    m_base = nullptr;
+            if ((*base_)->Type() == value::ValueType::kArray) {
+                arr_iter_++;
+                if (arr_iter_ == (*base_)->ToArray().GetVector().end()) {
+                    base_ = nullptr;
                 }
             }
-            else if ((*m_base)->Type() == value::ValueType::kObject) {
-                m_obj_iter++;
-                if (m_obj_iter == (*m_base)->ToObject().GetMap().end()) {
-                    m_base = nullptr;
+            else if ((*base_)->Type() == value::ValueType::kObject) {
+                obj_iter_++;
+                if (obj_iter_ == (*base_)->ToObject().GetMap().end()) {
+                    base_ = nullptr;
                 }
             }
             return *this;
         }
 
     public:
-        const YUJSON_STD string& key() {
-            if ((*m_base)->Type() == value::ValueType::kObject) {
-                return m_obj_iter->first;
+        const std::string& key() {
+            if ((*base_)->Type() == value::ValueType::kObject) {
+                return obj_iter_->first;
             }
             throw value::ValueTypeError("Not an object iterator");
         }
 
         Json& value() {
-            if ((*m_base)->Type() == value::ValueType::kArray) {
-                return (Json&)*m_arr_iter;
+            if ((*base_)->Type() == value::ValueType::kArray) {
+                return (Json&)*arr_iter_;
             }
-            else if ((*m_base)->Type() == value::ValueType::kObject) {
-                return (Json&)m_obj_iter->second;
+            else if ((*base_)->Type() == value::ValueType::kObject) {
+                return (Json&)obj_iter_->second;
             }
             throw value::ValueTypeError("Non container types cannot iterate");
         }
 
     private:
-        value::ValuePtrtMap::iterator m_obj_iter;
-        value::ValuePtrVector::iterator m_arr_iter;
-        Json* m_base;
+        union {
+            value::ValuePtrtMap::iterator obj_iter_;
+            value::ValuePtrVector::iterator arr_iter_;
+        };
+        Json* base_;
     };
 
 public:
     Json() noexcept { }
     explicit Json(value::ValuePtr value) noexcept : value::ValuePtr{ std::move(value) } { }
     Json(Json&& json) noexcept : value::ValuePtr{ std::move(json) } { }
-    Json(nullptr_t) : value::ValuePtr{ YUJSON_STD make_unique<value::NullValue>() } { }
-    Json(bool b) : value::ValuePtr{ YUJSON_STD make_unique<value::BooleanValue>(b) } { }
-    Json(int i) : value::ValuePtr{ YUJSON_STD make_unique<value::NumberIntValue>(long long(i)) } { }
-    Json(unsigned int i) : value::ValuePtr{ YUJSON_STD make_unique<value::NumberIntValue>(unsigned long long(i)) } { }
+    Json(nullptr_t) : value::ValuePtr{ std::make_unique<value::NullValue>() } { }
+    Json(bool b) : value::ValuePtr{ std::make_unique<value::BooleanValue>(b) } { }
+    Json(int i) : value::ValuePtr{ std::make_unique<value::NumberIntValue>(long long(i)) } { }
+    Json(unsigned int i) : value::ValuePtr{ std::make_unique<value::NumberIntValue>(unsigned long long(i)) } { }
 #ifndef YUJSON_DISABLE_FLOAT
-    Json(double d) : value::ValuePtr{ YUJSON_STD make_unique<value::NumberFloatValue>(d) } { }
+    Json(double d) : value::ValuePtr{ std::make_unique<value::NumberFloatValue>(d) } { }
 #endif
-    Json(const char* str) : value::ValuePtr{ YUJSON_STD make_unique<value::StringValue>(str) } { }
-    Json(const unsigned char* str) : value::ValuePtr{ YUJSON_STD make_unique<value::StringValue>((char*)str) } { }
-    Json(YUJSON_STD string str) : value::ValuePtr{ YUJSON_STD make_unique<value::StringValue>(str) } { }
-#ifdef WINNT
-    Json(YUJSON_STD list<Json>& json_list) {
-#else
+    Json(const char* str) : value::ValuePtr{ std::make_unique<value::StringValue>(str) } { }
+    Json(const unsigned char* str) : value::ValuePtr{ std::make_unique<value::StringValue>((char*)str) } { }
+    Json(std::string str) : value::ValuePtr{ std::make_unique<value::StringValue>(str) } { }
     Json(std::initializer_list<Json> json_list) {
-#endif // WINNT
         if (json_list.size() % 2 == 0) {
             bool is_obj = true;
             for (auto iter = json_list.begin(); iter != json_list.end(); iter++, iter++) {
@@ -249,11 +260,11 @@ public:
         return this->get() != nullptr;
     }
 
-    YUJSON_STD string Print(bool format = true) const {
+    std::string Print(bool format = true) const {
         if (!this->get()) {
             return "";
         }
-        YUJSON_STD string jsonStr;
+        std::string jsonStr;
         Print(this->get(), format, 0, &jsonStr);
         return jsonStr;
     }
@@ -291,7 +302,7 @@ public:
         return (*this)->IsString();
     }
 
-    YUJSON_STD string& String() {
+    std::string& String() {
         return (*this)->ToString().Get();
     }
 
@@ -319,7 +330,7 @@ public:
         case value::ValueType::kString: {
             auto& str = (*this)->GetString().Get();
             if (str.empty() || str[0] < '0' && str[0] > '9') return 0;
-            return YUJSON_STD stoll(str);
+            return std::stoll(str);
         }
         case value::ValueType::kNull: {
             return defalut;
@@ -345,7 +356,7 @@ public:
         case value::ValueType::kString: {
             auto& str = (*this)->GetString().Get();
             if (str.empty() || str[0] < '0' && str[0] > '9') return 0;
-            return YUJSON_STD stod(str);
+            return std::stod(str);
         }
         case value::ValueType::kNull: {
             return defalut;
@@ -361,11 +372,11 @@ public:
         if (!IsValid()) return defalut;
         switch ((*this)->Type()) {
         case value::ValueType::kNumberInt: {
-            return YUJSON_STD to_string((*this)->GetNumberInt().Get());
+            return std::to_string((*this)->GetNumberInt().Get());
         }
 #ifndef YUJSON_DISABLE_FLOAT
         case value::ValueType::kNumberFloat:
-            return YUJSON_STD to_string((*this)->ToNumberFloat().Get());
+            return std::to_string((*this)->ToNumberFloat().Get());
 #endif    
         case value::ValueType::kString: {
             return (*this)->GetString().Get().c_str();
@@ -389,7 +400,7 @@ private:
     }
 
 private:
-    static YUJSON_STD string Replace(const YUJSON_STD string& str, const YUJSON_STD string& replace, const YUJSON_STD string& target) {
+    static std::string Replace(const std::string& str, const std::string& replace, const std::string& target) {
         auto new_str = str;
         size_t pos = 0;
         pos = new_str.find(replace);
@@ -400,7 +411,7 @@ private:
         return new_str;
     }
 
-    void StrEscapr(YUJSON_STD string* str) const {
+    void StrEscapr(std::string* str) const {
         // 引号添加\转义，一个\修改为两个\\ 
         *str = Replace(*str, R"(\)", R"(\\)");
         *str = Replace(*str, R"(")", R"(\")");
@@ -411,10 +422,10 @@ private:
         *str = Replace(*str, "\t", R"(\t)");
     }
 
-    void Print(value::ValueInterface* value, bool format, size_t level, YUJSON_STD string* jsonStr) const {
-        YUJSON_STD string indent;
+    void Print(value::ValueInterface* value, bool format, size_t level, std::string* jsonStr) const {
+        std::string indent;
         if (format) {
-            indent = YUJSON_STD string(level * kIndent, '    ');
+            indent = std::string(level * kIndent, '    ');
         }
 
         switch (value->Type()) {
@@ -429,13 +440,13 @@ private:
         case value::ValueType::kNumberInt: {
             //char str[64];
             //sprintf(str, "%lld", );
-            auto str = YUJSON_STD to_string(static_cast<value::NumberIntValue*>(value)->Get());
+            auto str = std::to_string(static_cast<value::NumberIntValue*>(value)->Get());
             *jsonStr += str;
             break;
         }
 #ifndef YUJSON_DISABLE_FLOAT
         case value::ValueType::kNumberFloat: {
-            auto str = YUJSON_STD to_string(static_cast<value::NumberFloatValue*>(value)->Get());
+            auto str = std::to_string(static_cast<value::NumberFloatValue*>(value)->Get());
             *jsonStr += str;
             break;
         }
@@ -449,7 +460,7 @@ private:
         case value::ValueType::kArray: {
             *jsonStr += '[';
             if (format) {
-                indent += YUJSON_STD string(kIndent, '    ');
+                indent += std::string(kIndent, '    ');
             }
             const auto& arr = static_cast<value::ArrayValue*>(value)->GetVector();
             for (int i = 0; i < arr.size(); ) {
@@ -473,7 +484,7 @@ private:
         case value::ValueType::kObject: {
             *jsonStr += '{';
             if (format) {
-                indent += YUJSON_STD string(kIndent, '    ');
+                indent += std::string(kIndent, '    ');
             }
 
             const auto& obj = static_cast<value::ObjectValue*>(value)->GetMap();
@@ -508,40 +519,24 @@ private:
     static constexpr int kIndent = 4;
 };
 
-static inline Json Parse(const YUJSON_STD string& json_text) {
+static inline Json Parse(const std::string& json_text) {
     compiler::Lexer lexer(json_text);
     compiler::Parser parser(&lexer);
     return Json(parser.ParseValue());
 }
 
-#ifdef WINNT
-static inline Json Object(YUJSON_STD list<Json>& json_list) {
-#else
-static inline Json Object(YUJSON_STD initializer_list<Json> json_list) {
-#endif
-    Json json{ YUJSON_STD make_unique<value::ObjectValue>() };
+static inline Json Object(std::initializer_list<Json> json_list) {
+    Json json{ std::make_unique<value::ObjectValue>() };
     for (auto iter = json_list.begin(); iter != json_list.end(); iter++, iter++) {
-        YUJSON_STD string key = (*iter)->ToString().Get();
-#ifdef WINNT
+        std::string key = (*iter)->ToString().Get();
         json->ToObject().Set(key, (value::ValuePtr&&)*(iter + 1));
-#else
-        json->ToObject().Set(key, (value::ValuePtr&&)*(iter + 1));
-#endif // WINNT
     }
     return json;
 }
-#ifdef WINNT
-static inline Json Array(YUJSON_STD list<Json>& json_list) {
-#else
-static inline Json Array(YUJSON_STD initializer_list<Json> json_list) {
-#endif
-    Json json{ YUJSON_STD make_unique<value::ArrayValue>() };
+static inline Json Array(std::initializer_list<Json> json_list) {
+    Json json{ std::make_unique<value::ArrayValue>() };
     for (auto iter = json_list.begin(); iter != json_list.end(); iter++) {
-#ifdef WINNT
         json->ToArray().Pushback((value::ValuePtr&&)*iter);
-#else
-        json->ToArray().Pushback((value::ValuePtr&&)*iter);
-#endif // WINNT
     }
     return json;
 }

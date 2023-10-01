@@ -26,12 +26,12 @@ enum class TokenType {
 
 struct Token {
     TokenType type;
-    YUJSON_STD string str;
+    std::string str;
 };
 
 class Lexer {
 public:
-    Lexer(const YUJSON_STD string& src) : m_src(src), m_idx(0) {
+    Lexer(const std::string& src) : m_src(src), m_idx(0) {
         m_nextToken.type = TokenType::kNone;
     }
 
@@ -134,20 +134,20 @@ public:
             do {
 #ifndef YUJSON_DISABLE_FLOAT
                 if (c >= '0' && c <= '9' || c == '-' && i == 0 || c == '+' && i == 0 || c == '.' && is_float == false) {
-                    token->str += YUJSON_STD string(1, c);
+                    token->str += std::string(1, c);
                     if (c == '.') is_float = true;
                 }
                 else if (is_e == false && is_float && (c == 'e' || c == 'E')) {
-                    token->str += YUJSON_STD string(1, c);
+                    token->str += std::string(1, c);
                     is_e = true;
                     e_pos = i;
                 }
                 else if (is_e == true && i == e_pos+1 && (c == '+' || c == '-')) {
-                    token->str += YUJSON_STD string(1, c);
+                    token->str += std::string(1, c);
                 }
 #else
                 if (c >= '0' && c <= '9' || c == '-' && i == 0 || c == '+' && i == 0) {
-                    token->str += YUJSON_STD string(1, c);
+                    token->str += std::string(1, c);
                 }
 #endif
                 else {
@@ -195,7 +195,7 @@ public:
                     }
                     else if (c == 'u') {
                         auto make_unicode_hex = [&](int& hex) -> bool {
-                            YUJSON_STD string hex_str;
+                            std::string hex_str;
                             for (size_t i = 0; i < 4; i++) {
                                 auto hex_c = NextChar();
                                 if (hex_c) {
@@ -205,7 +205,7 @@ public:
                                     return false;
                                 }
                             }
-                            hex = YUJSON_STD stoi(hex_str, nullptr, 16);
+                            hex = std::stoi(hex_str, nullptr, 16);
                             return true;
                         };
                         
@@ -280,7 +280,7 @@ public:
     }
 
 private:
-    YUJSON_STD string m_src;
+    std::string m_src;
     size_t m_idx;
     Token m_nextToken;
 };

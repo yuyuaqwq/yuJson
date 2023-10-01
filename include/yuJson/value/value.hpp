@@ -158,9 +158,9 @@ public:
 namespace yuJson{
 namespace value{
 
-using ValuePtr = YUJSON_STD unique_ptr<ValueInterface>;
-using ValuePtrVector = YUJSON_STD vector<ValuePtr>;
-using ValuePtrtMap = YUJSON_STD map<YUJSON_STD string, ValuePtr>;
+using ValuePtr = std::unique_ptr<ValueInterface>;
+using ValuePtrVector = std::vector<ValuePtr>;
+using ValuePtrtMap = std::map<std::string, ValuePtr>;
 
 }
 }

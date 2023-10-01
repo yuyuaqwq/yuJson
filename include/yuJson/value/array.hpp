@@ -11,7 +11,7 @@ namespace value {
 class ArrayValue : public ValueInterface {
 public:
     ArrayValue() noexcept { }
-    ArrayValue(ArrayValue&& arr) noexcept : m_arr(std::move(arr.m_arr)) { }
+    ArrayValue(ArrayValue&& arr) noexcept : arr_(std::move(arr.arr_)) { }
     ~ArrayValue() noexcept { }
 
     ArrayValue(const ArrayValue&) = delete;
@@ -21,30 +21,30 @@ public:
         return ValueType::kArray;
     }
     ValuePtrVector& GetVector() noexcept {
-        return m_arr;
+        return arr_;
     }
 
     ValuePtr& At(int i) {
-        return m_arr.at(i);
+        return arr_.at(i);
     }
 
     ValuePtr& operator[](int i) {
-        return m_arr[i];
+        return arr_[i];
     }
 
     void Pushback(ValuePtr value) {
-        m_arr.push_back(std::move(value));
+        arr_.push_back(std::move(value));
     }
 
     void Set(int i, ValuePtr value) noexcept {
-        m_arr[i] = std::move(value);
+        arr_[i] = std::move(value);
     }
 
 private:
-    ValuePtrVector m_arr;
+    ValuePtrVector arr_;
 };
 
-using ArrayPtr = YUJSON_STD unique_ptr<ArrayValue>;
+using ArrayPtr = std::unique_ptr<ArrayValue>;
 } // namespace value
 } // namespace yuJson
 

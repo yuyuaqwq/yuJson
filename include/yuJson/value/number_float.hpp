@@ -7,7 +7,7 @@ namespace yuJson {
 namespace value {
 class NumberFloatValue : public ValueInterface {
 public:
-    explicit NumberFloatValue(double num) noexcept : m_float(num) { }
+    explicit NumberFloatValue(double num) noexcept : float_(num) { }
     
     ~NumberFloatValue() noexcept { }
 
@@ -16,18 +16,18 @@ public:
     }
 
     double& Get() noexcept {
-        return m_float;
+        return float_;
     }
 
     void Set(double num) noexcept {
-        m_float = num;
+        float_ = num;
     }
 
 private:
-    double m_float;
+    double float_;
 };
 
-using NumberFloatPtr = YUJSON_STD unique_ptr<NumberFloatValue>;
+using NumberFloatPtr = std::unique_ptr<NumberFloatValue>;
 
 } // namespace value
 } // namespace yuJson

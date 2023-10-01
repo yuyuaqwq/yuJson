@@ -11,7 +11,7 @@ namespace value {
 class ObjectValue : public ValueInterface {
 public:
     ObjectValue() noexcept { }
-    ObjectValue(ObjectValue&& obj) noexcept : m_obj(std::move(obj.m_obj)) { }
+    ObjectValue(ObjectValue&& obj) noexcept : obj_(std::move(obj.obj_)) { }
     ~ObjectValue() noexcept { }
 
     ObjectValue(const ObjectValue&) = delete;
@@ -22,35 +22,35 @@ public:
     }
 
     ValuePtrtMap& GetMap() noexcept {
-        return m_obj;
+        return obj_;
     }
 
-    ValuePtr& At(const YUJSON_STD string& key) {
-        return m_obj.at(key);
+    ValuePtr& At(const std::string& key) {
+        return obj_.at(key);
     }
 
-    ValuePtr& operator[](const YUJSON_STD string& key) {
-        return m_obj[key];
+    ValuePtr& operator[](const std::string& key) {
+        return obj_[key];
     }
 
-    bool Exist(const YUJSON_STD string& key) noexcept {
-        return m_obj.find(key) != m_obj.end();
+    bool Exist(const std::string& key) noexcept {
+        return obj_.find(key) != obj_.end();
     }
 
-    void Set(const YUJSON_STD string& key, ValuePtr value) {
-        auto& it = m_obj.operator[](key);
+    void Set(const std::string& key, ValuePtr value) {
+        auto& it = obj_.operator[](key);
         it = std::move(value);
     }
 
-    void Delete(const YUJSON_STD string& key) noexcept {
-        m_obj.erase(key);
+    void Delete(const std::string& key) noexcept {
+        obj_.erase(key);
     }
 
 private:
-    ValuePtrtMap m_obj;
+    ValuePtrtMap obj_;
 };
 
-using ObjectPtr = YUJSON_STD unique_ptr<ObjectValue>;
+using ObjectPtr = std::unique_ptr<ObjectValue>;
 } // namespace value
 } // namespace yuJson
 
