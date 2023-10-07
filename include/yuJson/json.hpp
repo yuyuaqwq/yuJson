@@ -25,9 +25,11 @@ public:
             base_ = base;
             if (base) {
                 if (base_->IsArray()) {
+                    new(&arr_iter_) decltype(arr_iter_);
                     arr_iter_ = (*base_)->ToArray().GetVector().begin();
                 }
                 else if (base_->IsObject()) {
+                    new(&obj_iter_) decltype(obj_iter_);
                     obj_iter_ = (*base_)->ToObject().GetMap().begin();
                 }
                 else {
