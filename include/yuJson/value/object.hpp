@@ -17,7 +17,7 @@ public:
     ObjectValue(const ObjectValue&) = delete;
     void operator=(const ObjectValue&) = delete;
 
-    virtual ValueType Type() const noexcept {
+    ValueType Type() const override noexcept {
         return ValueType::kObject;
     }
 

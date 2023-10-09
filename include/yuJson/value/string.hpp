@@ -10,15 +10,13 @@ public:
     explicit StringValue(const std::string& str) : str_(str) { }
     StringValue(StringValue&& str) noexcept : str_(str.Get()) { }
 
-    void operator=(StringValue& str) = delete;
-
     void operator=(StringValue&& str) noexcept {
         this->str_ = std::move(str.Get());
     }
 
     ~StringValue() noexcept { }
 
-    virtual ValueType Type() const noexcept {
+    ValueType Type() const override noexcept {
         return ValueType::kString;
     }
 

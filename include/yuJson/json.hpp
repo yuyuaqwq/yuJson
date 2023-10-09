@@ -52,7 +52,7 @@ public:
         }
 
         template<class T>
-        inline void Destroy(T* ptr) {
+        void Destroy(T* ptr) {
             ptr->~T();
         }
 

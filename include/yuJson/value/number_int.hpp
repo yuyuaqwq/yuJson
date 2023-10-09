@@ -12,7 +12,7 @@ public:
     
     ~NumberIntValue() noexcept { }
 
-    virtual ValueType Type() const noexcept {
+    virtual ValueType Type() const override noexcept {
         return ValueType::kNumberInt;
     }
 

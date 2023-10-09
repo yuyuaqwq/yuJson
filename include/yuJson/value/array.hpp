@@ -17,7 +17,7 @@ public:
     ArrayValue(const ArrayValue&) = delete;
     void operator=(const ArrayValue&) = delete;
 
-    virtual ValueType Type() const noexcept {
+    ValueType Type() const override noexcept {
         return ValueType::kArray;
     }
     ValuePtrVector& GetVector() noexcept {

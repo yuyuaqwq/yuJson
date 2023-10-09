@@ -41,7 +41,7 @@ public:
     virtual ~ValueInterface() noexcept { }
 
 public:
-    virtual inline ValueType Type() const noexcept = 0;
+    virtual ValueType Type() const noexcept = 0;
 
     template <typename T>
     T& To() {

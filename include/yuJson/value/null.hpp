@@ -11,7 +11,7 @@ public:
 
     explicit NullValue(std::nullptr_t) { }
 
-    virtual ValueType Type() const noexcept {
+    ValueType Type() const override noexcept {
         return ValueType::kNull;
     }
 };
