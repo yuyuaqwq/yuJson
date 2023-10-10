@@ -45,7 +45,7 @@ public:
 
     template <typename T>
     T& To() {
-        return *(T*)this;// static_cast<ast::T*>(this);
+        return *reinterpret_cast<T*>(this);
     }
 
     bool IsNull() const noexcept {
@@ -56,7 +56,7 @@ public:
         if (!IsNull()) {
             throw ValueTypeError("Not Null data");
         }
-        return *(NullValue*)this;// static_cast<ast::Boolean*>(this);
+        return *reinterpret_cast<NullValue*>(this);
     }
 
     bool IsBoolean() const noexcept {
@@ -112,7 +112,7 @@ public:
         if (!IsArray()) {
             throw ValueTypeError("Not Array data");
         }
-        return *(ArrayValue*)this; //static_cast<ast::Array*>(this);
+        return *reinterpret_cast<ArrayValue*>(this);
     }
 
     bool IsObject() const noexcept {
@@ -123,26 +123,26 @@ public:
         if (!IsObject()) {
             throw ValueTypeError("Not Object data");
         }
-        return *(ObjectValue*)this; // static_cast<ast::Object*>(this);
+        return *reinterpret_cast<ObjectValue*>(this);
     }
 
 
     BooleanValue& GetBoolean() {
-        return *(BooleanValue*)this;// static_cast<ast::Boolean*>(this);
+        return *reinterpret_cast<BooleanValue*>(this);
     }
 
     NumberIntValue& GetNumberInt() {
-        return *(NumberIntValue*)this; // static_cast<ast::Number*>(this);
+        return *reinterpret_cast<NumberIntValue*>(this);
     }
 
 #ifndef YUJSON_DISABLE_FLOAT
     NumberFloatValue& GetNumberFloat() {
-        return *(NumberFloatValue*)this; // static_cast<ast::Number*>(this);
+        return *reinterpret_cast<NumberFloatValue*>(this);
     }
 #endif
 
     StringValue& GetString() {
-        return *(StringValue*)this; // static_cast<ast::String*>(this);
+        return *reinterpret_cast<StringValue*>(this);
     }
 
 };

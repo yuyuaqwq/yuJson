@@ -130,10 +130,10 @@ public:
 
         Json& value() {
             if ((*base_)->Type() == value::ValueType::kArray) {
-                return (Json&)*arr_iter_;
+                return static_cast<Json&>(*arr_iter_);
             }
             else if ((*base_)->Type() == value::ValueType::kObject) {
-                return (Json&)obj_iter_->second;
+                return static_cast<Json&>(obj_iter_->second);
             }
             throw value::ValueTypeError("Non container types cannot iterate");
         }
@@ -190,19 +190,19 @@ public:
     }
 
     Json& operator[](const char* str) {
-        return *(Json*)&((*this)->ToObject()[str]);
+        return *static_cast<Json*>(&((*this)->ToObject()[str]));
     }
 
     Json& operator[](int index) {
-        return *(Json*)&((*this)->ToArray()[index]);
+        return *static_cast<Json*>(&((*this)->ToArray()[index]));
     }
 
     Json& at(const char* str) {
-        return *(Json*)&((*this)->ToObject().At(str));
+        return *static_cast<Json*>(&((*this)->ToObject().At(str)));
     }
 
     Json& at(int index) {
-        return *(Json*)&((*this)->ToArray().At(index));
+        return *static_cast<Json*>(&((*this)->ToArray().At(index)));
     }
 
     bool operator==(const Json&& other) const {
@@ -398,7 +398,7 @@ public:
 private:
     template <typename T>
     T& Get() noexcept {
-        return *(T*)this->get();
+        return *static_cast<T*>(this->get());
     }
 
 private:
@@ -531,14 +531,14 @@ static inline Json Object(std::initializer_list<Json> json_list) {
     Json json{ std::make_unique<value::ObjectValue>() };
     for (auto iter = json_list.begin(); iter != json_list.end(); iter++, iter++) {
         std::string key = (*iter)->ToString().Get();
-        json->ToObject().Set(key, (value::ValuePtr&&)*(iter + 1));
+        json->ToObject().Set(key, std::move(static_cast<value::ValuePtr&>(*(const_cast<Json*>(iter) + 1))));
     }
     return json;
 }
 static inline Json Array(std::initializer_list<Json> json_list) {
     Json json{ std::make_unique<value::ArrayValue>() };
     for (auto iter = json_list.begin(); iter != json_list.end(); iter++) {
-        json->ToArray().Pushback((value::ValuePtr&&)*iter);
+        json->ToArray().Pushback(std::move(static_cast<value::ValuePtr&>(const_cast<Json&>(*iter))));
     }
     return json;
 }

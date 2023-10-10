@@ -11,7 +11,7 @@ public:
     
     ~NumberFloatValue() noexcept { }
 
-    ValueType Type() const override noexcept {
+    ValueType Type() const noexcept override {
         return ValueType::kNumberFloat;
     }
 

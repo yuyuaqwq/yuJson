@@ -11,7 +11,7 @@ public:
     explicit BooleanValue(bool b) noexcept : bool_(b) { }
     ~BooleanValue() noexcept { }
 
-    ValueType Type() const override noexcept {
+    ValueType Type() const noexcept override {
         return ValueType::kBoolean;
     }
 
