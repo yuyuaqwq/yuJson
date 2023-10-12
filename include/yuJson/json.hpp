@@ -152,8 +152,8 @@ public:
     Json(Json&& json) noexcept : value::ValuePtr{ std::move(json) } { }
     Json(nullptr_t) : value::ValuePtr{ std::make_unique<value::NullValue>() } { }
     Json(bool b) : value::ValuePtr{ std::make_unique<value::BooleanValue>(b) } { }
-    Json(int i) : value::ValuePtr{ std::make_unique<value::NumberIntValue>(long long(i)) } { }
-    Json(unsigned int i) : value::ValuePtr{ std::make_unique<value::NumberIntValue>(unsigned long long(i)) } { }
+    Json(int i) : value::ValuePtr{ std::make_unique<value::NumberIntValue>(int64_t(i)) } { }
+    Json(unsigned int i) : value::ValuePtr{ std::make_unique<value::NumberIntValue>(uint64_t(i)) } { }
 #ifndef YUJSON_DISABLE_FLOAT
     Json(double d) : value::ValuePtr{ std::make_unique<value::NumberFloatValue>(d) } { }
 #endif

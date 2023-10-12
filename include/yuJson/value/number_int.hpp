@@ -7,8 +7,8 @@ namespace yuJson {
 namespace value {
 class NumberIntValue : public ValueInterface {
 public:
-    explicit NumberIntValue(long long num) noexcept : int_(num) { }
-    explicit NumberIntValue(unsigned long long num) noexcept : int_((long long)num) { }
+    explicit NumberIntValue(int64_t num) noexcept : int_(num) { }
+    explicit NumberIntValue(uint64_t num) noexcept : int_(num) { }
     
     ~NumberIntValue() noexcept { }
 
@@ -16,16 +16,16 @@ public:
         return ValueType::kNumberInt;
     }
 
-    long long& Get() noexcept {
+    int64_t& Get() noexcept {
         return int_;
     }
 
-    void Set(long long num) noexcept {
+    void Set(int64_t num) noexcept {
         int_ = num;
     }
 
 private:
-    long long int_;
+    int64_t int_;
 };
 
 using NumberIntPtr = std::unique_ptr<NumberIntValue>;
