@@ -100,6 +100,10 @@ public:
             throw value::ValueTypeError("Non container types cannot iterate");
         }
 
+        bool operator==(const Iterator& other) const {
+            return !operator!=(other);
+        }
+
         Iterator& operator*() {
             return *this;
         }
