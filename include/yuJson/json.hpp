@@ -251,7 +251,7 @@ public:
         return Iterator{ this, map_iter };
     }
 
-    size_t size() {
+    size_t size() const noexcept {
         if (IsArray()) {
             return (*this)->ToArray().GetVector().size();
         }
@@ -266,7 +266,7 @@ public:
         }
     }
 
-    bool IsValid() noexcept {
+    bool IsValid() const noexcept {
         return this->get() != nullptr;
     }
 
@@ -279,55 +279,55 @@ public:
         return jsonStr;
     }
 
-    bool IsNull() {
+    bool IsNull() const noexcept {
         if (!IsValid()) return false;
         return (*this)->IsNull();
     }
 
-    bool IsBoolean() {
+    bool IsBoolean() const noexcept {
         if (!IsValid()) return false;
         return (*this)->IsBoolean();
     }
 
-    bool& Boolean() {
+    bool& Boolean() const noexcept {
         return (*this)->ToBoolean().Get();
     }
 
-    bool IsNumber() {
+    bool IsNumber() const noexcept {
         if (!IsValid()) return false;
         return (*this)->IsNumberInt() || (*this)->IsNumberFloat();
     }
 
-    long long& Int() {
+    long long& Int() const noexcept {
         return (*this)->ToNumberInt().Get();
     }
 #ifndef YUJSON_DISABLE_FLOAT
-    double& Float() {
+    double& Float() const noexcept {
         return (*this)->ToNumberFloat().Get();
     }
 #endif
 
-    bool IsString() {
+    bool IsString() const noexcept {
         if (!IsValid()) return false;
         return (*this)->IsString();
     }
 
-    std::string& String() {
+    std::string& String() const noexcept {
         return (*this)->ToString().Get();
     }
 
-    bool IsArray() {
+    bool IsArray() const noexcept {
         if (!IsValid()) return false;
         return (*this)->IsArray();
     }
 
-    bool IsObject() {
+    bool IsObject() const noexcept {
         if (!IsValid()) return false;
         return (*this)->IsObject();
     }
 
 
-    long long ConvertToInt(long long defalut = 0) {
+    long long ConvertToInt(long long defalut = 0) const {
         if (!IsValid()) return defalut;
         switch ((*this)->Type()) {
         case value::ValueType::kNumberInt: {
@@ -378,7 +378,7 @@ public:
     }
 #endif
 
-    std::string ConvertToString(std::string defalut = "") {
+    std::string ConvertToString(std::string defalut = "") const {
         if (!IsValid()) return defalut;
         switch ((*this)->Type()) {
         case value::ValueType::kNumberInt: {
@@ -535,7 +535,7 @@ static inline Json Parse(const std::string& json_text) {
     return Json(parser.ParseValue());
 }
 
-static inline Json Object(std::initializer_list<Json> json_list) {
+static inline Json Object(std::initializer_list<Json> json_list = {}) {
     Json json{ std::make_unique<value::ObjectValue>() };
     for (auto iter = json_list.begin(); iter != json_list.end(); iter++, iter++) {
         std::string key = (*iter)->ToString().Get();
@@ -543,7 +543,7 @@ static inline Json Object(std::initializer_list<Json> json_list) {
     }
     return json;
 }
-static inline Json Array(std::initializer_list<Json> json_list) {
+static inline Json Array(std::initializer_list<Json> json_list = {}) {
     Json json{ std::make_unique<value::ArrayValue>() };
     for (auto iter = json_list.begin(); iter != json_list.end(); iter++) {
         json->ToArray().Pushback(std::move(static_cast<value::ValuePtr&>(const_cast<Json&>(*iter))));
