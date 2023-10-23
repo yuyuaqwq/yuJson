@@ -209,7 +209,11 @@ public:
         return *static_cast<Json*>(&((*this)->ToArray().At(index)));
     }
 
-    bool operator==(const Json&& other) const {
+    void push_back(Json&& val) {
+        (*this)->ToArray().Pushback(std::move(val));
+    }
+
+    bool operator==(const Json& other) const {
         if ((*this)->Type() != other->Type()) {
             return false;
         }
