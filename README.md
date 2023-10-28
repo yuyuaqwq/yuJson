@@ -1,5 +1,5 @@
 # yuJson
-C++ Json数据交互
+C++ Json
 
 # 特性
 - header-only
