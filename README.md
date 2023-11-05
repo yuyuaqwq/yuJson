@@ -14,20 +14,19 @@ C++ Json
 
 int main() {
     using Json = yuJson::Json;
-	// Parse
-	auto json_parse = Json::Parse(R"({"key":["arr_ele", 1, "abc", {"efg":"string", "emmm":true}]})");
-	std::cout << json_parse.Print(true) << std::endl << std::endl;
+    // Parse
+    auto json_parse = Json::Parse(R"({"key":["arr_ele", 1, "abc", {"efg":"string", "emmm":true}]})");
+    std::cout << json_parse.Print(true) << std::endl << std::endl;
 
-	// Dump
-	Json json_dump { 
-		"int", 123, 
-		"arr", Json::Array({ "1", 2 }),
-		"obj", { "key", "value" },
-		"str", "2333" 
-	};
-	std::cout << json_dump.Print() << std::endl << std::endl;
-
-	return 0;
+    // Dump
+    Json json_dump { 
+        "int", 123, 
+        "arr", Json::Array({ "1", 2 }),
+        "obj", { "key", "value" },
+        "str", "2333" 
+    };
+    std::cout << json_dump.Print() << std::endl << std::endl;
+    return 0;
 }
 ```
 
