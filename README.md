@@ -3,7 +3,7 @@ C++ Json
 
 # 特性
 - header-only
-- 仅 `1k+` 代码行，适合学习
+- 仅 `1k+` 行代码，适合学习
 - 要求C++14
 
 # 快速入门
@@ -19,7 +19,7 @@ int main() {
 	std::cout << json_parse.Print(true) << std::endl << std::endl;
 
 	// Dump
-	yuJson::Json json_dump { 
+	Json json_dump { 
 		"int", 123, 
 		"arr", Json::Array({ "1", 2 }),
 		"obj", { "key", "value" },
