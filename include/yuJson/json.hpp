@@ -122,7 +122,7 @@ public:
         }
 
     public:
-        const std::string& key() {
+        const std::string& key() const {
             if ((*base_)->Type() == value::ValueType::kObject) {
                 return obj_iter_->first;
             }

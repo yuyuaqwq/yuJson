@@ -3,7 +3,10 @@
 
 class A {
 public:
-    const int& a() const {
+    //const int& a() const {
+    //    return a_;
+    //}
+    int& a() {
         return a_;
     }
     int a_;
@@ -11,6 +14,7 @@ public:
 
 
 int main() {
+
     using Json = yuJson::Json;
 
     /*
