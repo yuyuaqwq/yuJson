@@ -4,6 +4,7 @@ C++ Json
 # 特性
 - header-only
 - 仅 `1k+` 代码行，适合学习
+- 要求C++14，在MSVC、clang，g++中通过编译
 
 # 快速入门
 ``` C++
