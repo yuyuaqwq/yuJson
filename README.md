@@ -13,14 +13,15 @@ C++ Json
 #include <yuJson/json.hpp>
 
 int main() {
+    using Json = yuJson::Json;
 	// Parse
-	auto json_parse = yuJson::Json::Parse(R"({"key":["arr_ele", 1, "abc", {"efg":"string", "emmm":true}]})");
+	auto json_parse = Json::Parse(R"({"key":["arr_ele", 1, "abc", {"efg":"string", "emmm":true}]})");
 	std::cout << json_parse.Print(true) << std::endl << std::endl;
 
 	// Dump
 	yuJson::Json json_dump { 
 		"int", 123, 
-		"arr", yuJson::Array({ "1", 2 }),
+		"arr", Json::Array({ "1", 2 }),
 		"obj", { "key", "value" },
 		"str", "2333" 
 	};
