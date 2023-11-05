@@ -40,7 +40,7 @@ public:
             return std::make_unique<value::BooleanValue>(false);
         }
         case TokenType::kNumberInt: {
-            return std::make_unique<value::NumberIntValue>(std::stoll(token.str));
+            return std::make_unique<value::NumberIntValue>(int64_t{ std::stoll(token.str) });
         }
 #ifndef YUJSON_DISABLE_FLOAT
         case TokenType::kNumberFloat: {
@@ -135,7 +135,6 @@ private:
 
 private:
     Lexer* lexer_;
-
 };
 
 } // namespace compiler

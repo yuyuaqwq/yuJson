@@ -2,6 +2,7 @@
 #define YUJSON_COMPILER_LEXER_HPP_
 
 #include <string>
+#include <cstring>
 
 namespace yuJson {
 namespace compiler {
