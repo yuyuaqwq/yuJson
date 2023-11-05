@@ -25,8 +25,8 @@ enum class TokenType {
 };
 
 struct Token {
-    TokenType type;
-    std::string str;
+    TokenType type{ TokenType::kNone };
+    std::string str{};
 };
 
 class Lexer {
@@ -133,7 +133,10 @@ public:
             int e_pos = 0;
             do {
 #ifndef YUJSON_DISABLE_FLOAT
-                if (c >= '0' && c <= '9' || c == '-' && i == 0 || c == '+' && i == 0 || c == '.' && is_float == false) {
+                if (c >= '0' && c <= '9' || 
+                    c == '-' && i == 0 || 
+                    c == '+' && i == 0 || 
+                    c == '.' && is_float == false) {
                     token->str += std::string(1, c);
                     if (c == '.') is_float = true;
                 }
@@ -254,11 +257,16 @@ public:
                         }
                         
                     }
+                    else {
+                        token->str += '\\';
+                        token->str += c;
+                    }
                 }
                 else {
+                    
                     token->str += c;
                 }
-            };
+            }
             if (c != '\"') {
                 return false;
             }

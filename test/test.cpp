@@ -1,20 +1,30 @@
 #include <iostream>
 #include <yuJson/json.hpp>
 
+class A {
+public:
+    const int& a() const {
+        return a_;
+    }
+    int a_;
+};
+
 
 int main() {
+    using Json = yuJson::Json;
+
     /*
     * build
     */
-    auto arr_build = yuJson::Array({ "key", "value" });
+    auto arr_build = Json::Array({ "key", "value" });
     std::cout << arr_build.Print() << std::endl << std::endl;
 
-    auto obj_build = yuJson::Object({"key", "value"});
+    auto obj_build = Json::Object({"key", "value"});
     std::cout << obj_build.Print() << std::endl << std::endl;
     
-    yuJson::Json json { 
+    Json json { 
         "int", 123, 
-        "arr", yuJson::Array({ "1", 2 }),
+        "arr", Json::Array({ "1", 2 }),
         "obj", { "key", "value" },
         "str", "2333" 
     };
@@ -43,24 +53,24 @@ int main() {
     std::cout << json["int"].ConvertToString() << std::endl;
 
     // Json can also be a non container type
-    yuJson::Json str = "abc";
+    Json str = "abc";
     std::cout << str.Print() << std::endl;
 
-    yuJson::Json int_ = 123321;
+    Json int_ = 123321;
     std::cout << int_.Print() << std::endl;
 
 
     /*
     * serialization and deserialization
     */
-    auto invalid_test = yuJson::Parse("{a}");
+    auto invalid_test = Json::Parse("{a}");
     if (invalid_test.IsValid()) {
         std::cout << "valid json text" << std::endl << std::endl;
     }
     else {
         std::cout << "invalid json text" << std::endl << std::endl;
     }
-    auto valid_test = yuJson::Parse("{\"test\":123}");
+    auto valid_test = Json::Parse("{\"test\":123}");
     if (invalid_test.IsValid()) {
         std::cout << "valid" << std::endl << std::endl;
     }
@@ -69,7 +79,7 @@ int main() {
     json["obj"]["aa"] = { 1,2,3,4 };
     std::cout << json.Print() << std::endl << std::endl;
 
-    json = yuJson::Parse(R"({ "qvq":     ["233", 123, "emm", {"qa\q":"sb", "emmm":true}] })");
+    json = Json::Parse(R"({ "qvq":     ["233", 123, "emm", {"qa\q":"sb", "emmm":true}] })");
     std::cout << json.Print() << std::endl << std::endl;
 
     std::cout << (json.find("qvq") != json.end() ? "exist" : "non-existent") << std::endl << std::endl;
@@ -78,7 +88,7 @@ int main() {
     std::cout << json["qvq"][3].Print() << std::endl << std::endl;
 
 
-    json = yuJson::Parse(R"({"\uD83C\uDF0D": "hello world!"})");
+    json = Json::Parse(R"({"\uD83C\uDF0D": "hello world!"})");
     std::cout << json.Print() << std::endl << std::endl;
 
 
@@ -92,7 +102,7 @@ int main() {
         std::cout << sub_json.value().Print() << std::endl << std::endl;
     }
 
-    json = {1, 2};
+    json = { 1, 2 };
     std::cout << json.Print() << std::endl << std::endl;
 
     for (auto& sub_json : json) {

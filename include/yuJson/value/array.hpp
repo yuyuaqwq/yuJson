@@ -32,7 +32,7 @@ public:
         return arr_[i];
     }
 
-    void Pushback(ValuePtr value) {
+    void PushBack(ValuePtr value) {
         arr_.push_back(std::move(value));
     }
 

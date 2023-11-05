@@ -4,6 +4,7 @@
 // #define YUJSON_DISABLE_FLOAT
 
 #include <string>
+#include <regex>
 #include <memory>
 #include <initializer_list>
 
@@ -13,8 +14,7 @@
 namespace yuJson {
 class Json : private value::ValuePtr {
 public:
-    friend Json Object(std::initializer_list<Json> json_list);
-    friend Json Array(std::initializer_list<Json> json_list);
+    using Base = value::ValuePtr;
 
 public:
     class Iterator {
@@ -63,9 +63,6 @@ public:
                 }
                 else if (base_->IsArray()) {
                     Destroy(&arr_iter_);
-                }
-                else {
-                    throw value::ValueTypeError("Non container types cannot iterate");
                 }
             }
         }
@@ -151,6 +148,28 @@ public:
     };
 
 public:
+    static Json Parse(const std::string& json_text) {
+        compiler::Lexer lexer(json_text);
+        compiler::Parser parser(&lexer);
+        return Json(parser.ParseValue());
+    }
+    static Json Object(std::initializer_list<Json> json_list = {}) {
+        Json json{ std::make_unique<value::ObjectValue>() };
+        for (auto iter = json_list.begin(); iter != json_list.end(); iter++, iter++) {
+            std::string key = (*iter)->ToString().Get();
+            json->ToObject().Set(key, std::move(static_cast<value::ValuePtr&>(*(const_cast<Json*>(iter) + 1))));
+        }
+        return json;
+    }
+    static Json Array(std::initializer_list<Json> json_list = {}) {
+        Json json{ std::make_unique<value::ArrayValue>() };
+        for (auto iter = json_list.begin(); iter != json_list.end(); iter++) {
+            json->ToArray().PushBack(std::move(static_cast<value::ValuePtr&>(const_cast<Json&>(*iter))));
+        }
+        return json;
+    }
+
+public:
     Json() noexcept { }
     explicit Json(value::ValuePtr value) noexcept : value::ValuePtr{ std::move(value) } { }
     Json(Json&& json) noexcept : value::ValuePtr{ std::move(json) } { }
@@ -194,69 +213,69 @@ public:
     }
 
     Json& operator[](const char* str) {
-        return *static_cast<Json*>(&((*this)->ToObject()[str]));
+        return static_cast<Json&>(GetValue().ToObject()[str]);
     }
 
     Json& operator[](int index) {
-        return *static_cast<Json*>(&((*this)->ToArray()[index]));
+        return static_cast<Json&>(GetValue().ToArray()[index]);
     }
 
-    Json& at(const char* str) {
-        return *static_cast<Json*>(&((*this)->ToObject().At(str)));
+    Json& at(const char* key) {
+        return static_cast<Json&>(GetValue().ToObject().At(key));
     }
 
     Json& at(int index) {
-        return *static_cast<Json*>(&((*this)->ToArray().At(index)));
+        return static_cast<Json&>(GetValue().ToArray().At(index));
     }
 
     void push_back(Json&& val) {
-        (*this)->ToArray().Pushback(std::move(val));
+        GetValue().ToArray().PushBack(std::move(val));
     }
 
     bool operator==(const Json& other) const {
-        if ((*this)->Type() != other->Type()) {
+        if (GetValue().Type() != other->Type()) {
             return false;
         }
-        switch ((*this)->Type()) {
+        switch (GetValue().Type()) {
         case value::ValueType::kNull:
             return true;
         case value::ValueType::kBoolean:
-            return (*this)->ToBoolean().Get() == other->ToBoolean().Get();
+            return GetValue().ToBoolean().Get() == other->ToBoolean().Get();
         case value::ValueType::kNumberInt:
-            return (*this)->ToNumberInt().Get() == other->ToNumberInt().Get();
+            return GetValue().ToNumberInt().Get() == other->ToNumberInt().Get();
 #ifndef YUJSON_DISABLE_FLOAT
         case value::ValueType::kNumberFloat:
-            return (*this)->ToNumberFloat().Get() == other->ToNumberFloat().Get();
+            return GetValue().ToNumberFloat().Get() == other->ToNumberFloat().Get();
 #endif
         case value::ValueType::kString:
-            return (*this)->ToString().Get() == other->ToString().Get();
+            return GetValue().ToString().Get() == other->ToString().Get();
         default:
             return false;
         }
     }
 
     Iterator begin() {
-        return Iterator(this);
+        return Iterator{ this };
     }
 
     Iterator end() {
-        return Iterator(nullptr);
+        return Iterator{ nullptr };
     }
 
-    Iterator find(const char* str) {
-        auto map_iter = (*this)->ToObject().GetMap().find(str);
-        if (map_iter == (*this)->ToObject().GetMap().end()) {
+    Iterator find(const char* key) {
+        auto map_iter = GetValue().ToObject().GetMap().find(key);
+        if (map_iter == GetValue().ToObject().GetMap().end()) {
             return Iterator{ nullptr };
         }
         return Iterator{ this, map_iter };
     }
 
-    size_t size() const noexcept {
+    size_t size() const {
         if (IsArray()) {
-            return (*this)->ToArray().GetVector().size();
+            return GetValue().ToArray().GetVector().size();
         }
         else if (IsObject()) {
-            return (*this)->ToObject().GetMap().size();
+            return GetValue().ToObject().GetMap().size();
         }
         else if (IsString()) {
             return String().size();
@@ -264,6 +283,15 @@ public:
         else {
             throw value::ValueTypeError("Unable to view the type of size");
         }
+    }
+
+    bool erase(const char* key) {
+        return GetValue().ToObject().GetMap().erase(key) != 0;
+    }
+
+    Iterator erase(const Iterator& iter) {
+        auto new_iter = GetValue().ToObject().GetMap().erase(iter.obj_iter_);
+        return Iterator{ this , new_iter };
     }
 
     bool IsValid() const noexcept {
@@ -281,123 +309,123 @@ public:
 
     bool IsNull() const noexcept {
         if (!IsValid()) return false;
-        return (*this)->IsNull();
+        return GetValue().IsNull();
     }
 
     bool IsBoolean() const noexcept {
         if (!IsValid()) return false;
-        return (*this)->IsBoolean();
+        return GetValue().IsBoolean();
     }
 
-    bool& Boolean() const noexcept {
-        return (*this)->ToBoolean().Get();
+    bool Boolean() const noexcept {
+        return GetValue().ToBoolean().Get();
     }
 
     bool IsNumber() const noexcept {
         if (!IsValid()) return false;
-        return (*this)->IsNumberInt() || (*this)->IsNumberFloat();
+        return GetValue().IsNumberInt() || GetValue().IsNumberFloat();
     }
 
-    long long& Int() const noexcept {
-        return (*this)->ToNumberInt().Get();
+    int64_t Int() const noexcept {
+        return GetValue().ToNumberInt().Get();
     }
 #ifndef YUJSON_DISABLE_FLOAT
-    double& Float() const noexcept {
-        return (*this)->ToNumberFloat().Get();
+    double Float() const noexcept {
+        return GetValue().ToNumberFloat().Get();
     }
 #endif
 
     bool IsString() const noexcept {
         if (!IsValid()) return false;
-        return (*this)->IsString();
+        return GetValue().IsString();
     }
 
-    std::string& String() const noexcept {
-        return (*this)->ToString().Get();
+    std::string String() const noexcept {
+        return GetValue().ToString().Get();
     }
 
     bool IsArray() const noexcept {
         if (!IsValid()) return false;
-        return (*this)->IsArray();
+        return GetValue().IsArray();
     }
 
     bool IsObject() const noexcept {
         if (!IsValid()) return false;
-        return (*this)->IsObject();
+        return GetValue().IsObject();
     }
 
 
-    long long ConvertToInt(long long defalut = 0) const {
-        if (!IsValid()) return defalut;
-        switch ((*this)->Type()) {
+    int64_t ConvertToInt(int64_t defalut_int = 0) const {
+        if (!IsValid()) return defalut_int;
+        switch (GetValue().Type()) {
         case value::ValueType::kNumberInt: {
-            return (*this)->GetNumberInt().Get();
+            return GetValue().GetNumberInt().Get();
         }
 #ifndef YUJSON_DISABLE_FLOAT
         case value::ValueType::kNumberFloat:
-            return (*this)->ToNumberFloat().Get();
+            return static_cast<int64_t>(GetValue().ToNumberFloat().Get());
 #endif                   
         case value::ValueType::kString: {
-            auto& str = (*this)->GetString().Get();
+            auto& str = GetValue().GetString().Get();
             if (str.empty() || str[0] < '0' && str[0] > '9') return 0;
             return std::stoll(str);
         }
         case value::ValueType::kNull: {
-            return defalut;
+            return defalut_int;
         }
         case value::ValueType::kBoolean: {
-            return (*this)->GetBoolean().Get() ? 1 : 0;
+            return GetValue().GetBoolean().Get() ? 1 : 0;
         }
-        defalut: {
+        default: {
             throw value::ValueTypeError("Object and Array cannot be converted to Int");
         }
         }
     }
 
 #ifndef YUJSON_DISABLE_FLOAT
-    double ConvertToFloat(double defalut = 0.0) {
-        if (!IsValid()) return defalut;
-        switch ((*this)->Type()) {
+    double ConvertToFloat(double default_float = 0.0) {
+        if (!IsValid()) return default_float;
+        switch (GetValue().Type()) {
         case value::ValueType::kNumberInt: {
-            return (*this)->GetNumberInt().Get();
+            return static_cast<double>(GetValue().GetNumberInt().Get());
         }
         case value::ValueType::kNumberFloat:
-            return (*this)->ToNumberFloat().Get();             
+            return GetValue().ToNumberFloat().Get();             
         case value::ValueType::kString: {
-            auto& str = (*this)->GetString().Get();
+            auto& str = GetValue().GetString().Get();
             if (str.empty() || str[0] < '0' && str[0] > '9') return 0;
             return std::stod(str);
         }
         case value::ValueType::kNull: {
-            return defalut;
+            return default_float;
         }
-        defalut: {
+        default: {
             throw value::ValueTypeError("Object and Array cannot be converted to Float");
         }
         }
     }
 #endif
 
-    std::string ConvertToString(std::string defalut = "") const {
-        if (!IsValid()) return defalut;
-        switch ((*this)->Type()) {
+    std::string ConvertToString(std::string default_str = "") const {
+        if (!IsValid()) return default_str;
+        switch (GetValue().Type()) {
         case value::ValueType::kNumberInt: {
-            return std::to_string((*this)->GetNumberInt().Get());
+            return std::to_string(GetValue().GetNumberInt().Get());
         }
 #ifndef YUJSON_DISABLE_FLOAT
         case value::ValueType::kNumberFloat:
-            return std::to_string((*this)->ToNumberFloat().Get());
+            return std::to_string(GetValue().ToNumberFloat().Get());
 #endif    
         case value::ValueType::kString: {
-            return (*this)->GetString().Get().c_str();
+            return GetValue().GetString().Get().c_str();
         }
         case value::ValueType::kNull: {
-            return defalut;
+            return default_str;
         }
         case value::ValueType::kBoolean: {
-            return (*this)->GetBoolean().Get() ? "true" : "false";
+            return GetValue().GetBoolean().Get() ? "true" : "false";
         }
-        defalut: {
+        default: {
             throw value::ValueTypeError("Object and Array cannot be converted to String");
         }
         }
@@ -409,33 +437,54 @@ private:
         return *static_cast<T*>(this->get());
     }
 
-private:
-    static std::string Replace(const std::string& str, const std::string& replace, const std::string& target) {
-        auto new_str = str;
-        size_t pos = 0;
-        pos = new_str.find(replace);
-        while (pos != -1) {
-            new_str = new_str.replace(pos, replace.size(), target.c_str());
-            pos = new_str.find(replace, pos + target.size());
-        }
-        return new_str;
+    value::ValueInterface& GetValue() const {
+        return **this;
     }
 
-    void StrEscapr(std::string* str) const {
-        // 引号添加\转义，一个\修改为两个\\ 
-        *str = Replace(*str, R"(\)", R"(\\)");
-        *str = Replace(*str, R"(")", R"(\")");
-        *str = Replace(*str, R"(/)", R"(\/)");
-        *str = Replace(*str, "\b", R"(\b)");
-        *str = Replace(*str, "\r", R"(\r)");
-        *str = Replace(*str, "\n", R"(\n)");
-        *str = Replace(*str, "\t", R"(\t)");
+private:
+    std::string StrEscape(const std::string& str) const {
+        std::string new_str;
+        bool escape = false;
+        for (auto c : str) {
+            if (escape) {
+                escape = false;
+                new_str += '\\';
+                if (c != '\\') {
+                    new_str += c;
+                }
+            }
+            else if (c == '\\') {
+                escape = true;
+            }
+            else if (c == '"') {
+                new_str += R"(\")";
+            }
+            else if (c == '/') {
+                new_str += R"(\/")";
+            }
+            else if (c == '\b') {
+                new_str += R"(\b)";
+            }
+            else if (c == '\r') {
+                new_str += R"(\r)";
+            }
+            else if (c == '\n') {
+                new_str += R"(\n)";
+            }
+            else if (c == '\t') {
+                new_str += R"(\t)";
+            }
+            else {
+                new_str += c;
+            }
+        }
+        return new_str;
     }
 
     void Print(value::ValueInterface* value, bool format, size_t level, std::string* jsonStr) const {
         std::string indent;
         if (format) {
-            indent = std::string(level * kIndent, '    ');
+            indent = std::string(level * kIndent, ' ');
         }
 
         switch (value->Type()) {
@@ -444,35 +493,32 @@ private:
             break;
         }
         case value::ValueType::kBoolean: {
-            *jsonStr += static_cast<value::BooleanValue*>(value)->Get() ? "true" : "false";
+            *jsonStr += value->GetBoolean().Get() ? "true" : "false";
             break;
         }
         case value::ValueType::kNumberInt: {
-            //char str[64];
-            //sprintf(str, "%lld", );
-            auto str = std::to_string(static_cast<value::NumberIntValue*>(value)->Get());
+            auto str = std::to_string(value->GetNumberInt().Get());
             *jsonStr += str;
             break;
-        }
+        }value->GetNumberInt();
 #ifndef YUJSON_DISABLE_FLOAT
         case value::ValueType::kNumberFloat: {
-            auto str = std::to_string(static_cast<value::NumberFloatValue*>(value)->Get());
+            auto str = std::to_string(value->GetNumberFloat().Get());
             *jsonStr += str;
             break;
         }
 #endif 
         case value::ValueType::kString: {
-            auto str = static_cast<value::StringValue*>(value)->Get();
-            StrEscapr(&str);
+            auto str = StrEscape(value->GetString().Get());
             *jsonStr += "\"" + str + "\"";
             break;
         }
         case value::ValueType::kArray: {
             *jsonStr += '[';
             if (format) {
-                indent += std::string(kIndent, '    ');
+                indent += std::string(kIndent, ' ');
             }
-            const auto& arr = static_cast<value::ArrayValue*>(value)->GetVector();
+            const auto& arr = value->GetArray().GetVector();
             for (int i = 0; i < arr.size(); ) {
                 if (format) {
                     *jsonStr += '\n' + indent;
@@ -494,17 +540,16 @@ private:
         case value::ValueType::kObject: {
             *jsonStr += '{';
             if (format) {
-                indent += std::string(kIndent, '    ');
+                indent += std::string(kIndent, ' ');
             }
 
-            const auto& obj = static_cast<value::ObjectValue*>(value)->GetMap();
+            const auto& obj = value->GetObject().GetMap();
             int i = 0;
             for (const auto& it : obj) {
                 if (format) {
                     *jsonStr += '\n' + indent;
                 }
-                auto key = it.first;
-                StrEscapr(&key);
+                auto key = StrEscape(it.first);
                 *jsonStr += '\"' + key + "\":";
 
                 Print(it.second.get(), format, level + 1, jsonStr);
@@ -526,30 +571,8 @@ private:
     }
 
 private:
-    static constexpr int kIndent = 4;
+    static constexpr size_t kIndent = 4;
 };
-
-static inline Json Parse(const std::string& json_text) {
-    compiler::Lexer lexer(json_text);
-    compiler::Parser parser(&lexer);
-    return Json(parser.ParseValue());
-}
-
-static inline Json Object(std::initializer_list<Json> json_list = {}) {
-    Json json{ std::make_unique<value::ObjectValue>() };
-    for (auto iter = json_list.begin(); iter != json_list.end(); iter++, iter++) {
-        std::string key = (*iter)->ToString().Get();
-        json->ToObject().Set(key, std::move(static_cast<value::ValuePtr&>(*(const_cast<Json*>(iter) + 1))));
-    }
-    return json;
-}
-static inline Json Array(std::initializer_list<Json> json_list = {}) {
-    Json json{ std::make_unique<value::ArrayValue>() };
-    for (auto iter = json_list.begin(); iter != json_list.end(); iter++) {
-        json->ToArray().Pushback(std::move(static_cast<value::ValuePtr&>(const_cast<Json&>(*iter))));
-    }
-    return json;
-}
 
 } // namespace yuJson
 

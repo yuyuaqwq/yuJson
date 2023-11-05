@@ -3,7 +3,7 @@ C++ Json
 
 # 特性
 - header-only
-- 精致小巧，接口友好
+- 仅 `1k+` 代码行，适合学习
 
 # 快速入门
 ``` C++
@@ -13,7 +13,7 @@ C++ Json
 
 int main() {
 	// Parse
-	auto json_parse = yuJson::Parse(R"({"key":["arr_ele", 1, "abc", {"efg":"string", "emmm":true}]})");
+	auto json_parse = yuJson::Json::Parse(R"({"key":["arr_ele", 1, "abc", {"efg":"string", "emmm":true}]})");
 	std::cout << json_parse.Print(true) << std::endl << std::endl;
 
 	// Dump

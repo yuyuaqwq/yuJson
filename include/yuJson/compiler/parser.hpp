@@ -72,7 +72,7 @@ private:
             lexer_->NextToken(nullptr);
             return array;
         }
-        array->Pushback(ParseValue());
+        array->PushBack(ParseValue());
         do {
             Token token;
             if (!lexer_->LookAhead(&token)) {
@@ -82,7 +82,7 @@ private:
                 break;
             }
             lexer_->NextToken(nullptr);
-            array->Pushback(ParseValue());
+            array->PushBack(ParseValue());
 
         } while (true);
         if (!lexer_->MatchToken(TokenType::kRbrack)) {

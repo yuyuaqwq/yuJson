@@ -1,7 +1,7 @@
 #ifndef YUJSON_VALUE_VALUE_HPP_
 #define YUJSON_VALUE_VALUE_HPP_
 
-#include <exception>
+#include <stdexcept>
 
 namespace yuJson {
 namespace value {
@@ -16,11 +16,11 @@ enum class ValueType {
     kObject
 };
 
-class ValueTypeError : public std::exception {
+class ValueTypeError : public std::runtime_error {
 public:
-    ValueTypeError(const char* message) : std::exception(message) {
-
-    }
+    using Base = std::runtime_error;
+public:
+    using Base::Base;
 };
 
 class NullValue;
@@ -112,7 +112,7 @@ public:
         if (!IsArray()) {
             throw ValueTypeError("Not Array data");
         }
-        return *reinterpret_cast<ArrayValue*>(this);
+        return GetArray();
     }
 
     bool IsObject() const noexcept {
@@ -123,26 +123,34 @@ public:
         if (!IsObject()) {
             throw ValueTypeError("Not Object data");
         }
-        return *reinterpret_cast<ObjectValue*>(this);
+        return GetObject();
     }
 
 
     BooleanValue& GetBoolean() {
-        return *reinterpret_cast<BooleanValue*>(this);
+        return reinterpret_cast<BooleanValue&>(*this);
     }
 
     NumberIntValue& GetNumberInt() {
-        return *reinterpret_cast<NumberIntValue*>(this);
+        return reinterpret_cast<NumberIntValue&>(*this);
     }
 
 #ifndef YUJSON_DISABLE_FLOAT
     NumberFloatValue& GetNumberFloat() {
-        return *reinterpret_cast<NumberFloatValue*>(this);
+        return reinterpret_cast<NumberFloatValue&>(*this);
     }
 #endif
 
     StringValue& GetString() {
-        return *reinterpret_cast<StringValue*>(this);
+        return reinterpret_cast<StringValue&>(*this);
+    }
+
+    ArrayValue& GetArray() {
+        return reinterpret_cast<ArrayValue&>(*this);
+    }
+
+    ObjectValue& GetObject() {
+        return reinterpret_cast<ObjectValue&>(*this);
     }
 
 };
